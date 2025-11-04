@@ -2,3 +2,4 @@
 
 ## Auteurs
 - Chad Vézina
+- Camille Breau
