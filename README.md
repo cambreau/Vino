@@ -1,1 +1,4 @@
 # Vino
+
+## Auteurs
+- Chad Vézina
