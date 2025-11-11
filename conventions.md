@@ -4,9 +4,9 @@
 
 ## 1. Stack et philosophie générale
 
-- **Front-end** : React + Vite, JSX, React Router, Tailwind CSS.
+- **Front-end** : React JSX+ Rolldown Vite, React Router, Tailwind CSS.
 - **Back-end** : Node.js + Express exposant une API REST/JSON.
-- **Langage** : JavaScript moderne (ES2020+), `type="module"` côté Node.
+- **Langage** : JavaScript moderne (ES2025), `type="module"` côté Node.
 - **Outillage** : npm, ESLint, Prettier, Git.
 
 Objectifs principaux : code prévisible, structure stable, séparation claire des responsabilités.
@@ -19,7 +19,7 @@ Objectifs principaux : code prévisible, structure stable, séparation claire de
 
 ```text
 .
-├── client/                 # Frontend React + Vite
+├── frontend/                 # Frontend React + Vite
 │   ├── index.html
 │   ├── vite.config.js
 │   ├── package.json
@@ -35,10 +35,10 @@ Objectifs principaux : code prévisible, structure stable, séparation claire de
 │       ├── styles/
 │       ├── assets/
 │       └── config/
-└── server/                 # Backend Node + Express
+└── backend/                 # Backend Node + Express
     ├── package.json
     └── src/
-        ├── index.js
+        ├── server.js
         ├── app.js
         ├── config/
         ├── routes/
@@ -51,9 +51,9 @@ Objectifs principaux : code prévisible, structure stable, séparation claire de
 
 ### 2.2. Règles de structure
 
-- Langue utilisée pour coder : anglais.
+- Langue utilisée pour coder : Français.
 - Commentaire en français.
-- **Pas de logique métier dans `index.js` / `main.jsx`**.
+- **Pas de logique métier dans `server.js` / `main.jsx`**.
 - Un dossier par **feature** côté front (`features/auth`, `features/cart`, etc.).
 - Un dossier par **ressource métier** côté back (`user`, `order`, etc.).
 
@@ -100,7 +100,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
-import "./styles/index.css";
+import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -142,8 +142,8 @@ export default UserCard;
 #### Règles de base
 
 - Composant **pur** autant que possible :
-  > Favoriser les fonctions et composants **purs**, sans effets secondaires implicites.  
-  > **Éviter les mutations** de données ou d’objets partagés.  
+  > Favoriser les fonctions et composants **purs**, sans effets secondaires implicites.
+  > **Éviter les mutations** de données ou d’objets partagés.
   > Une fonction pure est prévisible, testable et ne dépend que de ses entrées.
 
 #### Exemples en JavaScript
@@ -202,16 +202,19 @@ function updateUser(user, newName) {
 - Compatible avec les principes de React
 
 - Nommer chaque prop de manière explicite et cohérente avec la logique du composant. Pas de « prop bag » ambigu (`props` brut).
+
+  ```jsx
   // ❌ À éviter
   function MonComposant(props) {
-  const { title, ...rest } = props;
-  return <Header {...rest} />;
+    const { title, ...rest } = props;
+    return <Header {...rest} />;
   }
 
   // ✅ Préféré
   function MonComposant({ pageTitle, onBackClick }) {
-  return <Header title={pageTitle} onBack={onBackClick} />;
+    return <Header title={pageTitle} onBack={onBackClick} />;
   }
+  ```
 
 - Préférer la composition à la logique conditionnelle gigantesque.
 
@@ -343,12 +346,21 @@ export function Button({ variant = "default", className, ...props }) {
 - Éviter de mélanger Tailwind et CSS custom pour le même composant sauf si nécessaire.
 
 ```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import tailwindcss
 
-:root {
-  color-scheme: dark light;
+/*Voir documentation Tailwind: https://tailwindcss.com/docs/adding-custom-styles*/
+
+@theme {
+  --font-display: "Satoshi", "sans-serif";
+  --breakpoint-3xl: 120rem;
+  --color-avocado-100: oklch(0.99 0 0);
+  --color-avocado-200: oklch(0.98 0.04 113.22);
+  --color-avocado-300: oklch(0.94 0.11 115.03);
+  --color-avocado-400: oklch(0.92 0.19 114.08);
+  --color-avocado-500: oklch(0.84 0.18 117.33);
+  --color-avocado-600: oklch(0.53 0.12 118.34);
+  --ease-fluid: cubic-bezier(0.3, 0, 0, 1);
+  --ease-snappy: cubic-bezier(0.2, 0, 0, 1);
 }
 ```
 
@@ -358,7 +370,7 @@ export function Button({ variant = "default", className, ...props }) {
 
 ### 6.1. Entry point
 
-`src/index.js` doit uniquement démarrer le serveur :
+`src/server.js` doit uniquement démarrer le serveur :
 
 ```js
 import { createServer } from "http";
@@ -507,12 +519,12 @@ Exemples :
 ```bash
 # server/.env
 NODE_ENV=development
-PORT=4000
+PORT=3000
 DATABASE_URL=mysql://user:pass@localhost:3306/app_db
 JWT_SECRET=change-me
 
 # client/.env
-VITE_API_URL=http://localhost:4000/api
+VITE_API_URL=http://localhost:3000/api
 ```
 
 ### 8.2. Accès aux variables
@@ -526,60 +538,28 @@ VITE_API_URL=http://localhost:4000/api
 
 ### 9.1. ESLint
 
-Installer un preset React moderne (par ex. `eslint-config-react-app` ou équivalent) et l’adapter.
+Installer extension ESLint sur VSCode.
 
 Principes :
 
-- Interdire `any` implicite si TypeScript (optionnel).
 - Pas de variables non utilisées.
 - Hooks : respecter les règles (`react-hooks/rules-of-hooks`, `react-hooks/exhaustive-deps`).
 
 ### 9.2. Prettier
 
 - Un seul formateur de code dans le projet.
-- Préférer l’exécution via script npm : `npm run format`.
-
-Exemple de scripts :
-
-```json
-{
-  "scripts": {
-    "lint": "eslint src --ext .js,.jsx",
-    "format": "prettier --write ."
-  }
-}
-```
 
 ---
 
-## 10. Tests
+## 10. Performance et accessibilité
 
-### 10.1. Frontend
-
-- Utiliser Vitest + React Testing Library.
-- Convention de fichiers : `ComponentName.test.jsx` à côté du composant ou dans `__tests__/`.
-
-```bash
-npm install -D vitest @testing-library/react @testing-library/jest-dom
-```
-
-### 10.2. Backend
-
-- Jest ou Vitest.
-- Tester les services et la logique métier en priorité.
-- Tests d’intégration sur les routes critiques.
-
----
-
-## 11. Performance et accessibilité
-
-### 11.1. Performance
+### 10.1. Performance
 
 - `React.lazy` + `Suspense` pour le code-splitting des pages.
 - Mémoïsation ciblée (`useMemo`, `useCallback`) uniquement quand nécessaire.
 - Éviter de recréer des fonctions dans le JSX quand elles seront passées profondément.
 
-### 11.2. Accessibilité
+### 10.2. Accessibilité
 
 - Utiliser des balises sémantiques (`header`, `main`, `nav`, `footer`).
 - Toujours fournir `alt` sur les images.
@@ -588,9 +568,9 @@ npm install -D vitest @testing-library/react @testing-library/jest-dom
 
 ---
 
-## 12. Scripts npm usuels
+## 11. Scripts npm usuels
 
-### 12.1. Client
+### 11.1. Client
 
 ```json
 {
@@ -605,13 +585,13 @@ npm install -D vitest @testing-library/react @testing-library/jest-dom
 }
 ```
 
-### 12.2. Server
+### 11.2. Server
 
 ```json
 {
   "scripts": {
-    "dev": "NODE_ENV=development nodemon src/index.js",
-    "start": "NODE_ENV=production node src/index.js",
+    "dev": "NODE_ENV=development nodemon src/server.js",
+    "start": "NODE_ENV=production node src/server.js",
     "lint": "eslint src --ext .js",
     "test": "vitest",
     "format": "prettier --write ."
@@ -621,34 +601,10 @@ npm install -D vitest @testing-library/react @testing-library/jest-dom
 
 ---
 
-## 13. Git et conventions de commit
+## 12. Git et conventions de commit
 
-- Unité de commit = une fonctionnalité ou un changement cohérent.
-- Messages de commit courts et explicites :
-
-  - Option 1 : phrases simples, en français ou en anglais, à l’impératif.
-  - Option 2 : **Conventional Commits** (`feat:`, `fix:`, `chore:`, etc.).
-
-Exemples :
-
-```text
-feat: add user authentication flow
-fix: correct cart total calculation
-chore: configure eslint and prettier
-refactor: extract api client
-```
+- Une fontionnalité est égale à une branche
+- Ne JAMAIS travailler directement sur la branche main
+- Toujours faire une Pull request et attendre l'avis du "Reviewer" avant de merge
 
 ---
-
-## 14. Checklist de démarrage pour un nouveau projet
-
-1. Initialiser Git, `.gitignore` propre pour Node + Vite.
-2. Créer `client` + `server` avec `npm init` et Vite (`npm create vite@latest`).
-3. Installer Tailwind et le configurer (`tailwind.config.js`, `postcss.config.js`).
-4. Installer ESLint + Prettier + configurations de base.
-5. Mettre en place la structure de dossiers standard.
-6. Créer une route API simple (`GET /health`) côté back.
-7. Connecter le front à cette route avec un `useFetch` ou équivalent.
-8. Ajouter un test minimal front + back.
-9. Configurer les scripts npm (`dev`, `build`, `start`, `lint`, `test`, `format`).
-10. Documenter dans un `README.md` la stack, les scripts et les variables d’environnement.
