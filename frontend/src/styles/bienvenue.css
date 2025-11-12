@@ -1,0 +1,60 @@
+@layer components {
+  /* Section Bienvenue (Hero) */
+  .bienvenue-hero {
+    background: url("../assets/images/heroBienvenue.webp") center/cover no-repeat;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: var(--rythme-espace) var(--rythme-base);
+  }
+
+  /* Conteneur principal */
+  .bienvenue-contenu {
+    padding: var(--rythme-base);
+    color: var(--couleur-texte);
+    text-align: center;
+  }
+
+  /* Conteneur max largeur */
+  .conteneur-max-md {
+    width: 100%;
+    max-width: 28rem;
+  }
+
+  /* Section texte bienvenue */
+  .texte-bienvenue {
+    text-align: center;
+    color: var(--couleur-primaire-premier-plan);
+    margin-bottom: var(--rythme-espace);
+  }
+
+  /* Sous-titre */
+  .sous-titre-bienvenue {
+    font-size: var(--taille-police-petit);
+    margin-bottom: var(--rythme-tres-serre);
+    opacity: 0.95;
+  }
+
+  /* Titre principal */
+  .titre-bienvenue {
+    font-size: var(--taille-police-tres-gros);
+    font-weight: var(--epaisseur-police-tres-gras);
+    color: var(--couleur-primaire-premier-plan);
+    margin-bottom: calc(var(--rythme-base) * 3);
+    font-family: var(--font-display);
+  }
+
+  /* Conteneur des boutons */
+  .conteneur-boutons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--rythme-base);
+  }
+
+  /* Lien block centré */
+  .lien-bloc-centre {
+    display: block;
+    text-align: center;
+  }
+}

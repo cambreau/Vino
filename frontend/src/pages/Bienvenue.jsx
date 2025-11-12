@@ -1,31 +1,32 @@
 import { Link } from "react-router-dom";
+import "../styles/bienvenue.css";
 
-function Bienvenue() {
+const Bienvenue = () => {
   return (
-    <div className="hero-welcome flex items-end justify-center py-10 px-5">
-      <div className="w-full max-w-md">
+    <div className="bienvenue-hero">
+      <div className="conteneur-max-md">
         {/* Texte de bienvenue */}
-        <div className="text-center text-primary-foreground mb-8">
-          <p className="text-sm mb-1 opacity-95">
-            Votre cave personnelle, organisée
+        <div className="texte-bienvenue">
+          <p className="sous-titre-bienvenue">
+            Votre cave personnelle, organisée <br />
+            comme vous le souhaitez
           </p>
-          <p className="text-sm mb-8 opacity-95">comme vous le souhaitez</p>
 
-          <h1 className="text-5xl font-bold mb-12">Bienvenue à Vino</h1>
+          <h1 className="titre-bienvenue">Bienvenue à Vino</h1>
         </div>
 
         {/* Boutons d'action */}
-        <div className="space-y-4">
-          <Link to="/" className="btn-primary text-center block">
+        <div className="conteneur-boutons">
+          <Link to="/" className="btn-primaire lien-bloc-centre">
             Créer votre compte
           </Link>
-          <Link to="/connexion" className="btn-secondary text-center block">
+          <Link to="/connexion" className="btn-secondaire lien-bloc-centre">
             Se connecter
           </Link>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Bienvenue;
