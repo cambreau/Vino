@@ -1,1 +1,63 @@
-@import "tailwindcss"
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
+@import "tailwindcss";
+
+@theme {
+  /* Typographie */
+  --font-display: "Playfair Display", "serif";
+  --font-body: "Montserrat", "sans-serif";
+
+  /* Palette de couleurs - Primary */
+  --color-primary-100: #f5dfe5;
+  --color-primary-200: #821250;
+  --color-primary-300: #a8427d;
+  --color-primary-foreground: #fcfcfd;
+
+  /* Palette de couleurs - Background */
+  --color-background: #fcfcfd;
+  --color-background-secondary: #f6ebdc;
+
+  /* Palette de couleurs - Foreground/Text */
+  --color-foreground: #f6ebdc;
+  --color-muted-foreground: #461243;
+
+  /* Palette de couleurs - Alerts */
+  --color-erreur: #a31621;
+  --color-success: #2d5016;
+}
+
+/* Styles de base pour la typographie */
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+  }
+
+  body {
+    font-family: var(--font-body);
+  }
+}
+
+/* Composants */
+@layer components {
+  /* Bouton principal */
+  .btn-primary {
+    @apply bg-[#821250] text-white font-semibold px-8 py-3 rounded-lg transition-all duration-300 cursor-pointer hover:bg-[#A8427D] hover:-translate-y-0.5 w-full;
+  }
+
+  /* Bouton secondaire */
+  .btn-secondary {
+    @apply bg-white text-[#461243] font-semibold px-8 py-3 rounded-lg transition-all duration-300 cursor-pointer hover:bg-[#F6EBDC] hover:-translate-y-0.5 w-full;
+  }
+}
+
+/* Hero avec image de fond */
+.hero-welcome {
+  background: url(../assets/images/heroBienvenue.webp);
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+}
