@@ -1,1 +1,53 @@
-@import "tailwindcss"
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
+@import "tailwindcss";
+
+:root {
+  /* Primary */
+  --color-primary: #821250;
+  --color-primary-dark: #a8427d;
+  --color-rose-pale: #f5dfe5;
+
+  /* Couleurs fond */
+  --color-fond-basique: #fcfcfd;
+  --color-fond-secondaire: #f6ebdc;
+
+  /* Couleurs texte */
+  --color-sombre: #461243;
+  --color-primemarge: #1f1c1f;
+
+  /* Couleurs d'alerte */
+  --color-error: #a31621;
+  --color-sombre-alert: #2d5016;
+}
+
+@layer components {
+  /* Boutons */
+  .btn-primary {
+    @apply bg-[#821250] text-white font-semibold px-8 py-3 rounded-lg transition-all duration-300 cursor-pointer hover:bg-[#A8427D] hover:-translate-y-0.5 w-full;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-[#461243] font-semibold px-8 py-3 rounded-lg transition-all duration-300 cursor-pointer hover:bg-[#F6EBDC] hover:-translate-y-0.5 w-full;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Playfair Display", serif;
+}
+
+body {
+  font-family: "Montserrat", sans-serif;
+}
+
+/* Background images */
+.hero-welcome {
+  background: url(../assets/images/heroBienvenue.webp);
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+}
