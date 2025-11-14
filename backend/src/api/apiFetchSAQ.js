@@ -152,6 +152,10 @@ const recupererTousVins = async () => {
     return tousProduits;
   }
 
+  if (!premiereReponse.data) {
+    console.error("Erreur: Aucune donnée reçue de l'API");
+    return tousProduits;
+  }
   const premiereDonnees = premiereReponse.data.productSearch;
   if (!premiereDonnees) return tousProduits;
 
