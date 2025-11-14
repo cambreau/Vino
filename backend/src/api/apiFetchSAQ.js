@@ -131,6 +131,9 @@ const recupererTousVins = async () => {
         headers: ENTETES,
         body,
       });
+      if (!res.ok) {
+        return { errors: [{ message: `HTTP error! status: ${res.status}` }] };
+      }
       return res.json();
     } catch (err) {
       // Normaliser l'erreur pour que le reste du code puisse la consommer
