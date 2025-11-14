@@ -216,7 +216,7 @@ const recupererTousVins = async () => {
 
     writeFileSync(
       "saq-cleaned.json",
-      JSON.stringify(nettoyes),
+      JSON.stringify(nettoyes, null, 2),
       "utf8"
     );
     console.log(
