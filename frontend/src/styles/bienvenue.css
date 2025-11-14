@@ -1,7 +1,7 @@
 @layer components {
   /* Section Bienvenue (Hero) */
-  .bienvenue-hero {
-    background: url("../assets/images/heroBienvenue.webp") center/cover no-repeat;
+  .bienvenue {
+    background: linear-gradient(0deg, rgba(0, 0, 0, 1), 25%, rgba(0, 0, 0, 0)), url("../assets/images/heroBienvenue.webp") center/cover no-repeat;
     min-height: 100vh;
     display: flex;
     align-items: flex-end;
@@ -10,51 +10,32 @@
   }
 
   /* Conteneur principal */
-  .bienvenue-contenu {
+  .bienvenue__contenu {
     padding: var(--rythme-base);
     color: var(--couleur-texte);
     text-align: center;
   }
 
-  /* Conteneur max largeur */
-  .conteneur-max-md {
-    width: 100%;
-    max-width: 28rem;
-  }
-
   /* Section texte bienvenue */
-  .texte-bienvenue {
+  .bienvenue__texte {
     text-align: center;
     color: var(--couleur-primaire-premier-plan);
     margin-bottom: var(--rythme-espace);
   }
 
   /* Sous-titre */
-  .sous-titre-bienvenue {
+  .bienvenue__sous-titre {
     font-size: var(--taille-police-petit);
     margin-bottom: var(--rythme-tres-serre);
     opacity: 0.95;
   }
 
   /* Titre principal */
-  .titre-bienvenue {
+  .bienvenue__titre {
     font-size: var(--taille-police-tres-gros);
     font-weight: var(--epaisseur-police-tres-gras);
     color: var(--couleur-primaire-premier-plan);
     margin-bottom: calc(var(--rythme-base) * 3);
     font-family: var(--font-display);
-  }
-
-  /* Conteneur des boutons */
-  .conteneur-boutons {
-    display: flex;
-    flex-direction: column;
-    gap: var(--rythme-base);
-  }
-
-  /* Lien block centré */
-  .lien-bloc-centre {
-    display: block;
-    text-align: center;
   }
 }

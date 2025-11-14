@@ -3,29 +3,30 @@ import "../styles/bienvenue.css";
 
 const Bienvenue = () => {
   return (
-    <div className="bienvenue-hero">
-      <div className="conteneur-max-md">
+    <main className="bienvenue">
+      <section className="conteneur-max-md">
+
         {/* Texte de bienvenue */}
-        <div className="texte-bienvenue">
-          <p className="sous-titre-bienvenue">
+        <header className="bienvenue__texte">
+          <p className="bienvenue__sousTitre">
             Votre cave personnelle, organisée <br />
             comme vous le souhaitez
           </p>
 
-          <h1 className="titre-bienvenue">Bienvenue à Vino</h1>
-        </div>
+          <h1>Bienvenue à Vino</h1>
+        </header>
 
         {/* Boutons d'action */}
-        <div className="conteneur-boutons">
-          <Link to="/" className="btn-primaire lien-bloc-centre">
+        <div className="btn__action">
+          <Link to="/" className="btn__primaire block text-center">
             Créer votre compte
           </Link>
-          <Link to="/connexion" className="btn-secondaire lien-bloc-centre">
+          <Link to="/connexion" className="btn__secondaire block text-center">
             Se connecter
           </Link>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 
