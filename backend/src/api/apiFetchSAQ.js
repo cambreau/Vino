@@ -177,6 +177,10 @@ const recupererTousVins = async () => {
         continue;
       }
 
+      if (!json.data) {
+        console.error("Erreur: Aucune donnée reçue pour la page");
+        continue;
+      }
       const data = json.data.productSearch;
       if (data) {
         tousProduits.push(...data.items);
