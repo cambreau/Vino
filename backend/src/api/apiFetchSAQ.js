@@ -1,18 +1,38 @@
 // apiFetchSAQ.js
 // Récupère toutes les bouteilles de vin SAQ via GraphQL et nettoie les attributs inutiles.
 
+// Charger .env local pour les variables SAQ_* si présentes
+import "dotenv/config";
 import { writeFileSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 
-const URL_GRAPHQL = "https://catalog-service.adobe.io/graphql";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const URL_GRAPHQL =
+  process.env.SAQ_API_URL || "https://catalog-service.adobe.io/graphql";
 const ENTETES = {
   "Content-Type": "application/json",
-  "x-api-key": "7a7d7422bd784f2481a047e03a73feaf",
-  "magento-store-code": "main_website_store",
-  "magento-store-view-code": "fr",
-  "magento-website-code": "base",
-  "magento-environment-id": "2ce24571-9db9-4786-84a9-5f129257ccbb",
-  "magento-customer-group": "b6589fc6ab0dc82cf12099d1c2d40ab994e8410c",
+  // Clé API nécessaire pour accéder au catalogue SAQ (si non fournie,
+  // on utilise l'ancienne valeur par défaut pour compatibilité)
+  "x-api-key": process.env.SAQ_API_KEY || "7a7d7422bd784f2481a047e03a73feaf",
+  // Codes magasin / magasin-view / website peuvent varier d'un environnement à l'autre
+  "magento-store-code": process.env.SAQ_STORE_CODE || "main_website_store",
+  "magento-store-view-code": process.env.SAQ_STORE_VIEW_CODE || "fr",
+  "magento-website-code": process.env.SAQ_WEBSITE_CODE || "base",
+  "magento-environment-id":
+    process.env.SAQ_ENV_ID || "2ce24571-9db9-4786-84a9-5f129257ccbb",
+  "magento-customer-group":
+    process.env.SAQ_CUSTOMER_GROUP ||
+    "b6589fc6ab0dc82cf12099d1c2d40ab994e8410c",
 };
+
+if (!process.env.SAQ_API_KEY) {
+  console.warn(
+    "Avertissement: La variable d'environnement SAQ_API_KEY n'est pas définie. Utilisation de la clé par défaut. Cela peut entraîner des erreurs si la clé par défaut est invalide.\n"
+  );
+}
 
 // --- Requête GraphQL ---
 const requete = `
@@ -77,7 +97,7 @@ const filtrerAttributs = (attributes) => {
     "nom_producteur",
   ];
   return attributes.filter((a) => keep.includes(a.name));
-}
+};
 
 // --- Récupération paginée ---
 /**
@@ -91,7 +111,7 @@ const recupererTousVins = async () => {
   const TAILLE_PAGE = 100; // Taille de page recommandée
   const REQUETES_PARALLELES = 10; // Nombre de requêtes parallèles par lot
 
-  console.log("🔍 Démarrage de la récupération des vins SAQ...");
+  console.log("Démarrage de la récupération des vins SAQ...");
 
   /**
    * Récupère une page de résultats depuis le service GraphQL.
@@ -131,6 +151,11 @@ const recupererTousVins = async () => {
         headers: ENTETES,
         body,
       });
+
+      if (!res.ok) {
+        return { errors: [{ message: `Erreur HTTP, status: ${res.status}` }] };
+      }
+
       return res.json();
     } catch (err) {
       // Normaliser l'erreur pour que le reste du code puisse la consommer
@@ -138,8 +163,25 @@ const recupererTousVins = async () => {
     }
   };
 
+  // Wrapper de réessai pour recupererPage avec backoff exponentiel
+  const TENTATIVES_MAX = 3;
+  const DELAI_REESSAI = 1000; // 1 seconde
+
+  const recupererPageAvecRetry = async (pageNum, tentatives = 0) => {
+    const resultat = await recupererPage(pageNum);
+
+    if (resultat.errors && tentatives < TENTATIVES_MAX) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, DELAI_REESSAI * Math.pow(2, tentatives))
+      );
+      return recupererPageAvecRetry(pageNum, tentatives + 1);
+    }
+
+    return resultat;
+  };
+
   // Première requête pour obtenir le nombre total de pages
-  const premiereReponse = await recupererPage(1);
+  const premiereReponse = await recupererPageAvecRetry(1);
 
   if (premiereReponse.errors) {
     console.error(
@@ -149,13 +191,18 @@ const recupererTousVins = async () => {
     return tousProduits;
   }
 
+  if (!premiereReponse.data) {
+    console.error("Erreur: Aucune donnée reçue de l'API");
+    return tousProduits;
+  }
+
   const premiereDonnees = premiereReponse.data.productSearch;
   if (!premiereDonnees) return tousProduits;
 
   tousProduits.push(...premiereDonnees.items);
   const pagesTotales = premiereDonnees.page_info.total_pages;
 
-  console.log(`✅ Page 1/${pagesTotales} - ${tousProduits.length} vins cumulés`);
+  console.log(`Page 1/${pagesTotales} - ${tousProduits.length} vins cumulés`);
 
   // Récupération des pages restantes en parallèle
   for (let debut = 2; debut <= pagesTotales; debut += REQUETES_PARALLELES) {
@@ -165,7 +212,7 @@ const recupererTousVins = async () => {
       decalage < REQUETES_PARALLELES && debut + decalage <= pagesTotales;
       decalage++
     ) {
-      pagePromises.push(recupererPage(debut + decalage));
+      pagePromises.push(recupererPageAvecRetry(debut + decalage));
     }
 
     const results = await Promise.all(pagePromises);
@@ -177,16 +224,30 @@ const recupererTousVins = async () => {
         continue;
       }
 
+      if (!json.data) {
+        console.error("Erreur: Aucune donnée reçue pour la page");
+        continue;
+      }
+
       const data = json.data.productSearch;
+      if (!data) {
+        console.error(
+          "Erreur: structure 'productSearch' manquante dans la réponse"
+        );
+        continue;
+      }
+
       if (data) {
         tousProduits.push(...data.items);
         console.log(
-          `✅ Page ${debut + idx}/${pagesTotales} - ${tousProduits.length} vins cumulés`
+          `Page ${debut + idx}/${pagesTotales} - ${
+            tousProduits.length
+          } vins cumulés`
         );
       }
     }
   }
-  console.log(`\n🏁 Récupération terminée (${tousProduits.length} produits).`);
+  console.log(`\nRécupération terminée (${tousProduits.length} produits).`);
   return tousProduits;
 };
 
@@ -207,15 +268,12 @@ const recupererTousVins = async () => {
       };
     });
 
-    writeFileSync(
-      "saq-cleaned.json",
-      JSON.stringify(nettoyes),
-      "utf8"
-    );
+    const outputPath = join(__dirname, "..", "..", "data", "saq-cleaned.json");
+    writeFileSync(outputPath, JSON.stringify(nettoyes), "utf8");
     console.log(
-      `\n💾 Fichier exporté : saq-cleaned.json (${nettoyes.length} produits nettoyés)`
+      `\n Fichier exporté : ${outputPath} (${nettoyes.length} produits nettoyés)`
     );
   } catch (err) {
-    console.error("❌ Échec :", err.message || err);
+    console.error("Échec :", err.message || err);
   }
 })();

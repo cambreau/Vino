@@ -1,3 +1,5 @@
+// Charger les variables d'environnement depuis un fichier .env (si présent)
+import 'dotenv/config';
 import express from "express";
 
 const app = express();
