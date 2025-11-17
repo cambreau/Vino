@@ -53,7 +53,7 @@ function Inscription() {
               }}
             />
             {erreurs.email && <p className="erreur">{erreurs.email}</p>}
-            
+
             <FormulaireInput
               type="email"
               nom="confirmationEmail"
@@ -78,7 +78,9 @@ function Inscription() {
                 }
               }}
             />
-            {erreurs.confirmationEmail && <p className="erreur">{erreurs.confirmationEmail}</p>}
+            {erreurs.confirmationEmail && (
+              <p className="erreur">{erreurs.confirmationEmail}</p>
+            )}
 
             <FormulaireInput
               type="text"
@@ -97,10 +99,12 @@ function Inscription() {
                 }
               }}
             />
-             {erreurs.motDePasse && <p className="erreur">{erreurs.motDePasse}</p>}
+            {erreurs.motDePasse && (
+              <p className="erreur">{erreurs.motDePasse}</p>
+            )}
           </>
         }
-        bouton={}
+        bouton={"."}
       />
       <Formulaire />
     </section>
