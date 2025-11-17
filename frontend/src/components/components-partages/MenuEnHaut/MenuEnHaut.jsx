@@ -1,12 +1,11 @@
-function MenuEnHaut({
+import Icon from "../Icon/Icon";
 
-  }) {
-    return (
-      <nav>
-        
-      </nav>
-    );
-  }
-  
-  export default MenuEnHaut;
-  
+function MenuEnHaut({}) {
+  return (
+    <nav>
+      <Icon name="menuHamburger" typeMenu="haut"/>
+    </nav>
+  );
+}
+
+export default MenuEnHaut;
