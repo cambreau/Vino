@@ -35,7 +35,7 @@ app.get("/", (req, res) => {
 // Démarrage du serveur sur le port défini dans .env ou 5252 par défaut
 const PORT = process.env.PORT || 5252;
 app.listen(PORT, () => {
-  console.log(`Server is on http://localhost:${PORT}`);
+  console.log(`Server est sur http://localhost:${PORT}`);
 });
 
 export default app;
