@@ -1,5 +1,7 @@
 function MenuEnBas({}) {
-  return <></>;
+    return <footer>
+      
+  </footer>;
 }
 
 export default MenuEnBas;
