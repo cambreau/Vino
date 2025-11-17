@@ -103,7 +103,7 @@ const query = `
 `;
 
 // Liste des attributs à conserver
-const keepAttributes = [
+const conserverAttributs = [
   "pays_origine",
   "couleur",
   "cepage",
@@ -120,9 +120,9 @@ const keepAttributes = [
 ];
 
 // Fonction pour filtrer les attributs du produit
-const filterAttributes = (attributes) => {
+const filtrerAttributs = (attributes) => {
   if (!Array.isArray(attributes)) return [];
-  return attributes.filter((a) => keepAttributes.includes(a.name));
+  return attributes.filter((a) => conserverAttributs.includes(a.name));
 };
 
 // Fonction pour récupérer tous les vins de la SAQ via l'API GraphQL
@@ -220,11 +220,11 @@ export const recupererTousVins = async () => {
     }
 
     // Attendre que toutes les promesses soient résolues
-    const results = await Promise.all(pagePromises);
+    const resultats = await Promise.all(pagePromises);
 
     // Traiter les résultats
-    for (let idx = 0; idx < results.length; idx++) {
-      const json = results[idx];
+    for (let idx = 0; idx < resultats.length; idx++) {
+      const json = resultats[idx];
       if (json.errors) {
         console.error("Erreur GraphQL:", JSON.stringify(json.errors, null, 2));
         continue;
@@ -251,7 +251,7 @@ export const recupererEtSauvegarder = async (cheminSortie) => {
       sku: vue?.sku,
       name: vue?.name,
       inStock: vue?.inStock,
-      attributes: filterAttributes(vue?.attributes),
+      attributes: filtrerAttributs(vue?.attributes),
       image: article.product?.image?.url,
       price: article.product?.price_range?.minimum_price?.final_price?.value,
     };
