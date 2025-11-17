@@ -1,7 +1,3 @@
-// apiFetchSAQ.js
-// Récupère toutes les bouteilles de vin SAQ via GraphQL et nettoie les attributs inutiles.
-
-// Charger .env local pour les variables SAQ_* si présentes
 import "dotenv/config";
 import { writeFileSync } from "fs";
 import { join, dirname } from "path";
@@ -10,14 +6,13 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+
+// Requête GraphQL pour rechercher des produits
 const URL_GRAPHQL =
   process.env.SAQ_API_URL || "https://catalog-service.adobe.io/graphql";
 const ENTETES = {
   "Content-Type": "application/json",
-  // Clé API nécessaire pour accéder au catalogue SAQ (si non fournie,
-  // on utilise l'ancienne valeur par défaut pour compatibilité)
   "x-api-key": process.env.SAQ_API_KEY || "7a7d7422bd784f2481a047e03a73feaf",
-  // Codes magasin / magasin-view / website peuvent varier d'un environnement à l'autre
   "magento-store-code": process.env.SAQ_STORE_CODE || "main_website_store",
   "magento-store-view-code": process.env.SAQ_STORE_VIEW_CODE || "fr",
   "magento-website-code": process.env.SAQ_WEBSITE_CODE || "base",
@@ -30,12 +25,12 @@ const ENTETES = {
 
 if (!process.env.SAQ_API_KEY) {
   console.warn(
-    "Avertissement: La variable d'environnement SAQ_API_KEY n'est pas définie. Utilisation de la clé par défaut. Cela peut entraîner des erreurs si la clé par défaut est invalide.\n"
+    "Avertissement: La variable d'environnement SAQ_API_KEY n'est pas définie. Utilisation de la clé par défaut."
   );
 }
 
-// --- Requête GraphQL ---
-const requete = `
+// Requête GraphQL pour rechercher des produits
+const query = `
   query productSearch(
     $phrase: String!,
     $page_size: Int,
@@ -72,57 +67,39 @@ const requete = `
   }
 `;
 
-// --- Liste des attributs utiles ---
-/**
- * Filtre les attributs d'un produit et ne conserve que ceux utiles.
- *
- * @param {Array<{name: string, label?: string, value?: any}>} attributes
- * @returns {Array<{name: string, label?: string, value?: any}>} attributs filtrés
- */
-const filtrerAttributs = (attributes) => {
+// Liste des attributs à conserver
+const keepAttributes = [
+  "pays_origine",
+  "couleur",
+  "cepage",
+  "millesime_produit",
+  "pourcentage_alcool_par_volume",
+  "taux_sucre",
+  "pastille_gout",
+  "format_contenant_ml",
+  "region_origine",
+  "designation_reglementee",
+  "identite_produit",
+  "gamme_marketing",
+  "nom_producteur",
+];
+
+// Fonction pour filtrer les attributs du produit
+const filterAttributes = (attributes) => {
   if (!Array.isArray(attributes)) return [];
-  const keep = [
-    "pays_origine",
-    "couleur",
-    "cepage",
-    "millesime_produit",
-    "pourcentage_alcool_par_volume",
-    "taux_sucre",
-    "pastille_gout",
-    "format_contenant_ml",
-    "region_origine",
-    "designation_reglementee",
-    "identite_produit",
-    "gamme_marketing",
-    "nom_producteur",
-  ];
-  return attributes.filter((a) => keep.includes(a.name));
+  return attributes.filter((a) => keepAttributes.includes(a.name));
 };
 
-// --- Récupération paginée ---
-/**
- * Récupère tous les produits (vins) via l'API GraphQL en pagination.
- * Utilise des requêtes parallèles par lot pour accélérer la récupération.
- *
- * @returns {Promise<Array>} tableau des items de produit récupérés (raw)
- */
-const recupererTousVins = async () => {
+// Fonction pour récupérer tous les vins de la SAQ via l'API GraphQL
+export const recupererTousVins = async () => {
   const tousProduits = [];
-  const TAILLE_PAGE = 100; // Taille de page recommandée
-  const REQUETES_PARALLELES = 10; // Nombre de requêtes parallèles par lot
+  const TAILLE_PAGE = 100;
+  const REQUETES_PARALLELES = 10;
 
-  console.log("Démarrage de la récupération des vins SAQ...");
-
-  /**
-   * Récupère une page de résultats depuis le service GraphQL.
-   * Retourne l'objet JSON exposé par l'API ou un objet { errors: [...] } en cas d'échec réseau.
-   *
-   * @param {number} pageNum numéro de page (1-based)
-   * @returns {Promise<object>} réponse JSON de l'API (ou structure d'erreur)
-   */
+  // Fonction pour récupérer une page spécifique
   const recupererPage = async (pageNum) => {
     const body = JSON.stringify({
-      query: requete,
+      query,
       variables: {
         phrase: "",
         page_size: TAILLE_PAGE,
@@ -145,6 +122,7 @@ const recupererTousVins = async () => {
       },
     });
 
+    // Effectuer la requête HTTP
     try {
       const res = await fetch(URL_GRAPHQL, {
         method: "POST",
@@ -152,37 +130,33 @@ const recupererTousVins = async () => {
         body,
       });
 
-      if (!res.ok) {
+      if (!res.ok)
         return { errors: [{ message: `Erreur HTTP, status: ${res.status}` }] };
-      }
-
       return res.json();
     } catch (err) {
-      // Normaliser l'erreur pour que le reste du code puisse la consommer
       return { errors: [{ message: err.message || String(err) }] };
     }
   };
 
-  // Wrapper de réessai pour recupererPage avec backoff exponentiel
   const TENTATIVES_MAX = 3;
-  const DELAI_REESSAI = 1000; // 1 seconde
+  const DELAI_REESSAI = 1000;
 
+  // Fonction pour récupérer une page avec des tentatives de réessai en cas d'erreur
   const recupererPageAvecRetry = async (pageNum, tentatives = 0) => {
     const resultat = await recupererPage(pageNum);
-
     if (resultat.errors && tentatives < TENTATIVES_MAX) {
       await new Promise((resolve) =>
         setTimeout(resolve, DELAI_REESSAI * Math.pow(2, tentatives))
       );
       return recupererPageAvecRetry(pageNum, tentatives + 1);
     }
-
     return resultat;
   };
 
-  // Première requête pour obtenir le nombre total de pages
-  const premiereReponse = await recupererPageAvecRetry(1);
+  console.log("Démarrage de la récupération des vins SAQ...");
 
+  // Récupérer la première page pour obtenir le nombre total de pages
+  const premiereReponse = await recupererPageAvecRetry(1);
   if (premiereReponse.errors) {
     console.error(
       "Erreur GraphQL:",
@@ -191,20 +165,15 @@ const recupererTousVins = async () => {
     return tousProduits;
   }
 
-  if (!premiereReponse.data) {
-    console.error("Erreur: Aucune donnée reçue de l'API");
-    return tousProduits;
-  }
+  // Vérifier si les données sont présentes
+  if (!premiereReponse.data) return tousProduits;
 
+  // Traiter la première page de résultats
   const premiereDonnees = premiereReponse.data.productSearch;
-  if (!premiereDonnees) return tousProduits;
-
   tousProduits.push(...premiereDonnees.items);
   const pagesTotales = premiereDonnees.page_info.total_pages;
 
-  console.log(`Page 1/${pagesTotales} - ${tousProduits.length} vins cumulés`);
-
-  // Récupération des pages restantes en parallèle
+  // Récupérer les pages restantes en parallèle
   for (let debut = 2; debut <= pagesTotales; debut += REQUETES_PARALLELES) {
     const pagePromises = [];
     for (
@@ -215,65 +184,57 @@ const recupererTousVins = async () => {
       pagePromises.push(recupererPageAvecRetry(debut + decalage));
     }
 
+    // Attendre que toutes les promesses soient résolues
     const results = await Promise.all(pagePromises);
 
+    // Traiter les résultats
     for (let idx = 0; idx < results.length; idx++) {
       const json = results[idx];
       if (json.errors) {
         console.error("Erreur GraphQL:", JSON.stringify(json.errors, null, 2));
         continue;
       }
-
       if (!json.data) {
         console.error("Erreur: Aucune donnée reçue pour la page");
         continue;
       }
-
       const data = json.data.productSearch;
-      if (!data) {
-        console.error(
-          "Erreur: structure 'productSearch' manquante dans la réponse"
-        );
-        continue;
-      }
-
-      if (data) {
-        tousProduits.push(...data.items);
-        console.log(
-          `Page ${debut + idx}/${pagesTotales} - ${
-            tousProduits.length
-          } vins cumulés`
-        );
-      }
+      console.log(`Récupéré page ${debut + idx} / ${pagesTotales}`);
+      if (data) tousProduits.push(...data.items);
     }
   }
-  console.log(`\nRécupération terminée (${tousProduits.length} produits).`);
+  console.log(`Récupération terminée (${tousProduits.length} produits).`);
   return tousProduits;
 };
 
-// --- Programme principal ---
-(async () => {
-  try {
-    const tousVins = await recupererTousVins();
+// Fonction pour récupérer et sauvegarder les données nettoyées dans un fichier JSON
+export const fetchAndSave = async (outputPath) => {
+  const tousVins = await recupererTousVins();
+  const nettoyes = tousVins.map((article) => {
+    const vue = article.productView;
+    return {
+      sku: vue?.sku,
+      name: vue?.name,
+      inStock: vue?.inStock,
+      attributes: filterAttributes(vue?.attributes),
+      image: article.product?.image?.url,
+      price: article.product?.price_range?.minimum_price?.final_price?.value,
+    };
+  });
 
-    const nettoyes = tousVins.map((article) => {
-      const vue = article.productView;
-      return {
-        sku: vue?.sku,
-        name: vue?.name,
-        inStock: vue?.inStock,
-        attributes: filtrerAttributs(vue?.attributes),
-        image: article.product?.image?.url,
-        price: article.product?.price_range?.minimum_price?.final_price?.value,
-      };
-    });
-
-    const outputPath = join(__dirname, "..", "..", "data", "saq-cleaned.json");
-    writeFileSync(outputPath, JSON.stringify(nettoyes), "utf8");
-    console.log(
-      `\n Fichier exporté : ${outputPath} (${nettoyes.length} produits nettoyés)`
-    );
-  } catch (err) {
-    console.error("Échec :", err.message || err);
-  }
-})();
+  // Sauvegarde dans un fichier JSON
+  const out =
+    outputPath || join(__dirname, "..", "..", "data", "saq-cleaned.json");
+  writeFileSync(out, JSON.stringify(nettoyes), "utf8");
+  console.log(
+    `Fichier exporté : ${out} (${nettoyes.length} produits nettoyés)`
+  );
+  return nettoyes;
+};
+// Permet d'exécuter ce fichier directement pour récupérer et sauvegarder les données
+if (fileURLToPath(import.meta.url) === process.argv[1]) {
+  fetchAndSave().catch((err) => {
+    console.error("fetchAndSave Error:", err.message || err);
+    process.exit(1);
+  });
+}
