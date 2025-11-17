@@ -4,8 +4,8 @@ import { formatteStringSansAccentEtEspace } from "../../../../lib/utils";
 function FormulaireInput({
   type,
   nom,
-  genre,
-  estObligatoire,
+  genre, //Un ou une
+  estObligatoire, //Required ou non
   onChange,
   value = "",
 }) {
