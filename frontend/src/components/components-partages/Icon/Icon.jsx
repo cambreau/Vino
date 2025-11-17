@@ -5,6 +5,7 @@ import { GiNotebook } from "react-icons/gi"; // Liste
 import { BiSearch } from "react-icons/bi"; // Recherche
 import { FaUser } from "react-icons/fa"; // Profil
 import { TiThMenu } from "react-icons/ti"; // Menu
+import { MdLogout } from "react-icons/md"; // Deconnection
 
 // Objet qui mappe les noms aux icônes
 const icons = {
@@ -14,6 +15,7 @@ const icons = {
   recherche: BiSearch,
   utilisateur: FaUser,
   menuHamburger: TiThMenu,
+  deconnection: MdLogout,
 };
 
 function Icon({ name, size = 24, typeMenu }) {
