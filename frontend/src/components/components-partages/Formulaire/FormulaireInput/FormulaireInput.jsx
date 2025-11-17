@@ -8,6 +8,7 @@ function FormulaireInput({
   estObligatoire, //Required ou non
   onChange,
   value = "",
+  pattern,
 }) {
   return (
     <div>
@@ -19,6 +20,7 @@ function FormulaireInput({
         {...(estObligatoire ? { required: true } : {})}
         placeholder={`Entrez ${genre} ${nom.toLowerCase()}`}
         value={value}
+        pattern={pattern}
         onChange={onChange}
       />
     </div>
