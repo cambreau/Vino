@@ -1,3 +1,6 @@
+import express from "express";
+const router = express.Router();
+
 import {
   creerUtilisateur,
   recupererUtilisateur,
