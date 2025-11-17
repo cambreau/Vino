@@ -6,6 +6,8 @@ import { BiSearch } from "react-icons/bi"; // Recherche
 import { FaUser } from "react-icons/fa"; // Profil
 import { TiThMenu } from "react-icons/ti"; // Menu
 import { MdLogout } from "react-icons/md"; // Deconnection
+import { PiCastleTurret } from "react-icons/pi"; // Chateau
+import { IoClose } from "react-icons/io5"; // Fermer
 
 // Objet qui mappe les noms aux icônes
 const icons = {
@@ -16,6 +18,8 @@ const icons = {
   utilisateur: FaUser,
   menuHamburger: TiThMenu,
   deconnection: MdLogout,
+  chateau: PiCastleTurret,
+  fermer: IoClose,
 };
 
 function Icon({ name, size = 24, typeMenu }) {
