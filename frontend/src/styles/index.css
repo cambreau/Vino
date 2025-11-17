@@ -1,63 +1,56 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
 @import "tailwindcss";
 
+
 @theme {
   /* Typographie */
   --font-display: "Playfair Display", "serif";
   --font-body: "Montserrat", "sans-serif";
 
-  /* Palette de couleurs - Primary */
-  --color-primary-100: #f5dfe5;
-  --color-primary-200: #821250;
-  --color-primary-300: #a8427d;
-  --color-primary-foreground: #fcfcfd;
+  /* Palette de couleurs - Principal */
+  --color-principal-100: #F5DFE5;    /* Rose Pâle */
+  --color-principal-200: #A8427D;    /* Primary Dark */
+  --color-principal-300: #821250;    /* Primary */
+  --color-principal-premier-plan: #fcfcfd;
 
-  /* Palette de couleurs - Background */
-  --color-background: #fcfcfd;
-  --color-background-secondary: #f6ebdc;
+  /* Palette de couleurs - Fond */
+  --color-fond: #F6EBDC;
+  --color-fond-secondaire: #FCFCFD;  
 
-  /* Palette de couleurs - Foreground/Text */
-  --color-foreground: #f6ebdc;
-  --color-muted-foreground: #461243;
+  /* Palette de couleurs - Textes */
+  --color-texte-premier: #461243;
+  --color-texte-secondaire: #1F1C1F;
 
-  /* Palette de couleurs - Alerts */
-  --color-erreur: #a31621;
-  --color-success: #2d5016;
-}
+  /* Palette de couleurs - Alertes */
+  --color-erreur: #A31621;
+  --color-succes: #2D5016;
 
-/* Styles de base pour la typographie */
-@layer base {
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-family: var(--font-display);
-  }
+  /* Rythmes d'espacement */
+  --rythme-tres-serre: 5px;
+  --rythme-serre: 10px;
+  --rythme-base: 20px;
+  --rythme-espace: 40px;
+  --rythme-tres-espace: 80px;
+  
+  /* Tailles de police  */
+  --taille-tres-petit: 0.688rem;    /* 11px */
+  --taille-petit: 0.813rem;         /* 13px */
+  --taille-normal: 1rem;            /* 16px */
+  --taille-moyen: 1.688rem;         /* 27px */
+  --taille-grand: 2.063rem;         /* 33px */
+  --taille-gros: 2.438rem;          /* 39px */
+  --taille-tres-gros: 2.938rem;     /* 47px */
 
-  body {
-    font-family: var(--font-body);
-  }
-}
 
-/* Composants */
-@layer components {
-  /* Bouton principal */
-  .btn-primary {
-    @apply bg-[#821250] text-white font-semibold px-8 py-3 rounded-lg transition-all duration-300 cursor-pointer hover:bg-[#A8427D] hover:-translate-y-0.5 w-full;
-  }
+    /* Rayons d'arrondi*/
+  --arrondi-petit: 4px;
+  --arrondi-base: 6px;
+  --arrondi-grand: 8px;
+  --arrondi-tres-grand: 16px;
 
-  /* Bouton secondaire */
-  .btn-secondary {
-    @apply bg-white text-[#461243] font-semibold px-8 py-3 rounded-lg transition-all duration-300 cursor-pointer hover:bg-[#F6EBDC] hover:-translate-y-0.5 w-full;
-  }
-}
-
-/* Hero avec image de fond */
-.hero-welcome {
-  background: url(../assets/images/heroBienvenue.webp);
-  background-size: cover;
-  background-position: center;
-  min-height: 100vh;
+  /* Points de rupture */
+  --point-rupture-mobile: 576px;    /* Téléphones portables (portrait) */
+  --point-rupture-tablette: 768px;  /* Tablettes */
+  --point-rupture-portable: 992px;  /* Ordinateurs portables */
+  --point-rupture-desktop: 1200px;  /* Écrans de grande taille */
 }
