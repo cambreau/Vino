@@ -1,5 +1,5 @@
 // Utils
-import { formatteStringSansAccentEtEspace } from "../../../../lib/utils";
+import { formatteString } from "../../../../lib/utils";
 
 function FormulaireSelect({
   nom,
@@ -11,10 +11,10 @@ function FormulaireSelect({
 }) {
   return (
     <div>
-      <label htmlFor={formatteStringSansAccentEtEspace(nom)}>{nom} :</label>
+      <label htmlFor={formatteString(nom)}>{nom} :</label>
       <select
-        id={formatteStringSansAccentEtEspace(nom)}
-        name={formatteStringSansAccentEtEspace(nom)}
+        id={formatteString(nom)}
+        name={formatteString(nom)}
         {...(estObligatoire ? { required: true } : {})}
         value={value || ""}
         onChange={onChange}
@@ -23,7 +23,7 @@ function FormulaireSelect({
           -- Choisir {genre} {nom} --
         </option>
         {arrayOptions.map((option) => (
-          <option key={option} value={formatteStringSansAccentEtEspace(option)}>
+          <option key={option} value={formatteString(option)}>
             {option}
           </option>
         ))}

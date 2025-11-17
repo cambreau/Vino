@@ -1,5 +1,5 @@
 // Utils
-import { formatteStringSansAccentEtEspace } from "../../../../lib/utils";
+import { formatteString } from "../../../../lib/utils";
 
 function FormulaireInput({
   type,
@@ -11,11 +11,11 @@ function FormulaireInput({
 }) {
   return (
     <div>
-      <label htmlFor={formatteStringSansAccentEtEspace(nom)}>{nom} :</label>
+      <label htmlFor={formatteString(nom)}>{nom} :</label>
       <input
         type={type}
-        name={formatteStringSansAccentEtEspace(nom)}
-        id={formatteStringSansAccentEtEspace(nom)}
+        name={formatteString(nom)}
+        id={formatteString(nom)}
         {...(estObligatoire ? { required: true } : {})}
         placeholder={`Entrez ${genre} ${nom.toLowerCase()}`}
         value={value}
