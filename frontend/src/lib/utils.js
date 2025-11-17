@@ -3,7 +3,7 @@
  * @param {string} nomString
  * @returns {string}
  */
-export const formatteStringSansAccentEtEspace = (nomString) => {
+export const formatteString = (nomString) => {
   //Faire une copie du string dans une nouvelle constante.
   let nom = nomString;
   //Supprimer les espaces de tabulation
