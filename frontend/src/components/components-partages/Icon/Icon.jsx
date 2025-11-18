@@ -15,20 +15,40 @@ const icons = {
   cellier: GiCellarBarrels,
   liste: GiNotebook,
   recherche: BiSearch,
-  utilisateur: FaUser,
+  profil: FaUser,
   menuHamburger: TiThMenu,
   deconnection: MdLogout,
   chateau: PiCastleTurret,
   fermer: IoClose,
 };
 
-function Icon({ name, size = 24, typeMenu }) {
-  const IconComponent = icons[name];
-
+function Icon({ nom, size = 24, couleur, typeMenu }) {
+  const IconComponent = icons[nom];
+  // Fonction pour capitaliser la première lettre
+  const IconNomMajuscule = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
   return (
     <div>
-      <IconComponent size={size} />
-      {typeMenu === "bas" ? <p>{name}</p> : null}
+      {/* Verifier le si c'est le menu en haut ou en bas pour avoir la bonne affichage d'ensemble du icon et nom correspondent */}
+      {typeMenu === "bas" ? (
+        <div className="flex flex-col items-center gap-[var(--rythme-tres-serre)] w-full text-[${couleur}]">
+          <IconComponent size={size} color={couleur} />
+          {typeMenu === "bas" ? (
+            <p style={{ color: couleur }}>{IconNomMajuscule(nom)}</p>
+          ) : null}
+        </div>
+      ) : (
+        <div className="flex items-center gap-[var(--rythme-base)] w-full text-[${couleur}]">
+          <IconComponent size={size} color={couleur} />
+          {/* Affiche le texte seulement si nom n’est PAS menuHamburger ou Fermer */}
+          {nom !== "menuHamburger" &&
+            nom !== "fermer" &&
+            nom !== "deconnection" && (
+              <p style={{ color: couleur }}>{IconNomMajuscule(nom)}</p>
+            )}
+        </div>
+      )}
     </div>
   );
 }
