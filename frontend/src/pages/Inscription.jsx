@@ -1,7 +1,7 @@
 import Formulaire from "../components/components-partages/Formulaire/Formulaire";
 import FormulaireInput from "../components/components-partages/Formulaire/FormulaireInput/FormulaireInput";
-import BoutonRetour from "../components/components-partages/Formulaire/FormulaireBouton/BoutonRetour";
-import Bouton from "../components/components-partages/Formulaire/FormulaireBouton/Bouton";
+import BoutonRetour from "../components/components-partages/Boutons/BoutonRetour";
+import Bouton from "../components/components-partages/Boutons/Bouton";
 import { regex, validationChamp } from "../lib/validationFormulaire.js";
 import { useState } from "react";
 
