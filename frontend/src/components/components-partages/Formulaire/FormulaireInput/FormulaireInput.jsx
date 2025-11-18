@@ -9,14 +9,14 @@ function FormulaireInput({
   onChange,
   value = "",
   pattern,
-  classCouleur = "Dark", //Dark ou Clair
+  classColor = "Dark", //Dark ou Clair
 }) {
   const nomFormat = formatteString(nom);
   const labelClair = "text-white";
-  const labelDark = "text-couleur-texte-secondaire";
+  const labelDark = "text-color-texte-secondaire";
   const inputClair =
-    "bg-couleur-fond text-couleur-texte-secondaire placeholder-couleur-texte-secondaire";
-  const inputDark = "bg-[#475467] text-couleur-fond placeholder-couleur-fond";
+    "bg-color-fond text-color-texte-secondaire placeholder-color-texte-secondaire";
+  const inputDark = "bg-[#475467] text-color-fond placeholder-color-fond";
 
   return (
     <div
@@ -29,7 +29,7 @@ function FormulaireInput({
         className={`
         mb-rythme-serre
         text-taille-petit font-medium
-        ${classCouleur === "Dark" ? labelDark : labelClair} 
+        ${classColor === "Dark" ? labelDark : labelClair} 
       `}
         htmlFor={nom}
       >
@@ -39,8 +39,8 @@ function FormulaireInput({
         className={`
           max-w-[320px] px-(--rythme-serre) py-(--rythme-tres-serre) 
           text-taille-normal font-font-body
-           ${classCouleur === "Dark" ? inputDark : inputClair} 
-          border rounded-(--arrondi-base) shadow-sm focus:outline-none focus:border-(--couleur-principal-200)`}
+           ${classColor === "Dark" ? inputDark : inputClair} 
+          border rounded-(--arrondi-base) shadow-sm focus:outline-none focus:border-(--color-principal-200)`}
         type={type}
         name={nom}
         id={nom}

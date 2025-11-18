@@ -7,14 +7,14 @@ function BoutonRetour({ action }) {
       className="
         flex items-center justify-center
         w-12 h-12
-        bg-(--couleur-fond-secondaire)
+        bg-(--color-fond-secondaire)
         rounded-full
         shadow-md
         hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer
       "
       onClick={action}
     >
-      <FiArrowLeft size={24} couleur="var(--couleur-texte-premier)" />
+      <FiArrowLeft size={24} color="var(--color-texte-premier)" />
     </button>
   );
 }

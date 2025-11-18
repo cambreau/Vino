@@ -71,7 +71,7 @@ function Bienvenue() {
                 className="
                 font-semibold
                 text-principal-200
-                hover:text-principal-100 transition-couleurs"
+                hover:text-principal-100 transition-colors"
               >
                 Je m'inscris
               </Link>
