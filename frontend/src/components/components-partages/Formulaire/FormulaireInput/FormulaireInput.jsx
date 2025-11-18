@@ -15,8 +15,8 @@ function FormulaireInput({
   const labelClair = "text-white";
   const labelDark = "text-color-texte-secondaire";
   const inputClair =
-    "bg-color-fond text-color-texte-secondaire placeholder-color-texte-secondaire";
-  const inputDark = "bg-[#475467] text-color-fond placeholder-color-fond";
+    "bg-color-fond text-color-texte-secondaire placeholder-(--color-texte-secondaire)";
+  const inputDark = "bg-[#475467] text-color-fond placeholder-(--color-fond)";
 
   return (
     <div
@@ -29,7 +29,7 @@ function FormulaireInput({
         className={`
         mb-rythme-serre
         text-taille-petit font-medium
-        ${classColor === "Dark" ? labelDark : labelClair} 
+        ${classColor === "Dark" ? labelClair : labelDark} 
       `}
         htmlFor={nom}
       >

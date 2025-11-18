@@ -1,5 +1,6 @@
 import Formulaire from "../components/components-partages/Formulaire/Formulaire";
 import FormulaireInput from "../components/components-partages/Formulaire/FormulaireInput/FormulaireInput";
+import BoutonRetour from "../components/components-partages/Formulaire/FormulaireBouton/BoutonRetour.jsx";
 import { regex, validationChamp } from "../lib/validationFormulaire.js";
 import { useState } from "react";
 
@@ -7,13 +8,19 @@ function Inscription() {
   // Regroupe les messages d'erreurs à afficher.
   const [erreurs, setErreurs] = useState({
     nom: "",
-    email: "",
-    confirmationEmail: "",
+    courriel: "",
+    confirmationcourriel: "",
     motDePasse: "",
   });
 
   return (
-    <section>
+    <section
+      className="
+      max-w-[800px] h-auto
+      min-h-screen
+      bg-[url('../assets/images/inscriptionCellier.webp')] bg-cover bg-center bg-no-repeat bg-[#e0e0e0]"
+    >
+      <BoutonRetour></BoutonRetour>
       <Formulaire
         titreFormulaire="Inscription"
         method="POST"
@@ -39,50 +46,50 @@ function Inscription() {
             {erreurs.nom && <p className="erreur">{erreurs.nom}</p>}
 
             <FormulaireInput
-              type="email"
-              nom="email"
+              type="courriel"
+              nom="courriel"
               genre="un"
               estObligatoire={true}
-              pattern={regex.regEmail}
+              pattern={regex.regcourriel}
               onChange={(e) => {
                 const valeur = e.target.value;
                 if (!validationChamp(pattern, valeur)) {
-                  const erreur = "Veuillez saisir un email valide.";
-                  setErreurs((prev) => ({ ...prev, email: erreur }));
+                  const erreur = "Veuillez saisir un courriel valide.";
+                  setErreurs((prev) => ({ ...prev, courriel: erreur }));
                 } // Ne pas oublier de valider que l'adresse courriel est unique
                 else {
-                  setErreurs((prev) => ({ ...prev, email: "" }));
+                  setErreurs((prev) => ({ ...prev, courriel: "" }));
                 }
               }}
             />
-            {erreurs.email && <p className="erreur">{erreurs.email}</p>}
+            {erreurs.courriel && <p className="erreur">{erreurs.courriel}</p>}
 
             <FormulaireInput
-              type="email"
+              type="courriel"
               nom="confirmation"
               genre="une"
               estObligatoire={true}
-              pattern={regex.regEmail}
+              pattern={regex.regcourriel}
               onChange={(e) => {
                 const valeur = e.target.value;
-                const emailInput = document.querySelector(
-                  'input[name="email"]'
+                const courrielInput = document.querySelector(
+                  'input[name="courriel"]'
                 );
-                const adresseEmail = emailInput.value;
-                if (!adresseEmail == valeur) {
+                const adressecourriel = courrielInput.value;
+                if (!adressecourriel == valeur) {
                   const erreur =
-                    "La confirmation de l'adresse email n'est pas valide";
+                    "La confirmation de l'adresse courriel n'est pas valide";
                   setErreurs((prev) => ({
                     ...prev,
-                    confirmationEmail: erreur,
+                    confirmationcourriel: erreur,
                   }));
                 } else {
-                  setErreurs((prev) => ({ ...prev, confirmationEmail: "" }));
+                  setErreurs((prev) => ({ ...prev, confirmationcourriel: "" }));
                 }
               }}
             />
-            {erreurs.confirmationEmail && (
-              <p className="erreur">{erreurs.confirmationEmail}</p>
+            {erreurs.confirmationcourriel && (
+              <p className="erreur">{erreurs.confirmationcourriel}</p>
             )}
 
             <FormulaireInput
