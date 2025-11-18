@@ -20,6 +20,9 @@ function Inscription() {
     mot_de_passe: "",
   });
 
+  // Confirmation du mot de passe (non envoyée au backend)
+  const [confirmation, setConfirmation] = useState("");
+
   // Regroupe les messages d'erreurs à afficher.
   const [erreurs, setErreurs] = useState({
     nom: "",
@@ -73,14 +76,15 @@ function Inscription() {
               genre="un"
               estObligatoire={true}
               pattern={regex.regNom}
+              value={utilisateur.nom}
               onChange={(e) => {
                 const valeur = e.target.value;
+                setUtilisateur((prev) => ({ ...prev, nom: valeur }));
                 if (!validationChamp(regex.regNom, valeur)) {
                   const erreur =
                     "Le nom doit comporter entre 2 et 50 caractères, uniquement des lettres, des accents et le tiret (-).";
                   setErreurs((prev) => ({ ...prev, nom: erreur }));
                 } else {
-                  setUtilisateur((prev) => ({ ...prev, nom: valeur }));
                   setErreurs((prev) => ({ ...prev, nom: "" }));
                 }
               }}
@@ -93,14 +97,15 @@ function Inscription() {
               genre="un"
               estObligatoire={true}
               pattern={regex.regcourriel}
+              value={utilisateur.courriel}
               onChange={(e) => {
                 const valeur = e.target.value;
+                setUtilisateur((prev) => ({ ...prev, courriel: valeur }));
                 if (!validationChamp(regex.regcourriel, valeur)) {
                   const erreur = "Veuillez saisir un courriel valide.";
                   setErreurs((prev) => ({ ...prev, courriel: erreur }));
                 } // Ne pas oublier de valider que l'adresse courriel est unique
                 else {
-                  setUtilisateur((prev) => ({ ...prev, courriel: valeur }));
                   setErreurs((prev) => ({ ...prev, courriel: "" }));
                 }
               }}
@@ -113,14 +118,15 @@ function Inscription() {
               genre="un"
               estObligatoire={true}
               pattern={regex.regMotDePasse}
+              value={utilisateur.mot_de_passe}
               onChange={(e) => {
                 const valeur = e.target.value;
+                setUtilisateur((prev) => ({ ...prev, mot_de_passe: valeur }));
                 if (!validationChamp(regex.regMotDePasse, valeur)) {
                   const erreur =
                     "Le mot de passe doit contenir au moins 8 caractères, dont une lettre majuscule, une lettre minuscule et un caractère spécial";
                   setErreurs((prev) => ({ ...prev, motDePasse: erreur }));
                 } else {
-                  setUtilisateur((prev) => ({ ...prev, mot_de_passe: valeur }));
                   setErreurs((prev) => ({ ...prev, motDePasse: "" }));
                 }
               }}
@@ -135,13 +141,11 @@ function Inscription() {
               genre="une"
               estObligatoire={true}
               pattern={regex.regMotDePasse}
+              value={confirmation}
               onChange={(e) => {
                 const valeur = e.target.value;
-                const inputMotDePasse = document.querySelector(
-                  'input[name="mot_de_passe"]'
-                );
-                const mdp = inputMotDePasse ? inputMotDePasse.value : "";
-                if (mdp !== valeur) {
+                setConfirmation(valeur);
+                if (utilisateur.mot_de_passe !== valeur) {
                   const erreur =
                     "La confirmation du mot de passe n'est pas valide";
                   setErreurs((prev) => ({
