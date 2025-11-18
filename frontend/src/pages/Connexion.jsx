@@ -86,7 +86,7 @@ function Connexion() {
                 estObligatoire={true}
                 onChange={(e) => {
                   // Récupère la valeur saisie dans le champ
-                  const valeur = e.target.value;
+                  const valeur = e.target.value; 
                   
                   // Vérifie si le mot de passe respecte les critères de sécurité
                   if (!validationChamp(regex.regMotDePasse, valeur)) {
