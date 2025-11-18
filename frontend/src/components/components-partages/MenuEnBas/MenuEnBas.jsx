@@ -3,11 +3,11 @@ import Icon from "../Icon/Icon";
 function MenuEnBas({}) {
   return (
     <footer>
-      <Icon name="accueil" />
-      <Icon name="cellier" />
-      <Icon name="liste" />
-      <Icon name="recherche" />
-      <Icon name="utilisateur" />
+      <Icon name="accueil" typeMenu="bas" />
+      <Icon name="cellier" typeMenu="bas" />
+      <Icon name="liste" typeMenu="bas" />
+      <Icon name="recherche" typeMenu="bas" />
+      <Icon name="utilisateur" typeMenu="bas" />
     </footer>
   );
 }
