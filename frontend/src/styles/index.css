@@ -7,22 +7,22 @@
   --font-body: "Montserrat", "sans-serif";
 
   /* Palette de couleurs - Principal */
-  --color-principal-100: #f5dfe5; /* Rose Pâle */
-  --color-principal-200: #a8427d; /* Primary Dark */
-  --color-principal-300: #821250; /* Primary */
-  --color-principal-premier-plan: #fcfcfd;
+  --couleur-principal-100: #f5dfe5; /* Rose Pâle */
+  --couleur-principal-200: #a8427d; /* Primary Dark */
+  --couleur-principal-300: #821250; /* Primary */
+  --couleur-principal-premier-plan: #fcfcfd;
 
   /* Palette de couleurs - Fond */
-  --color-fond: #f6ebdc;
-  --color-fond-secondaire: #fcfcfd;
+  --couleur-fond: #f6ebdc;
+  --couleur-fond-secondaire: #fcfcfd;
 
   /* Palette de couleurs - Textes */
-  --color-texte-premier: #461243;
-  --color-texte-secondaire: #1f1c1f;
+  --couleur-texte-premier: #461243;
+  --couleur-texte-secondaire: #1f1c1f;
 
   /* Palette de couleurs - Alertes */
-  --color-erreur: #a31621;
-  --color-succes: #2d5016;
+  --couleur-erreur: #a31621;
+  --couleur-succes: #2d5016;
 
   /* Rythmes d'espacement */
   --rythme-tres-serre: 5px;

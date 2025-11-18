@@ -9,9 +9,15 @@ function FormulaireInput({
   onChange,
   value = "",
   pattern,
+  classCouleur = "Dark", //Dark ou Clair
 }) {
   const nomFormat = formatteString(nom);
-  const inputClassique = "";
+  const labelClair = "text-white";
+  const labelDark = "text-couleur-texte-secondaire";
+  const inputClair =
+    "bg-couleur-fond text-couleur-texte-secondaire placeholder-couleur-texte-secondaire";
+  const inputDark = "bg-[#475467] text-couleur-fond placeholder-couleur-fond";
+
   return (
     <div
       className="
@@ -20,18 +26,21 @@ function FormulaireInput({
       font-font-body"
     >
       <label
-        className="
+        className={`
         mb-rythme-serre
-        text-taille-petit font-medium"
+        text-taille-petit font-medium
+        ${classCouleur === "Dark" ? labelDark : labelClair} 
+      `}
         htmlFor={nom}
       >
         {formatMajDebut(nomFormat)} :
       </label>
       <input
-        className="
-        max-w-[320px] px-(--rythme-serre) py-(--rythme-tres-serre) 
-        text-taille-normal font-font-body
-        border rounded-(--arrondi-base) shadow-sm focus:outline-none focus:ring-1 focus:ring-(--color-principal-200)"
+        className={`
+          max-w-[320px] px-(--rythme-serre) py-(--rythme-tres-serre) 
+          text-taille-normal font-font-body
+           ${classCouleur === "Dark" ? inputDark : inputClair} 
+          border rounded-(--arrondi-base) shadow-sm focus:outline-none focus:border-(--couleur-principal-200)`}
         type={type}
         name={nom}
         id={nom}
