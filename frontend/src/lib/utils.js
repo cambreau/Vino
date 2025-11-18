@@ -13,7 +13,7 @@ export const formatteString = (nomString) => {
   // Mettre en minuscule
   mot = mot.toLowerCase();
   // Remplacer les espaces et les underscores par des tirets
-  mot = mot.replaceAll(" ", "-").replaceAll("_", "-");
+  mot = mot.replaceAll(" ", " ").replaceAll("_", " ");
   return mot;
 };
 
@@ -22,6 +22,6 @@ export const formatteString = (nomString) => {
  * @param {string} string
  * @returns string transformé.
  */
-function formatMajDebut(string) {
+export function formatMajDebut(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }

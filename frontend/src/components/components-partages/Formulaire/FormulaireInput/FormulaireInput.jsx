@@ -10,6 +10,7 @@ function FormulaireInput({
   value = "",
   pattern,
 }) {
+  const nomFormat = formatteString(nom);
   const inputClassique = "";
   return (
     <div
@@ -22,9 +23,9 @@ function FormulaireInput({
         className="
         mb-rythme-serre
         text-taille-petit font-medium"
-        htmlFor={formatteString(nom)}
+        htmlFor={nom}
       >
-        {nom} :
+        {formatMajDebut(nomFormat)} :
       </label>
       <input
         className="
@@ -32,10 +33,10 @@ function FormulaireInput({
         text-taille-normal font-font-body
         border rounded-(--arrondi-base) shadow-sm focus:outline-none focus:ring-1 focus:ring-(--color-principal-200)"
         type={type}
-        name={formatteString(nom)}
-        id={formatteString(nom)}
+        name={nom}
+        id={nom}
         {...(estObligatoire ? { required: true } : {})}
-        placeholder={`Entrez ${genre} ${nom.toLowerCase()}`}
+        placeholder={`Entrez ${genre} ${nomFormat}`}
         value={value}
         pattern={pattern}
         onChange={onChange}
