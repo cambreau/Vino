@@ -10,7 +10,7 @@ function Inscription() {
   const [erreurs, setErreurs] = useState({
     nom: "",
     courriel: "",
-    confirmationcourriel: "",
+    confirmation: "",
     motDePasse: "",
   });
 
@@ -90,29 +90,27 @@ function Inscription() {
               nom="confirmation"
               genre="une"
               estObligatoire={true}
-              pattern={regex.regcourriel}
+              pattern={regex.regMotDePasse}
               onChange={(e) => {
                 const valeur = e.target.value;
-                const courrielInput = document.querySelector(
-                  'input[name="courriel"]'
+                const inputMotDePasse = document.querySelector(
+                  'input[name="mot_de_passe"]'
                 );
-                const adressecourriel = courrielInput
-                  ? courrielInput.value
-                  : "";
-                if (adressecourriel !== valeur) {
+                const mdp = inputMotDePasse ? inputMotDePasse.value : "";
+                if (inputMotDePasse !== valeur) {
                   const erreur =
                     "La confirmation du mot de passe n'est pas valide";
                   setErreurs((prev) => ({
                     ...prev,
-                    confirmationcourriel: erreur,
+                    confirmation: erreur,
                   }));
                 } else {
-                  setErreurs((prev) => ({ ...prev, confirmationcourriel: "" }));
+                  setErreurs((prev) => ({ ...prev, confirmation: "" }));
                 }
               }}
             />
-            {erreurs.confirmationcourriel && (
-              <p className="erreur">{erreurs.confirmationcourriel}</p>
+            {erreurs.confirmation && (
+              <p className="erreur">{erreurs.confirmation}</p>
             )}
           </>
         }
