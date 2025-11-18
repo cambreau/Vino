@@ -1,14 +1,17 @@
 import Formulaire from "../components/components-partages/Formulaire/Formulaire";
 import FormulaireInput from "../components/components-partages/Formulaire/FormulaireInput/FormulaireInput";
 import { regex, validationChamp } from "../lib/validationFormulaire.js";
+import { useState } from "react";
 
 function Inscription() {
+  // Regroupe les messages d'erreurs à afficher.
   const [erreurs, setErreurs] = useState({
     nom: "",
     email: "",
     confirmationEmail: "",
     motDePasse: "",
   });
+
   return (
     <section>
       <Formulaire
@@ -56,7 +59,7 @@ function Inscription() {
 
             <FormulaireInput
               type="email"
-              nom="confirmationEmail"
+              nom="confirmation"
               genre="une"
               estObligatoire={true}
               pattern={regex.regEmail}
