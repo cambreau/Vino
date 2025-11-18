@@ -1,11 +1,10 @@
 import { MdError, MdCheckCircle, MdInfo, MdClose } from "react-icons/md";
 
-function Message({ 
-  texte, 
-  type = "information",
-  onClose
+function Message({
+  texte,
+  type = "information", //Ou erreur ou succes
+  onClose,
 }) {
-
   // Classes de base pour les messages
   const classesBase = `
     w-full px-(--rythme-base) py-(--rythme-serre)
@@ -21,14 +20,19 @@ function Message({
   const classesInformation = `bg-texte-secondaire`;
 
   // Sélection des classes selon le type
-  const classesType = type === "erreur" ? classesErreur : type === "succes" ? classesSucces :classesInformation;
+  const classesType =
+    type === "erreur"
+      ? classesErreur
+      : type === "succes"
+      ? classesSucces
+      : classesInformation;
 
   // Icône selon le type
   const getIcone = () => {
     const iconSize = 24;
     const iconClass = "";
-    
-    switch(type) {
+
+    switch (type) {
       case "erreur":
         return <MdError size={iconSize} className={iconClass} />;
       case "succes":
@@ -41,13 +45,13 @@ function Message({
   return (
     <div className={`${classesBase} ${classesType}`} role="alert">
       <div>{getIcone()}</div>
-      
-      <div className="text-center"> 
+
+      <div className="text-center">
         <span>{texte}</span>
       </div>
-      
+
       <div>
-      {onClose && (
+        {onClose && (
           <button
             onClick={onClose}
             className="hover:opacity-75 transition-opacity cursor-pointer"

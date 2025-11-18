@@ -7,6 +7,7 @@ function FormulaireInput({
   genre, //Un ou une
   estObligatoire, //Required ou non
   onChange,
+  onBlur,
   value = "",
   pattern,
   classColor = "Dark", //Dark ou Clair
@@ -15,9 +16,9 @@ function FormulaireInput({
   const labelClair = "text-white";
   const labelDark = "text-color-texte-secondaire";
   const inputClair =
-    "bg-color-fond text-color-texte-secondaire placeholder-(--color-texte-secondaire) placeholder:text-(length:--taille-petit) placeholder:font-display";
+    "bg-(--color-fond) text-(--color-texte) placeholder-(--color-texte-secondaire) placeholder:text-(length:--taille-petit) placeholder:font-display";
   const inputDark =
-    "bg-[#475467] text-color-fond placeholder-(--color-fond) placeholder:text-(length:--taille-petit) placeholder:font-display";
+    "bg-[#475467] text-(--color-fond) placeholder-(--color-fond) placeholder:text-(length:--taille-petit) placeholder:font-display";
 
   return (
     <div
@@ -41,15 +42,15 @@ function FormulaireInput({
           max-w-[320px] px-(--rythme-serre) py-(--rythme-tres-serre) 
           text-(length:--taille-normal) font-font-body
            ${classColor === "Dark" ? inputDark : inputClair} 
-          border rounded-(--arrondi-base) shadow-sm focus:outline-none focus:border-(--color-principal-200)`}
+          border border-(--color-texte-secondaire) rounded-(--arrondi-base) shadow-sm focus:outline-none focus:border-(--color-principal-200)`}
         type={type}
         name={nom}
         id={nom}
         {...(estObligatoire ? { required: true } : {})}
         placeholder={`Entrez ${genre} ${nomFormat}`}
         value={value}
-        pattern={pattern}
         onChange={onChange}
+        onBlur={onBlur}
       />
     </div>
   );

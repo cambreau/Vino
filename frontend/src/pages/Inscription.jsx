@@ -75,11 +75,12 @@ function Inscription() {
               nom="nom"
               genre="un"
               estObligatoire={true}
-              pattern={regex.regNom}
               value={utilisateur.nom}
               onChange={(e) => {
+                setUtilisateur((prev) => ({ ...prev, nom: e.target.value }));
+              }}
+              onBlur={(e) => {
                 const valeur = e.target.value;
-                setUtilisateur((prev) => ({ ...prev, nom: valeur }));
                 if (!validationChamp(regex.regNom, valeur)) {
                   const erreur =
                     "Le nom doit comporter entre 2 et 50 caractères, uniquement des lettres, des accents et le tiret (-).";
@@ -89,14 +90,13 @@ function Inscription() {
                 }
               }}
             />
-            {erreurs.nom && <p className="erreur">{erreurs.nom}</p>}
+            {erreurs.nom && <Message texte={erreurs.nom} type="erreur" />}
 
             <FormulaireInput
-              type="courriel"
+              type="email"
               nom="courriel"
               genre="un"
               estObligatoire={true}
-              pattern={regex.regcourriel}
               value={utilisateur.courriel}
               onChange={(e) => {
                 const valeur = e.target.value;
@@ -110,18 +110,24 @@ function Inscription() {
                 }
               }}
             />
-            {erreurs.courriel && <p className="erreur">{erreurs.courriel}</p>}
+            {erreurs.courriel && (
+              <Message texte={erreurs.courriel} type="erreur" />
+            )}
 
             <FormulaireInput
               type="text"
               nom="mot_de_passe"
               genre="un"
               estObligatoire={true}
-              pattern={regex.regMotDePasse}
               value={utilisateur.mot_de_passe}
               onChange={(e) => {
+                setUtilisateur((prev) => ({
+                  ...prev,
+                  mot_de_passe: e.target.value,
+                }));
+              }}
+              onBlur={(e) => {
                 const valeur = e.target.value;
-                setUtilisateur((prev) => ({ ...prev, mot_de_passe: valeur }));
                 if (!validationChamp(regex.regMotDePasse, valeur)) {
                   const erreur =
                     "Le mot de passe doit contenir au moins 8 caractères, dont une lettre majuscule, une lettre minuscule et un caractère spécial";
@@ -132,7 +138,7 @@ function Inscription() {
               }}
             />
             {erreurs.motDePasse && (
-              <p className="erreur">{erreurs.motDePasse}</p>
+              <Message texte={erreurs.motDePasse} type="erreur" />
             )}
 
             <FormulaireInput
@@ -140,11 +146,12 @@ function Inscription() {
               nom="confirmation"
               genre="une"
               estObligatoire={true}
-              pattern={regex.regMotDePasse}
               value={confirmation}
               onChange={(e) => {
+                setConfirmation(e.target.value);
+              }}
+              onBlur={(e) => {
                 const valeur = e.target.value;
-                setConfirmation(valeur);
                 if (utilisateur.mot_de_passe !== valeur) {
                   const erreur =
                     "La confirmation du mot de passe n'est pas valide";
@@ -158,11 +165,18 @@ function Inscription() {
               }}
             />
             {erreurs.confirmation && (
-              <p className="erreur">{erreurs.confirmation}</p>
+              <Message texte={erreurs.confirmation} type="erreur" />
             )}
           </>
         }
-        bouton={<Bouton texte="S'inscrire" type="primaire" typeHtml="submit" />}
+        bouton={
+          <Bouton
+            texte="S'inscrire"
+            type="primaire"
+            typeHtml="button"
+            action={envoieInscription}
+          />
+        }
       />
     </section>
   );
