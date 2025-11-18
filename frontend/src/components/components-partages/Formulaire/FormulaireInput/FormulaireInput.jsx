@@ -15,8 +15,9 @@ function FormulaireInput({
   const labelClair = "text-white";
   const labelDark = "text-color-texte-secondaire";
   const inputClair =
-    "bg-color-fond text-color-texte-secondaire placeholder-(--color-texte-secondaire)";
-  const inputDark = "bg-[#475467] text-color-fond placeholder-(--color-fond)";
+    "bg-color-fond text-color-texte-secondaire placeholder-(--color-texte-secondaire) placeholder:text-(length:--taille-petit) placeholder:font-display";
+  const inputDark =
+    "bg-[#475467] text-color-fond placeholder-(--color-fond) placeholder:text-(length:--taille-petit) placeholder:font-display";
 
   return (
     <div
@@ -28,7 +29,7 @@ function FormulaireInput({
       <label
         className={`
         mb-rythme-serre
-        text-taille-petit font-medium
+        text-(length:--taille-petit) font-medium
         ${classColor === "Dark" ? labelClair : labelDark} 
       `}
         htmlFor={nom}
@@ -38,7 +39,7 @@ function FormulaireInput({
       <input
         className={`
           max-w-[320px] px-(--rythme-serre) py-(--rythme-tres-serre) 
-          text-taille-normal font-font-body
+          text-(length:--taille-normal) font-font-body
            ${classColor === "Dark" ? inputDark : inputClair} 
           border rounded-(--arrondi-base) shadow-sm focus:outline-none focus:border-(--color-principal-200)`}
         type={type}

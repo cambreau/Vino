@@ -15,6 +15,7 @@ function FormulaireTextarea({
         name={formatteString(nom)}
         rows={4}
         minLength={10}
+        className="placeholder:text-(length:--taille-petit) placeholder:font-display"
         placeholder={`Entrez ${genre} ${nom.toLowerCase()}`}
         {...(estObligatoire ? { required: true } : {})}
         {...(defaultValue ? { value: defaultValue } : "")}

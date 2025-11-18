@@ -1,6 +1,7 @@
 import Formulaire from "../components/components-partages/Formulaire/Formulaire";
 import FormulaireInput from "../components/components-partages/Formulaire/FormulaireInput/FormulaireInput";
-import BoutonRetour from "../components/components-partages/Formulaire/FormulaireBouton/BoutonRetour.jsx";
+import BoutonRetour from "../components/components-partages/Formulaire/FormulaireBouton/BoutonRetour";
+import Bouton from "../components/components-partages/Formulaire/FormulaireBouton/Bouton";
 import { regex, validationChamp } from "../lib/validationFormulaire.js";
 import { useState } from "react";
 
@@ -16,11 +17,10 @@ function Inscription() {
   return (
     <section
       className="
-      max-w-[800px] h-auto
-      min-h-screen
-      bg-[url('../assets/images/inscriptionCellier.webp')] bg-cover bg-center bg-no-repeat bg-[#e0e0e0]"
+      min-h-screen px-(--rythme-serre) pb-(--rythme-espace) grid grid-rows-[1fr_5fr] items-end
+      bg-[linear-gradient(0deg,rgba(0,0,0,0.8)30%,rgba(0,0,0,0)),url('../assets/images/inscriptionCellier.webp')] bg-cover bg-center bg-no-repeat bg-[#e0e0e0]"
     >
-      <BoutonRetour></BoutonRetour>
+      <BoutonRetour />
       <Formulaire
         titreFormulaire="Inscription"
         method="POST"
@@ -34,7 +34,7 @@ function Inscription() {
               pattern={regex.regNom}
               onChange={(e) => {
                 const valeur = e.target.value;
-                if (!validationChamp(pattern, valeur)) {
+                if (!validationChamp(regex.regNom, valeur)) {
                   const erreur =
                     "Le nom doit comporter entre 2 et 50 caractères, uniquement des lettres, des accents et le tiret (-).";
                   setErreurs((prev) => ({ ...prev, nom: erreur }));
@@ -53,7 +53,7 @@ function Inscription() {
               pattern={regex.regcourriel}
               onChange={(e) => {
                 const valeur = e.target.value;
-                if (!validationChamp(pattern, valeur)) {
+                if (!validationChamp(regex.regcourriel, valeur)) {
                   const erreur = "Veuillez saisir un courriel valide.";
                   setErreurs((prev) => ({ ...prev, courriel: erreur }));
                 } // Ne pas oublier de valider que l'adresse courriel est unique
@@ -65,7 +65,28 @@ function Inscription() {
             {erreurs.courriel && <p className="erreur">{erreurs.courriel}</p>}
 
             <FormulaireInput
-              type="courriel"
+              type="text"
+              nom="mot_de_passe"
+              genre="un"
+              estObligatoire={true}
+              pattern={regex.regMotDePasse}
+              onChange={(e) => {
+                const valeur = e.target.value;
+                if (!validationChamp(regex.regMotDePasse, valeur)) {
+                  const erreur =
+                    "Le mot de passe doit contenir au moins 8 caractères, dont une lettre majuscule, une lettre minuscule et un caractère spécial";
+                  setErreurs((prev) => ({ ...prev, motDePasse: erreur }));
+                } else {
+                  setErreurs((prev) => ({ ...prev, motDePasse: "" }));
+                }
+              }}
+            />
+            {erreurs.motDePasse && (
+              <p className="erreur">{erreurs.motDePasse}</p>
+            )}
+
+            <FormulaireInput
+              type="texte"
               nom="confirmation"
               genre="une"
               estObligatoire={true}
@@ -75,10 +96,12 @@ function Inscription() {
                 const courrielInput = document.querySelector(
                   'input[name="courriel"]'
                 );
-                const adressecourriel = courrielInput.value;
-                if (!adressecourriel == valeur) {
+                const adressecourriel = courrielInput
+                  ? courrielInput.value
+                  : "";
+                if (adressecourriel !== valeur) {
                   const erreur =
-                    "La confirmation de l'adresse courriel n'est pas valide";
+                    "La confirmation du mot de passe n'est pas valide";
                   setErreurs((prev) => ({
                     ...prev,
                     confirmationcourriel: erreur,
@@ -91,32 +114,10 @@ function Inscription() {
             {erreurs.confirmationcourriel && (
               <p className="erreur">{erreurs.confirmationcourriel}</p>
             )}
-
-            <FormulaireInput
-              type="text"
-              nom="mot_de_passe"
-              genre="un"
-              estObligatoire={true}
-              pattern={regex.regMotDePasse}
-              onChange={(e) => {
-                const valeur = e.target.value;
-                if (!validationChamp(pattern, valeur)) {
-                  const erreur =
-                    "Le mot de passe doit contenir au moins 8 caractères, dont une lettre majuscule, une lettre minuscule et un caractère spécial";
-                  setErreurs((prev) => ({ ...prev, motDePasse: erreur }));
-                } else {
-                  setErreurs((prev) => ({ ...prev, motDePasse: "" }));
-                }
-              }}
-            />
-            {erreurs.motDePasse && (
-              <p className="erreur">{erreurs.motDePasse}</p>
-            )}
           </>
         }
-        bouton={"."}
+        bouton={<Bouton texte="S'inscrire" type="primaire" />}
       />
-      <Formulaire />
     </section>
   );
 }
