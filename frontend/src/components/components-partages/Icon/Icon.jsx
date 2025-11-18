@@ -11,16 +11,19 @@ const icons = {
   cellier: GiCellarBarrels,
   liste: GiNotebook,
   recherche: BiSearch,
-  utilisateur: FaUser,
+  profil: FaUser,
 };
 
-function Icon({ name, size = 24 }) {
-  const IconComponent = icons[name];
-
+function Icon({ nom, size = 24, couleur }) {
+  const IconComponent = icons[nom];
+  // Fonction pour capitaliser la première lettre
+  const IconNomMajuscule = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
   return (
-    <div>
-      <IconComponent size={size} />
-      <p>{name}</p>
+    <div className="flex flex-col items-center gap-[var(--rythme-tres-serre)] w-full text-[${couleur}]">
+      <IconComponent size={size} color={couleur} />
+      <p style={{ color: couleur }}>{IconNomMajuscule(nom)}</p>
     </div>
   );
 }
