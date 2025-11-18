@@ -1,41 +1,35 @@
-function Bouton({ 
-  texte, 
-  type = "primaire",
-  action,
-  typeHtml = "button"
-}) {
-
-  // Classes de base pour les boutons 
+function Bouton({ texte, type = "primaire", action, typeHtml = "button" }) {
+  // Classes de base pour les boutons
   const classesBase = `
     block w-full text-center px-8 py-3
     font-semibold
-    rounded-[var(--arrondi-grand)] shadow-md
-    hover:shadow-lg hover:-translate-y-0.5 
+    rounded-(--arrondi-grand) shadow-md
+    hover:shadow-lg hover:-translate-y-0.5
     transition-all duration-300 cursor-pointer
   `;
-
   // Classes selon le type
   const classesPrimaire = `
-    bg-[var(--color-principal-200)] 
-    text-[color:var(--color-fond)]
-    border-1 border-[var(--color-principal-200)]
-    hover:bg-[var(--color-principal-premier-plan)]
-    hover:text-[var(--color-principal-300)]
+    bg-principal-200
+    text-fond
+    border border-principal-200
+    hover:bg-principal-premier-plan
+    hover:text-principal-300
   `;
-
+  // Classes pour le bouton secondaire
   const classesSecondaire = `
-    bg-[var(--color-principal-100)] 
-    text-[var(--color-texte-premier)] 
-    border border-[var(--color-principal-100)]
-    hover:bg-[var(--color-principal-premier-plan)]
-    hover:text-[var(--color-principal-300)]
+    bg-principal-100
+    text-texte-premier
+    border border-principal-100
+    hover:bg-principal-premier-plan
+    hover:text-principal-300
   `;
 
   // les classes selon le type
-  const classesType = type === "secondaire" ? classesSecondaire : classesPrimaire;
+  const classesType =
+    type === "secondaire" ? classesSecondaire : classesPrimaire;
 
   return (
-    <button 
+    <button
       type={typeHtml}
       className={`${classesBase} ${classesType}`}
       onClick={action}
