@@ -10,7 +10,11 @@ function MenuEnHaut({}) {
     <nav className="flex items-center justify-between fixed top-0 w-full p-[var(--rythme-base)] bg-[var(--color-fond-secondaire)]">
       <div className="relative">
         {/* Bouton hamburger */}
-        <button onClick={() => setestMenuOuvert(!estMenuOuvert)}>
+        <button
+          onClick={() => setestMenuOuvert(!estMenuOuvert)}
+          aria-label={estMenuOuvert ? "Fermer le menu" : "Ouvrir le menu"}
+          aria-expanded={estMenuOuvert}
+        >
           {!estMenuOuvert ? (
             <Icon
               nom="menuHamburger"
@@ -99,7 +103,7 @@ function MenuEnHaut({}) {
 
       {/* Déconnexion */}
 
-      <button>
+      <button aria-label="Deconnection">
         <Icon
           nom="deconnection"
           typeMenu="haut"
