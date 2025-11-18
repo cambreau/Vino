@@ -7,51 +7,105 @@ function MenuEnHaut({}) {
   const [estMenuOuvert, setestMenuOuvert] = useState(false);
 
   return (
-    <nav>
-      {/* Bouton hamburger */}
-      <button onClick={() => setestMenuOuvert(!estMenuOuvert)}>
-        {!estMenuOuvert ? (
-          <Icon name="menuHamburger" typeMenu="haut" />
-        ) : (
-          <Icon name="fermer" typeMenu="haut" />
+    <nav className="flex items-center justify-between fixed top-0 w-full p-[var(--rythme-base)] bg-[var(--color-fond-secondaire)]">
+      <div className="relative">
+        {/* Bouton hamburger */}
+        <button onClick={() => setestMenuOuvert(!estMenuOuvert)}>
+          {!estMenuOuvert ? (
+            <Icon
+              nom="menuHamburger"
+              typeMenu="haut"
+              couleur="var(--color-principal-200)"
+            />
+          ) : (
+            <Icon
+              nom="fermer"
+              typeMenu="haut"
+              couleur="var(--color-principal-200)"
+            />
+          )}
+        </button>
+
+        {/* Menu déroulant */}
+        {estMenuOuvert && (
+          <div className="absolute mt-[var(--rythme-tres-serre)] py-[var(--rythme-base)] min-w-[300px] bg-[var(--color-fond-secondaire)]">
+            <header className="mb-[var(--rythme-espace)]">
+              <h2
+                className="text-[var(--color-principal-200)] font-bold"
+                style={{
+                  fontSize: "var(--taille-grand)",
+                  fontFamily: "var(--font-display)",
+                }}
+              >
+                Utilisateur
+              </h2>
+              <small
+                className="text-[var(--color-principal-200)]"
+                style={{
+                  fontSize: "var(--taille-moyen)",
+                  fontFamily: "var(--font-display)",
+                }}
+              >
+                Courriel
+              </small>
+            </header>
+            <div className="flex flex-col gap-[var(--rythme-base)]">
+              <a href="#">
+                <Icon
+                  nom="profil"
+                  typeMenu="haut"
+                  couleur="var(--color-principal-200)"
+                />
+              </a>
+              <a href="#">
+                <Icon
+                  nom="chateau"
+                  typeMenu="haut"
+                  couleur="var(--color-principal-200)"
+                />
+              </a>
+              <a href="#">
+                <Icon
+                  nom="cellier"
+                  typeMenu="haut"
+                  couleur="var(--color-principal-200)"
+                />
+              </a>
+              <a href="#">
+                <Icon
+                  nom="liste"
+                  typeMenu="haut"
+                  couleur="var(--color-principal-200)"
+                />
+              </a>
+            </div>
+          </div>
         )}
-      </button>
-      {/* Menu déroulant */}
-      {estMenuOuvert && (
-        <div>
-          <header>
-            <h2>Utilisateur</h2>
-            <small>Courriel</small>
-          </header>
-          <ul>
-            <li>
-              <Icon name="utilisateur" typeMenu="haut" />
-              <p>Profil</p>
-            </li>
-            <li>
-              <Icon name="chateau" typeMenu="haut" />
-              <p>Savoir Plus</p>
-            </li>
-            <li>
-              <Icon name="cellier" typeMenu="haut" />
-              <p>Celliers</p>
-            </li>
-            <li>
-              <Icon name="liste" typeMenu="haut" />
-              <p>Liste d'achat</p>
-            </li>
-          </ul>
-        </div>
-      )}
+      </div>
 
       {/* Logo */}
-      <header>
-        <h2>Vin</h2>
+      <header className="flex items-center">
+        <h2
+          className="text-[var(--color-principal-200)]"
+          style={{
+            fontSize: "var(--taille-grand)",
+            fontFamily: "var(--font-display)",
+          }}
+        >
+          Vin
+        </h2>
         <img src={RasinLogo} alt="Logo raisin" width="43" height="35" />
       </header>
 
       {/* Déconnexion */}
-      <Icon name="deconnection" typeMenu="haut" />
+
+      <button>
+        <Icon
+          nom="deconnection"
+          typeMenu="haut"
+          couleur="var(--color-principal-200)"
+        />
+      </button>
     </nav>
   );
 }
