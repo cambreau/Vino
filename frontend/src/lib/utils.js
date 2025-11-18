@@ -4,15 +4,24 @@
  * @returns {string}
  */
 export const formatteString = (nomString) => {
-  //Faire une copie du string dans une nouvelle constante.
-  let nom = nomString;
-  //Supprimer les espaces de tabulation
-  nom = nom.trim();
-  //Supprimer les accents
-  nom = nom.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  //Mettre en minuscule
-  nom = nom.toLowerCase();
-  //Remplacer les espaces
-  nom = nom.replaceAll(" ", "-");
-  return nom;
+  // Faire une copie du string dans une nouvelle constante
+  let mot = nomString;
+  // Supprimer les espaces de tabulation
+  mot = mot.trim();
+  // Supprimer les accents
+  mot = mot.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  // Mettre en minuscule
+  mot = mot.toLowerCase();
+  // Remplacer les espaces et les underscores par des tirets
+  mot = mot.replaceAll(" ", "-").replaceAll("_", "-");
+  return mot;
 };
+
+/**
+ * Fonction qui transforme la premìere lettre en majuscule d'un string.
+ * @param {string} string
+ * @returns string transformé.
+ */
+function formatMajDebut(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
