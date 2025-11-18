@@ -29,6 +29,17 @@ function Inscription() {
   });
 
   /**
+   * Fonction envoie la creation de l'utilisateur
+   * @param {Event} e - L'événement de soumission du formulaire
+   */
+  const envoieInscription = async (e) => {
+    e.preventDefault();
+
+    // Envoyer les données utilisateur
+    await creerUtilisateur(utilisateur, navigate);
+  };
+
+  /**
    * Ferme le message d'erreur en supprimant le paramètre "echec" de l'URL.
    */
   const fermerMessage = () => {
@@ -53,6 +64,7 @@ function Inscription() {
       <Formulaire
         titreFormulaire="Inscription"
         method="POST"
+        action={envoieInscription}
         enfants={
           <>
             <FormulaireInput
@@ -118,7 +130,7 @@ function Inscription() {
             )}
 
             <FormulaireInput
-              type="texte"
+              type="text"
               nom="confirmation"
               genre="une"
               estObligatoire={true}
