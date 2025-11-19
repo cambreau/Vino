@@ -2,7 +2,7 @@
  * @source backend/src/controllers/controller.bouteille.js
  * Objectif:
  * Orchestrer les flux REST autour du domaine bouteille et exposer
- * explicitement dependances et reponses attendues.
+ * explicitement dépendances et réponses attendues.
  */
 
 import modeleBouteille from "../models/modele.bouteille.js";
