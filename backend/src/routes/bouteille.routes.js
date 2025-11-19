@@ -5,7 +5,7 @@
  *    1.1. https://expressjs.com/fr/guide/routing.html
  * 2. Convention REST CRUD — correspondance GET/POST/PUT/DELETE.
  *    2.1. https://restfulapi.net/http-methods/
- * 3. Documentation interne (`routes.exemple.js`) — structure declarative retenue.
+ * 3. Documentation interne (`routes.exemple.js`) — structure déclarative retenue.
  *    3.1. Voir backend/src/routes
  * Objectif:
  * Rattacher les actions du controleur aux routes Express et documenter
