@@ -10,7 +10,7 @@ import ModeleBouteille from '../src/models/modele.bouteille.js';
     console.log('Import terminé :', JSON.stringify(resultat, null, 2));
     process.exit(0);
   } catch (err) {
-    console.error('Erreur lors de limport:', err?.message || err);
+    console.error("Erreur lors de l'import:", err?.message || err);
     process.exit(1);
   }
 })();
