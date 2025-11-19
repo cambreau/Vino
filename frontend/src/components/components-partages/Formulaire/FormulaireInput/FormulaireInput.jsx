@@ -38,7 +38,7 @@ function FormulaireInput({
       </label>
       <input
         className={`
-          max-w-[320px] px-(--rythme-serre) py-(--rythme-tres-serre) 
+          max-w px-(--rythme-serre) py-(--rythme-tres-serre) 
           text-(length:--taille-normal) font-font-body
            ${classCouleur === "Dark" ? inputDark : inputClair} 
           border border-(--color-texte-secondaire) rounded-(--arrondi-base) shadow-sm focus:outline-none focus:border-(--color-principal-200)`}
