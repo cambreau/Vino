@@ -8,6 +8,7 @@ import { TiThMenu } from "react-icons/ti"; // Menu
 import { MdLogout } from "react-icons/md"; // Deconnection
 import { PiCastleTurret } from "react-icons/pi"; // Chateau
 import { IoClose } from "react-icons/io5"; // Fermer
+import { formatMajDebut } from "../../../lib/utils";
 
 // Objet qui mappe les noms aux icônes
 const icons = {
@@ -15,6 +16,7 @@ const icons = {
   cellier: GiCellarBarrels,
   liste: GiNotebook,
   recherche: BiSearch,
+  profil: FaUser,
   utilisateur: FaUser,
   menuHamburger: TiThMenu,
   deconnection: MdLogout,
@@ -26,9 +28,9 @@ function Icon({ name, size = 24, typeMenu }) {
   const IconComponent = icons[name];
 
   return (
-    <div>
-      <IconComponent size={size} />
-      {typeMenu === "bas" ? <p>{name}</p> : null}
+    <div className="flex flex-col items-center gap-(--rythme-tres-serre) w-full text-${couleur}">
+      <IconComponent size={size} color={couleur} />
+      <p style={{ color: couleur }}>{formatMajDebut(nom)}</p>
     </div>
   );
 }
