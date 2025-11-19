@@ -97,6 +97,8 @@ function Connexion() {
               type="password"
               nom="mot de passe"
               genre="un"
+              classCouleur="Clair"
+              classCouleurLabel="Clair"
               estObligatoire={true}
               value={utilisateur.mot_de_passe}
               onChange={(e) => {
@@ -113,19 +115,7 @@ function Connexion() {
                 }
               }}
             />
-
-          {/* Lien "Mot de passe oublié?" */}
-          <div className="text-right mt-2">
-              <Link
-                to="/mot-de-passe-oublie"
-                className="
-                text-(length:--taille-normal)
-                text-principal-premier-plan
-                hover:text-principal-100 transition-colors"
-              >
-                Mot de passe oublié?
-              </Link>
-          </div>
+            
           </>
         }
         bouton={
