@@ -13,7 +13,7 @@ function BoutonRetour() {
       type="button"
       className="
         flex items-center justify-center
-        w-12 h-12
+        w-(--rythme-espace) h-(--rythme-espace)
         bg-(--color-fond-secondaire)
         rounded-full
         shadow-md
