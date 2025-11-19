@@ -22,13 +22,6 @@ function Connexion() {
   const [messageErreurGeneral, setMessageErreurGeneral] = useState("");
 
   /**
-   * Fonction appelée quand on clique sur le bouton retour
-   */
-  const gererRetour = () => {
-    navigate(-1);
-  };
-
-  /**
    * Fonction qui envoie la connexion
    * @param {Event} e - L'événement de soumission du formulaire
    */
@@ -62,7 +55,7 @@ function Connexion() {
     >
 
       <header className="px-(--rythme-base)">
-        <BoutonRetour action={gererRetour} />
+        <BoutonRetour />
       </header>
       
       <Formulaire

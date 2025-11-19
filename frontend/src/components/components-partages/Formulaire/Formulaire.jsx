@@ -10,7 +10,7 @@ function Formulaire({
       <h1 className="text-(length:--taille-grand) text-(--color-fond) font-display font-bold mb-(--rythme-base)">
         {titreFormulaire}
       </h1>
-      <form method={method} className="flex flex-col gap-6">
+      <form method={method} className="flex flex-col gap-(--rythme-base)">
         {enfants}
         {bouton}
       </form>

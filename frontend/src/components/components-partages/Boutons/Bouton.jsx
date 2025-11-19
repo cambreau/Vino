@@ -1,7 +1,13 @@
-function Bouton({ texte, type = "primaire", action, typeHtml = "button" }) {
+function Bouton({
+  texte,
+  type = "primaire",
+  taille = "", // Si, on ne met rien aucune taille donc grand, Taille 'moyen' = 320px
+  action,
+  typeHtml = "button",
+}) {
   // Classes de base pour les boutons
   const classesBase = `
-    block w-full text-center p-(--rythme-serre)
+    block text-center p-(--rythme-serre) 
     font-semibold
     rounded-(--arrondi-grand) shadow-md
     hover:shadow-lg hover:-translate-y-0.5
@@ -31,7 +37,9 @@ function Bouton({ texte, type = "primaire", action, typeHtml = "button" }) {
   return (
     <button
       type={typeHtml}
-      className={`${classesBase} ${classesType}`}
+      className={`${classesBase} ${classesType} ${
+        taille === "moyen" ? "max-w-[320px]" : ""
+      }`}
       onClick={action}
     >
       {texte}

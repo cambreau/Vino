@@ -1,5 +1,5 @@
 // Utils
-import { formatteString, formatMajDebut } from "../../../../lib/utils";
+import { formatString, formatMajDebut } from "../../../../lib/utils";
 
 function FormulaireInput({
   type,
@@ -9,29 +9,28 @@ function FormulaireInput({
   onChange,
   onBlur,
   value = "",
-  pattern,
-  classColor = "Dark", //Dark ou Clair
+  classCouleur = "Dark", //Dark ou Clair
 }) {
-  const nomFormat = formatteString(nom);
-  const labelClair = "text-white";
+  const nomFormat = formatString(nom);
+  const labelClair = "text-(--color-fond)";
   const labelDark = "text-color-texte-secondaire";
   const inputClair =
-    "bg-(--color-fond) text-(--color-texte) placeholder-(--color-texte-secondaire) placeholder:text-(length:--taille-petit) placeholder:font-display";
+    "text-(--color-texte) placeholder-(--color-texte-secondaire) placeholder:text-(length:--taille-petit) placeholder:font-display bg-(--color-fond)";
   const inputDark =
-    "bg-[#475467] text-(--color-fond) placeholder-(--color-fond) placeholder:text-(length:--taille-petit) placeholder:font-display";
+    "text-(--color-fond) placeholder-(--color-fond) placeholder:text-(length:--taille-petit) placeholder:font-display bg-[#475467]";
 
   return (
     <div
       className="
       flex flex-col 
       gap-rythme-serre 
-      font-body"
+      font-font-body"
     >
       <label
         className={`
         mb-rythme-serre
         text-(length:--taille-petit) font-medium
-        ${classColor === "Dark" ? labelClair : labelDark} 
+        ${classCouleur === "Dark" ? labelClair : labelDark} 
       `}
         htmlFor={nom}
       >
@@ -39,9 +38,9 @@ function FormulaireInput({
       </label>
       <input
         className={`
-          max-w p-(--rythme-serre)
+          max-w px-(--rythme-serre) py-(--rythme-tres-serre) 
           text-(length:--taille-normal) font-font-body
-           ${classColor === "Dark" ? inputDark : inputClair} 
+           ${classCouleur === "Dark" ? inputDark : inputClair} 
           border border-(--color-texte-secondaire) rounded-(--arrondi-base) shadow-sm focus:outline-none focus:border-(--color-principal-200)`}
         type={type}
         name={nom}

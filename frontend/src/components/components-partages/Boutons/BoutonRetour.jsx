@@ -9,17 +9,17 @@ function BoutonRetour() {
   };
   return (
     <button
+      aria-label="Retour en arrière"
       type="button"
       className="
         flex items-center justify-center
-        w-12 h-12
+        w-(--rythme-espace) h-(--rythme-espace)
         bg-(--color-fond-secondaire)
         rounded-full
         shadow-md
         hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer
       "
       onClick={revenirEnArriere}
-      aria-label="Revenir en arrière"
     >
       <FiArrowLeft size={24} color="var(--color-texte-premier)" />
     </button>
