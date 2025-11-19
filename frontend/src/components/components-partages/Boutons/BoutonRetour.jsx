@@ -1,18 +1,25 @@
 import { FiArrowLeft } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
-function BoutonRetour({ action }) {
+function BoutonRetour() {
+  const navigate = useNavigate();
+
+  const revenirEnArriere = () => {
+    navigate(-1); // redirige vers la page précédente
+  };
   return (
     <button
+      aria-label="Retour en arrière"
       type="button"
       className="
         flex items-center justify-center
-        w-12 h-12
+        w-(--rythme-espace) h-(--rythme-espace)
         bg-(--color-fond-secondaire)
         rounded-full
         shadow-md
         hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer
       "
-      onClick={action}
+      onClick={revenirEnArriere}
     >
       <FiArrowLeft size={24} color="var(--color-texte-premier)" />
     </button>
