@@ -9,10 +9,8 @@ import {
   supprimerUtilisateur,
 } from "../controllers/controller.utilisateur.js";
 
-import { validerCreationUtilisateur } from "../middlewares/validation.utilisateur.js";
-
 // POST / - Creer un utilisateur
-router.post("/", validerCreationUtilisateur, creerUtilisateur);
+router.post("/", creerUtilisateur);
 
 // GET //:id - Recuperer un utilisateur
 router.get("/:id", recupererUtilisateur);
