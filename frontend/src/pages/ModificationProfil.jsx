@@ -3,7 +3,8 @@ import FormulaireInput from "../components/components-partages/Formulaire/Formul
 import Bouton from "../components/components-partages/Boutons/Bouton";
 import Message from "../components/components-partages/Message/Message";
 import { regex, validationChamp } from "../lib/validationFormulaire.js";
-import { useState } from "react";
+import { recupererUtilisateur, modifierUtilisateur } from "../lib/requetes.js";
+import { useState, useEffect } from "react";
 import { useSearchParams, useParams, useNavigate } from "react-router-dom";
 
 function ModificationProfil() {
@@ -66,6 +67,30 @@ function ModificationProfil() {
   const fermerMessage = () => {
     searchParams.delete("echec");
     setSearchParams(searchParams);
+  };
+
+  /**
+   * Recharge les données de l'utilisateur depuis le backend.
+   */
+  const reinitialiserFormulaire = async () => {
+    if (id) {
+      const utilisateurData = await recupererUtilisateur(id);
+      if (utilisateurData) {
+        setUtilisateur({
+          id: utilisateurData.id,
+          nom: utilisateurData.nom || "",
+          courriel: utilisateurData.courriel || "",
+          mot_de_passe: "",
+        });
+        setConfirmation("");
+        setErreurs({
+          nom: "",
+          courriel: "",
+          confirmation: "",
+          motDePasse: "",
+        });
+      }
+    }
   };
 
   return (
