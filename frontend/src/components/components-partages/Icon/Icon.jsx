@@ -42,7 +42,8 @@ function Icon({ nom, size = 24, couleur, typeMenu }) {
           {/* Affiche le texte seulement si nom n’est PAS menuHamburger ou Fermer */}
           {nom !== "menuHamburger" &&
             nom !== "fermer" &&
-            nom !== "deconnection" && (
+            nom !== "deconnection" &&
+            nom !== "recherche" && (
               <p className={`text-${couleur}`}>{formatMajDebut(nom)}</p>
             )}
         </div>
