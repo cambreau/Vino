@@ -2,7 +2,7 @@
  * @source backend/src/database/pool.js
  * Objectif:
  * Prolonger `connexion.exemple.js` en documentant les variables requises
- * et en exposant un pool MySQL partage pour l'application Vino.
+ * et en exposant un pool MySQL partagé pour l'application Vino.
  */
 
 
