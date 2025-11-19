@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
 import Icon from "../components/components-partages/Icon/Icon";
+import MenuEnHaut from "../components/components-partages/MenuEnHaut/MenuEnHaut";
 
 function Profil() {
   const navigate = useNavigate();
