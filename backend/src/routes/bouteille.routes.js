@@ -29,13 +29,13 @@ const router = express.Router();
 router.get("/", listerBouteilles);
 // GET /:id - Recuperer une bouteille par ID
 router.get("/:id", recupererBouteille);
+// POST /import - Importer des bouteilles depuis SAQ
+router.post("/import", importerBouteillesDepuisSAQ);
 // POST / - Creer une nouvelle bouteille
 router.post("/", creerBouteille);
 // PUT /:id - Modifier une bouteille existante
 router.put("/:id", modifierBouteille);
 // DELETE /:id - Supprimer une bouteille
 router.delete("/:id", supprimerBouteille);
-// POST /import - Importer des bouteilles depuis SAQ
-router.post("/import", importerBouteillesDepuisSAQ);
 
 export default router;
