@@ -16,7 +16,7 @@ export default class modeleUtilisateur {
     return resultat.insertId;
   }
 
-  //Récupérer un utilisateur par email
+  //Récupérer un utilisateur par courriel
   static async trouverParCourriel(courriel) {
     const sql = `
         select * from utilisateur where courriel = ? LIMIT 1
@@ -27,17 +27,17 @@ export default class modeleUtilisateur {
 
 
 /**
- * Fonction qui recherche un utilisateur par son email pour la connexion
+ * Fonction qui recherche un utilisateur par son courriel pour la connexion
 */
-static async connexionUtilisateur(email) {
+static async connexionUtilisateur(courriel) {
   try {
     const sql = `
-      SELECT id_utilisateur, nom, email, mot_de_passe 
+      SELECT id_utilisateur, nom, courriel, mot_de_passe 
       FROM utilisateur 
-      WHERE email = ? 
+      WHERE courriel = ? 
       LIMIT 1
     `;
-    const [resultat] = await connexion.execute(sql, [email]);
+    const [resultat] = await connexion.execute(sql, [courriel]);
     
     // Si un utilisateur est trouvé, retourner le premier résultat, sinon retourner null
     return resultat.length > 0 ? resultat[0] : null;

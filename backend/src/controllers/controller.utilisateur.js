@@ -72,15 +72,15 @@ export const supprimerUtilisateur = async (req, res) => {};
 export const connexionUtilisateur = async (req, res) => {
 
 try {
-    const { email, mot_de_passe } = req.body;
+    const { courriel, mot_de_passe } = req.body;
     
     // Vérifier que tous les champs sont présents
-    if (!email || !mot_de_passe) {
+    if (!courriel || !mot_de_passe) {
       return res.status(400).json({ message: "Champs requis manquants." });
     }
     
     // Rechercher l'utilisateur dans la base de données via le modèle
-    const utilisateur = await modeleUtilisateur.connexionUtilisateur(email);
+    const utilisateur = await modeleUtilisateur.connexionUtilisateur(courriel);
     
     if (!utilisateur) {
       return res.status(401).json({ message: "Email ou mot de passe incorrect." });
@@ -88,10 +88,16 @@ try {
     
     // Comparer le mot de passe fourni avec le mot de passe hashé stocké dans la base
     const motDePasseValide = await bcrypt.compare(mot_de_passe, utilisateur.mot_de_passe);
-    
+
     if (!motDePasseValide) {
-      return res.status(401).json({ message: "Email ou mot de passe incorrect." });
+      return res.status(401).json({ message: "Courriel ou mot de passe incorrect." });
     }
+
+    // TEST
+    // if (mot_de_passe !== utilisateur.mot_de_passe) {
+    //   return res.status(401).json({ message: "Courriel ou mot de passe incorrect." });
+    // }
+
     
     // Connexion réussie - ne pas renvoyer le mot de passe
     return res.status(200).json({
@@ -99,7 +105,7 @@ try {
       utilisateur: {
         id_utilisateur: utilisateur.id_utilisateur,
         nom: utilisateur.nom,
-        email: utilisateur.email
+        courriel: utilisateur.courriel
       }
     });
     
