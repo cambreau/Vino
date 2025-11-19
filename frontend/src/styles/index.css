@@ -10,7 +10,7 @@
   --color-principal-100: #f5dfe5; /* Rose Pâle */
   --color-principal-200: #a8427d; /* Primary Dark */
   --color-principal-300: #821250; /* Primary */
-  --color-principal-premier-plan: #fcfcfd;
+  --color-principal-premier-plan: #ffffff; /* Premier plan (foreground) */
 
   /* Palette de couleurs - Fond */
   --color-fond: #f6ebdc;
@@ -51,4 +51,8 @@
   --point-rupture-tablette: 768px; /* Tablettes */
   --point-rupture-portable: 992px; /* Ordinateurs portables */
   --point-rupture-desktop: 1200px; /* Écrans de grande taille */
+}
+
+body {
+  font-family: var(--font-body);
 }

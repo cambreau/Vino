@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import Bouton from "../components/components-partages/Formulaire/FormulaireBouton/Bouton";
+import Bouton from "../components/components-partages/Boutons/Bouton";
 
 function Bienvenue() {
   const navigate = useNavigate();
