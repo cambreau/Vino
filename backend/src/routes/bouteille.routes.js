@@ -9,7 +9,7 @@
  *    3.1. Voir backend/src/routes
  * Objectif:
  * Rattacher les actions du controleur aux routes Express et documenter
- * explicitement la surface REST exposee par le domaine bouteille.
+ * explicitement la surface REST exposée par le domaine bouteille.
  */
 
 
