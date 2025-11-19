@@ -41,7 +41,7 @@ function MenuEnHaut({}) {
 
         {/* Menu déroulant */}
         {estMenuOuvert && (
-          <div className="absolute -left-(--rythme-base) mt-(--rythme-tres-serre) p-(--rythme-base) min-w-[300px] bg-(--color-fond-secondaire)">
+          <div className="absolute -left-(--rythme-base) mt-(--rythme-tres-serre) p-(--rythme-base) h-screen  min-w-[300px] bg-(--color-fond-secondaire)">
             <div className="flex justify-between mb-(--rythme-espace)">
               <header>
                 <h2 className="text-(--color-principal-300) text-(length:--taille-grand) font-display font-bold">
@@ -131,35 +131,31 @@ function MenuEnHaut({}) {
 
         {/* Menu de recherche déroulant */}
         {estRechercheOuvert && (
-          <div className=" flex absolute -right-(--rythme-base) top-full  mt-(--rythme-tres-serre) p-(--rythme-espace) px-(--rythme-base) min-w-[300px] bg-(--color-fond-secondaire)">
-            {/* <input
-              type="search"
-              placeholder="Rechercher un vin..."
-              className="w-full p-[var(--rythme-serre)] border rounded-lg"
-              autoFocus
-            /> */}
-            <FormulaireInput
-              type="test"
-              nom=""
-              genre="un"
-              estObligatoire={true}
-              onChange={handleChange}
-              onBlur={handleBlur}
-            />
-            <button
-              className="absolute right-(--rythme-base) top-(--rythme-serre)"
-              onClick={() => setestRechercheOuvert(!estRechercheOuvert)}
-              aria-label={
-                estRechercheOuvert ? "Fermer recherche" : "Ouvrir recherche"
-              }
-              aria-expanded={estRechercheOuvert}
-            >
-              <Icon
-                nom="fermer"
-                typeMenu="haut"
-                couleur="(--color-principal-300)"
+          <div className="absolute top-full h-screen -right-(--rythme-base) mt-(--rythme-serre) p-(--rythme-espace) px-(--rythme-base) min-w-[300px] bg-(--color-fond-secondaire)">
+            <div>
+              <FormulaireInput
+                type="test"
+                nom=""
+                genre="un"
+                estObligatoire={true}
+                onChange={handleChange}
+                onBlur={handleBlur}
               />
-            </button>
+              <button
+                className="absolute right-(--rythme-base) top-(--rythme-serre)"
+                onClick={() => setestRechercheOuvert(!estRechercheOuvert)}
+                aria-label={
+                  estRechercheOuvert ? "Fermer recherche" : "Ouvrir recherche"
+                }
+                aria-expanded={estRechercheOuvert}
+              >
+                <Icon
+                  nom="fermer"
+                  typeMenu="haut"
+                  couleur="(--color-principal-300)"
+                />
+              </button>
+            </div>
           </div>
         )}
 
