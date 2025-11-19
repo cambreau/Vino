@@ -7,7 +7,7 @@ function MenuEnHaut({}) {
   const [estMenuOuvert, setestMenuOuvert] = useState(false);
 
   return (
-    <nav className="flex items-center justify-between fixed top-0 w-full p-(--rythme-base) bg-(--color-fond-secondaire)">
+    <nav className="flex items-center justify-between fixed top-0 max-w-[500px] mx-auto inset-x-0 p-(--rythme-base) bg-(--color-fond-secondaire)">
       <div className="relative">
         {/* Bouton hamburger */}
         <button
@@ -19,13 +19,13 @@ function MenuEnHaut({}) {
             <Icon
               nom="menuHamburger"
               typeMenu="haut"
-              couleur="var(--color-principal-300)"
+              couleur="(--color-principal-300)"
             />
           ) : (
             <Icon
               nom="fermer"
               typeMenu="haut"
-              couleur="var(--color-principal-300)"
+              couleur="(--color-principal-300)"
             />
           )}
         </button>
@@ -46,28 +46,28 @@ function MenuEnHaut({}) {
                 <Icon
                   nom="profil"
                   typeMenu="haut"
-                  couleur="var(--color-principal-300)"
+                  couleur="(--color-principal-300)"
                 />
               </a>
               <a href="#">
                 <Icon
                   nom="chateau"
                   typeMenu="haut"
-                  couleur="var(--color-principal-300)"
+                  couleur="(--color-principal-300)"
                 />
               </a>
               <a href="#">
                 <Icon
                   nom="cellier"
                   typeMenu="haut"
-                  couleur="var(--color-principal-300)"
+                  couleur="(--color-principal-300)"
                 />
               </a>
               <a href="#">
                 <Icon
                   nom="liste"
                   typeMenu="haut"
-                  couleur="var(--color-principal-300)"
+                  couleur="(--color-principal-300)"
                 />
               </a>
             </div>
@@ -89,7 +89,7 @@ function MenuEnHaut({}) {
         <Icon
           nom="deconnection"
           typeMenu="haut"
-          couleur="var(--color-principal-300)"
+          couleur="(--color-principal-300)"
         />
       </button>
     </nav>
