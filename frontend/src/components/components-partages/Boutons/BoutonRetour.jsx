@@ -9,6 +9,7 @@ function BoutonRetour() {
   };
   return (
     <button
+      aria-label="Retour en arrière"
       type="button"
       className="
         flex items-center justify-center

@@ -9,8 +9,7 @@ function FormulaireInput({
   onChange,
   onBlur,
   value = "",
-  pattern,
-  classColor = "Dark", //Dark ou Clair
+  classCouleur = "Dark", //Dark ou Clair
 }) {
   const nomFormat = formatteString(nom);
   const labelClair = "text-white";
@@ -31,7 +30,7 @@ function FormulaireInput({
         className={`
         mb-rythme-serre
         text-(length:--taille-petit) font-medium
-        ${classColor === "Dark" ? labelClair : labelDark} 
+        ${classCouleur === "Dark" ? labelClair : labelDark} 
       `}
         htmlFor={nom}
       >
@@ -41,7 +40,7 @@ function FormulaireInput({
         className={`
           max-w-[320px] px-(--rythme-serre) py-(--rythme-tres-serre) 
           text-(length:--taille-normal) font-font-body
-           ${classColor === "Dark" ? inputDark : inputClair} 
+           ${classCouleur === "Dark" ? inputDark : inputClair} 
           border border-(--color-texte-secondaire) rounded-(--arrondi-base) shadow-sm focus:outline-none focus:border-(--color-principal-200)`}
         type={type}
         name={nom}

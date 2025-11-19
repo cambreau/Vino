@@ -172,6 +172,7 @@ function Inscription() {
         }
         bouton={
           <Bouton
+            taille="moyen"
             texte="S'inscrire"
             type="primaire"
             typeHtml="button"
