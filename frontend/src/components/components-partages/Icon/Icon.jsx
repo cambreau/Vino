@@ -8,6 +8,7 @@ import { TiThMenu } from "react-icons/ti"; // Menu
 import { MdLogout } from "react-icons/md"; // Deconnection
 import { PiCastleTurret } from "react-icons/pi"; // Chateau
 import { IoClose } from "react-icons/io5"; // Fermer
+import { formatMajDebut } from "../../../lib/utils";
 
 // Objet qui mappe les noms aux icônes
 const icons = {
@@ -15,20 +16,37 @@ const icons = {
   cellier: GiCellarBarrels,
   liste: GiNotebook,
   recherche: BiSearch,
-  utilisateur: FaUser,
+  profil: FaUser,
   menuHamburger: TiThMenu,
   deconnection: MdLogout,
   chateau: PiCastleTurret,
   fermer: IoClose,
 };
 
-function Icon({ name, size = 24, typeMenu }) {
-  const IconComponent = icons[name];
+function Icon({ nom, size = 24, couleur, typeMenu }) {
+  const IconComposant = icons[nom];
 
   return (
     <div>
-      <IconComponent size={size} />
-      {typeMenu === "bas" ? <p>{name}</p> : null}
+      {/* Verifier le si c'est le menu en haut ou en bas pour avoir la bonne affichage d'ensemble du icon et nom correspondent */}
+      {typeMenu === "bas" ? (
+        <div className="flex flex-col items-center gap-(--rythme-tres-serre) w-full text-[${couleur}]">
+          <IconComposant size={size} className={`text-${couleur}`} />
+          {typeMenu === "bas" ? (
+            <p className={`text-${couleur}`}>{formatMajDebut(nom)}</p>
+          ) : null}
+        </div>
+      ) : (
+        <div className="flex items-center gap-(--rythme-base) w-full text-[${couleur}]">
+          <IconComposant size={size} className={`text-${couleur}`} />
+          {/* Affiche le texte seulement si nom n’est PAS menuHamburger ou Fermer */}
+          {nom !== "menuHamburger" &&
+            nom !== "fermer" &&
+            nom !== "deconnection" && (
+              <p className={`text-${couleur}`}>{formatMajDebut(nom)}</p>
+            )}
+        </div>
+      )}
     </div>
   );
 }
