@@ -20,7 +20,7 @@ create table bouteille (
     id_pays INT,
     id_type INT,
     nom VARCHAR(100) NOT NULL,
-    millenisme YEAR NOT NULL,
+    millesime YEAR NOT NULL,
     region VARCHAR(50) NOT NULL,
     cepage VARCHAR(100) NOT NULL,
     image VARCHAR(255) NOT NULL,
