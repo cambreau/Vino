@@ -31,7 +31,7 @@ router.get("/", listerBouteilles);
 router.get("/:id", recupererBouteille);
 // POST /import - Importer des bouteilles depuis SAQ
 router.post("/import", importerBouteillesDepuisSAQ);
-// POST / - Creer une nouvelle bouteille
+// POST / - Créer une nouvelle bouteille
 router.post("/", creerBouteille);
 // PUT /:id - Modifier une bouteille existante
 router.put("/:id", modifierBouteille);
