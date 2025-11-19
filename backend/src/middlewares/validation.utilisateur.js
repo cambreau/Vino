@@ -1,4 +1,4 @@
-export function validerCreationUtilisateur(req, res, next) {
+export  default  function validerCreationUtilisateur(req, res, next) {
   const { nom, courriel, mot_de_passe } = req.body;
 
   // Valider le nom
@@ -38,5 +38,27 @@ export function validerCreationUtilisateur(req, res, next) {
   }
 
   //Si tout est valide
+  next();
+}
+
+
+// Validation pour la CONNEXION d'utilisateur
+export function validerConnexionUtilisateur(req, res, next) {
+  const { courriel, mot_de_passe } = req.body;
+
+  // Valider le courriel
+  if (!courriel || courriel.trim() === "") {
+    return res.status(400).json({ message: "Le courriel est requis." });
+  }
+
+  if (!courriel.includes("@") || !courriel.includes(".")) {
+    return res.status(400).json({ message: "Le courriel n'est pas valide." });
+  }
+
+  // Valider le mot de passe
+  if (!mot_de_passe || mot_de_passe.trim() === "") {
+    return res.status(400).json({ message: "Le mot de passe est requis." });
+  }
+
   next();
 }

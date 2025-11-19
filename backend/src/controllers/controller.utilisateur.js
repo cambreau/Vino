@@ -83,22 +83,16 @@ try {
     const utilisateur = await modeleUtilisateur.connexionUtilisateur(courriel);
     
     if (!utilisateur) {
-      return res.status(401).json({ message: "Email ou mot de passe incorrect." });
+      return res.status(401).json({ message: "Courriel ou mot de passe incorrect." });
     }
     
-    // Comparer le mot de passe fourni avec le mot de passe hashé stocké dans la base
+    // Comparer le mot de passe fourni avec le mot de passe hashé
     const motDePasseValide = await bcrypt.compare(mot_de_passe, utilisateur.mot_de_passe);
 
     if (!motDePasseValide) {
       return res.status(401).json({ message: "Courriel ou mot de passe incorrect." });
     }
 
-    // TEST
-    // if (mot_de_passe !== utilisateur.mot_de_passe) {
-    //   return res.status(401).json({ message: "Courriel ou mot de passe incorrect." });
-    // }
-
-    
     // Connexion réussie - ne pas renvoyer le mot de passe
     return res.status(200).json({
       message: "Connexion réussie.",

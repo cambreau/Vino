@@ -10,6 +10,8 @@ import {
   connexionUtilisateur
 } from "../controllers/controller.utilisateur.js";
 
+import { validerConnexionUtilisateur } from "../middlewares/validation.utilisateur.js";
+
 // POST / - Creer un utilisateur
 router.post("/", creerUtilisateur);
 
@@ -27,7 +29,7 @@ router.delete("/:id", supprimerUtilisateur);
 
 
 // POST /connexion - Connexion d'un utilisateur
-router.post("/connexion", connexionUtilisateur);
+router.post("/connexion", validerConnexionUtilisateur, connexionUtilisateur);
 
 
 export default router;
