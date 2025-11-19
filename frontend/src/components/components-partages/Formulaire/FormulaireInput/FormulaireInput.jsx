@@ -12,12 +12,12 @@ function FormulaireInput({
   classCouleur = "Dark", //Dark ou Clair
 }) {
   const nomFormat = formatteString(nom);
-  const labelClair = "text-white";
+  const labelClair = "text-(--color-fond)";
   const labelDark = "text-color-texte-secondaire";
   const inputClair =
-    "bg-(--color-fond) text-(--color-texte) placeholder-(--color-texte-secondaire) placeholder:text-(length:--taille-petit) placeholder:font-display";
+    "text-(--color-texte) placeholder-(--color-texte-secondaire) placeholder:text-(length:--taille-petit) placeholder:font-display bg-(--color-fond)";
   const inputDark =
-    "bg-[#475467] text-(--color-fond) placeholder-(--color-fond) placeholder:text-(length:--taille-petit) placeholder:font-display";
+    "text-(--color-fond) placeholder-(--color-fond) placeholder:text-(length:--taille-petit) placeholder:font-display bg-[#475467]";
 
   return (
     <div
