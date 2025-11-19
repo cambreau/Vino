@@ -167,9 +167,9 @@ class ModeleBouteille {
     console.log("Insertion - payload:", JSON.stringify(payload));
     await connection.query(
       `INSERT INTO bouteille
-	(nom, millenisme, region, cepage, image, description,
-	 taux_alcool, prix, id_pays, id_type)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  (nom, millenisme, region, cepage, image, description,
+    taux_alcool, prix, id_pays, id_type)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         payload.nom,
         payload.millenisme,
