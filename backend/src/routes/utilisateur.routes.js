@@ -7,6 +7,7 @@ import {
   recupererUtilisateurParEmail,
   modifierUtilisateur,
   supprimerUtilisateur,
+  connexionUtilisateur
 } from "../controllers/controller.utilisateur.js";
 
 // POST / - Creer un utilisateur
@@ -23,5 +24,9 @@ router.put("/:id", modifierUtilisateur);
 
 // DELETE //:id - Supprimer un utilisateur
 router.delete("/:id", supprimerUtilisateur);
+
+
+// POST /connexion - Connexion d'un utilisateur
+router.post("/connexion", connexionUtilisateur);
 
 export default router;
