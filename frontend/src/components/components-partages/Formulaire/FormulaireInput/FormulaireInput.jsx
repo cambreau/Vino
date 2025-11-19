@@ -1,5 +1,5 @@
 // Utils
-import { formatteString, formatMajDebut } from "../../../../lib/utils";
+import { formatString, formatMajDebut } from "../../../../lib/utils";
 
 function FormulaireInput({
   type,
@@ -11,7 +11,7 @@ function FormulaireInput({
   value = "",
   classCouleur = "Dark", //Dark ou Clair
 }) {
-  const nomFormat = formatteString(nom);
+  const nomFormat = formatString(nom);
   const labelClair = "text-(--color-fond)";
   const labelDark = "text-color-texte-secondaire";
   const inputClair =

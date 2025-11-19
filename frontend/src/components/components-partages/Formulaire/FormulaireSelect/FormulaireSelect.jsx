@@ -1,5 +1,5 @@
 // Utils
-import { formatteString } from "../../../../lib/utils";
+import { formatString } from "../../../../lib/utils";
 
 function FormulaireSelect({
   nom,
@@ -29,7 +29,7 @@ function FormulaireSelect({
         text-(length:--taille-petit) font-medium
         ${classCouleur === "Dark" ? labelClair : labelDark} 
       `}
-        htmlFor={formatteString(nom)}
+        htmlFor={formatString(nom)}
       >
         {nom} :
       </label>
@@ -39,8 +39,8 @@ function FormulaireSelect({
           text-(length:--taille-normal) font-font-body
            ${classCouleur === "Dark" ? selectDark : selectClair} 
           border border-(--color-texte-secondaire) rounded-(--arrondi-base) shadow-sm focus:outline-none focus:border-(--color-principal-200)`}
-        id={formatteString(nom)}
-        name={formatteString(nom)}
+        id={formatString(nom)}
+        name={formatString(nom)}
         {...(estObligatoire ? { required: true } : {})}
         value={value || ""}
         onChange={onChange}
@@ -49,7 +49,7 @@ function FormulaireSelect({
           -- Choisir {genre} {nom} --
         </option>
         {arrayOptions.map((option) => (
-          <option key={option} value={formatteString(option)}>
+          <option key={option} value={formatString(option)}>
             {option}
           </option>
         ))}

@@ -3,7 +3,7 @@
  * @param {string} nomString
  * @returns {string}
  */
-export const formatteString = (nomString) => {
+export const formatString = (nomString) => {
   // Faire une copie du string dans une nouvelle constante
   let mot = nomString;
   // Supprimer les espaces de tabulation
