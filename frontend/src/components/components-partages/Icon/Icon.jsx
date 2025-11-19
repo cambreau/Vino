@@ -25,28 +25,25 @@ const icons = {
 
 function Icon({ nom, size = 24, couleur, typeMenu }) {
   const IconComponent = icons[nom];
-  // Fonction pour capitaliser la première lettre
-  const IconNomMajuscule = (str) => {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
+
   return (
     <div>
       {/* Verifier le si c'est le menu en haut ou en bas pour avoir la bonne affichage d'ensemble du icon et nom correspondent */}
       {typeMenu === "bas" ? (
         <div className="flex flex-col items-center gap-(--rythme-tres-serre) w-full text-[${couleur}]">
-          <IconComponent size={size} color={couleur} />
+          <IconComponent size={size} className={`text-${couleur}`} />
           {typeMenu === "bas" ? (
-            <p style={{ color: couleur }}>{IconNomMajuscule(nom)}</p>
+            <p className={`text-${couleur}`}>{formatMajDebut(nom)}</p>
           ) : null}
         </div>
       ) : (
         <div className="flex items-center gap-(--rythme-base) w-full text-[${couleur}]">
-          <IconComponent size={size} color={couleur} />
+          <IconComponent size={size} className={`text-${couleur}`} />
           {/* Affiche le texte seulement si nom n’est PAS menuHamburger ou Fermer */}
           {nom !== "menuHamburger" &&
             nom !== "fermer" &&
             nom !== "deconnection" && (
-              <p style={{ color: couleur }}>{IconNomMajuscule(nom)}</p>
+              <p className={`text-${couleur}`}>{formatMajDebut(nom)}</p>
             )}
         </div>
       )}
