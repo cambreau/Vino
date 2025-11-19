@@ -1,36 +1,42 @@
 /**
  * @source backend/src/models/modele.bouteille.js
+ * Sources:
+ * 1. mysql2/promise — transactions et requêtes préparées.
+ *    1.1. https://github.com/sidorares/node-mysql2
+ * 2. MDN Array.prototype.reduce — agrégation d'attributs SAQ.
+ *    2.1. https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
+ * 3. Service interne SAQ (`src/services/saqService.js`) — récupération des produits.
  * Objectif:
  * Implémenter la couche d'accès et de normalisation des bouteilles en
  * documentant invariants, dépendances et opérations exposées.
  */
 
-import pool from "../database/pool.js";
+import { connexion } from "../database/connexion.js";
+import { recupererTousVins } from "../services/saqService.js";
 
 const BASE_SELECT = `
-	SELECT
-		b.id_bouteille,
-		b.code_saq,
-		b.nom,
-		b.millenisme,
-		b.region,
-		b.cepage,
-		b.image,
-		b.description,
-		b.taux_alcool,
-		b.prix,
-		p.nom AS pays,
-		t.couleur AS type
-	FROM bouteille b
-	LEFT JOIN pays p ON p.id_pays = b.id_pays
-	LEFT JOIN type t ON t.id_type = b.id_type
+  SELECT
+    b.id_bouteille,
+    b.nom,
+    b.millenisme,
+    b.region,
+    b.cepage,
+    b.image,
+    b.description,
+    b.taux_alcool,
+    b.prix,
+    p.nom AS pays,
+    t.couleur AS type
+  FROM bouteille b
+  LEFT JOIN pays p ON p.id_pays = b.id_pays
+  LEFT JOIN type t ON t.id_type = b.id_type
 `;
 
+// Transforme un enregistrement SQL en représentation API.
 const mapper = (row) => ({
   id: row.id_bouteille,
-  codeSAQ: row.code_saq,
   nom: row.nom,
-  millesime: row.millenisme,
+  millenisme: row.millenisme,
   region: row.region,
   cepage: row.cepage,
   image: row.image,
@@ -42,25 +48,295 @@ const mapper = (row) => ({
 });
 
 class ModeleBouteille {
-  static async trouverTout() {}
+  /**
+   * Récupère l'ensemble des bouteilles disponibles pour l'API.
+   */
+  static async trouverTout() {
+    const [rows] = await connexion.query(`${BASE_SELECT} ORDER BY b.id_bouteille DESC`);
+    return rows.map(mapper);
+  }
 
-  static async trouverParId() {}
+  /**
+   * Récupère une bouteille spécifique par identifiant.
+   */
+  static async trouverParId(id) {
+    const [rows] = await connexion.query(`${BASE_SELECT} WHERE b.id_bouteille = ?`, [
+      id,
+    ]);
+    return rows.length ? mapper(rows[0]) : null;
+  }
 
-  static async creer() {}
+  static async creer() {
+    throw new Error("creer non implémenté");
+  }
 
-  static async mettreAJour() {}
+  static async mettreAJour() {
+    throw new Error("mettreAJour non implémenté");
+  }
 
-  static async supprimer() {}
+  static async supprimer() {
+    throw new Error("supprimer non implémenté");
+  }
 
-  static async importerDepuisEnregistrementsSaq() {}
+  /**
+   * Importe les produits SAQ en respectant la structure `codeDb.sql`.
+   */
+  static async importerDepuisEnregistrementsSaq(options = {}) {
+    const { limite } = options;
+    const enregistrements = await recupererTousVins();
+    const aTraiter = Number.isInteger(limite) && limite > 0
+      ? enregistrements.slice(0, limite)
+      : enregistrements;
 
-  static async #normaliserPayload() {}
+    // Statistiques retournées au contrôleur pour informer le client.
+    const stats = {
+      totalRecuperes: enregistrements.length,
+      traites: aTraiter.length,
+      inseres: 0,
+      misAJour: 0,
+      ignores: 0,
+    };
 
-  static async #mapperEnregistrementSaq() {}
+    if (!aTraiter.length) return stats;
 
-  static #construireDescription() {}
+    const connection = await connexion.getConnection();
+    try {
+      await connection.beginTransaction();
+      for (const enregistrement of aTraiter) {
+        const mappe = this.#mapperEnregistrementSaq(enregistrement);
+        if (!mappe) {
+          stats.ignores += 1;
+          continue;
+        }
 
-  static async #assurerType() {}
+        const payload = await this.#normaliserPayload(connection, mappe);
+        if (!payload) {
+          stats.ignores += 1;
+          continue;
+        }
+
+        const action = await this.#persisterBouteille(connection, payload);
+        if (action === "insert") stats.inseres += 1;
+        else if (action === "update") stats.misAJour += 1;
+        else stats.ignores += 1;
+      }
+      await connection.commit();
+      return stats;
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+
+  /**
+   * Effectue un upsert basé sur (nom, millésime) pour respecter la structure actuelle.
+   */
+  static async #persisterBouteille(connection, payload) {
+    try {
+      const [existants] = await connection.query(
+      "SELECT id_bouteille FROM bouteille WHERE nom = ? AND millenisme = ? LIMIT 1",
+      [payload.nom, payload.millenisme]
+    );
+
+    if (existants.length) {
+      console.log("Mise à jour - payload:", JSON.stringify(payload));
+      await connection.query(
+        `UPDATE bouteille
+           SET nom = ?, millenisme = ?, region = ?, cepage = ?, image = ?,
+               description = ?, taux_alcool = ?, prix = ?, id_pays = ?, id_type = ?
+         WHERE id_bouteille = ?`,
+        [
+          payload.nom,
+          payload.millenisme,
+          payload.region,
+          payload.cepage,
+          payload.image,
+          payload.description,
+          payload.taux_alcool,
+          payload.prix,
+          payload.id_pays,
+          payload.id_type,
+          existants[0].id_bouteille,
+        ]
+      );
+      return "update";
+    }
+
+    console.log("Insertion - payload:", JSON.stringify(payload));
+    await connection.query(
+      `INSERT INTO bouteille
+	(nom, millenisme, region, cepage, image, description,
+	 taux_alcool, prix, id_pays, id_type)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        payload.nom,
+        payload.millenisme,
+        payload.region,
+        payload.cepage,
+        payload.image,
+        payload.description,
+        payload.taux_alcool,
+        payload.prix,
+        payload.id_pays,
+        payload.id_type,
+      ]
+    );
+    return "insert";
+    } catch (err) {
+      console.error("Erreur SQL #persisterBouteille:", err?.message || err);
+      console.error("payload:", payload);
+      throw err;
+    }
+  }
+
+  /**
+   * Valide et complète les données avant insertion SQL.
+   */
+  static async #normaliserPayload(connection, donneesMappees) {
+    if (!donneesMappees?.nom) return null;
+
+    const idPays = await this.#assurerPays(connection, donneesMappees.pays);
+    const idType = await this.#assurerType(connection, donneesMappees.type);
+
+    const millesime = Number.isInteger(donneesMappees.millesime)
+      ? donneesMappees.millesime
+      : 1900;
+
+    const cepageValue = Array.isArray(donneesMappees.cepage)
+      ? donneesMappees.cepage.join(", ")
+      : donneesMappees.cepage || "Cépage non précisé";
+
+    const regionValue = Array.isArray(donneesMappees.region)
+      ? donneesMappees.region.join(", ")
+      : donneesMappees.region || "Origine non précisée";
+
+    return {
+      nom: donneesMappees.nom,
+      millenisme: millesime,
+      region: regionValue,
+      cepage: cepageValue,
+      image: donneesMappees.image || "",
+      description: donneesMappees.description || "Description non fournie",
+      taux_alcool: donneesMappees.tauxAlcool ?? null,
+      prix: Number.isFinite(donneesMappees.prix) ? donneesMappees.prix : 0,
+      id_pays: idPays,
+      id_type: idType,
+    };
+  }
+
+  /**
+   * Traduit une réponse SAQ en attributs internes.
+   */
+  static #mapperEnregistrementSaq(enregistrement) {
+    if (!enregistrement?.product && !enregistrement?.productView) return null;
+    const product = enregistrement.product || {};
+    const vue = enregistrement.productView || {};
+    const attributes = Array.isArray(vue.attributes) ? vue.attributes : [];
+    // On convertit la liste d'attributs en objet clé/valeur pour des lectures rapides.
+    const attrMap = attributes.reduce((acc, attr) => {
+      if (attr?.name) acc[attr.name] = attr.value;
+      return acc;
+    }, {});
+
+    const brutPrix =
+      product?.price_range?.minimum_price?.final_price?.value ?? undefined;
+    const prix = Number.parseFloat(brutPrix);
+    const taux = attrMap.pourcentage_alcool_par_volume
+      ? Number.parseFloat(
+          attrMap.pourcentage_alcool_par_volume
+            .toString()
+            .replace(",", ".")
+            .replace(/[^0-9.]/g, "")
+        )
+      : null;
+
+    const millesime = attrMap.millesime_produit
+      ? Number.parseInt(attrMap.millesime_produit, 10)
+      : null;
+
+    return {
+      nom: vue.name || product?.name || null,
+      prix: Number.isFinite(prix) ? prix : null,
+      millesime: Number.isFinite(millesime) ? millesime : null,
+      region:
+        attrMap.region_origine ||
+        attrMap.designation_reglementee ||
+        attrMap.identite_produit ||
+        attrMap.gamme_marketing ||
+        null,
+      cepage: attrMap.cepage || attrMap.pastille_gout || null,
+      image: product?.image?.url || null,
+      description: this.#construireDescription(attrMap),
+      tauxAlcool: Number.isFinite(taux) ? taux : null,
+      pays: attrMap.pays_origine || null,
+      type: attrMap.couleur || null,
+    };
+  }
+
+  /**
+   * Produit une description textuelle compacte à partir d'attributs SAQ.
+   */
+  static #construireDescription(attrMap) {
+    const clefsImportantes = [
+      "identite_produit",
+      "designation_reglementee",
+      "pastille_gout",
+      "taux_sucre",
+      "gamme_marketing",
+      "nom_producteur",
+    ];
+
+    const fragments = clefsImportantes
+      .map((cle) => ({ cle, valeur: attrMap[cle] }))
+      .filter(({ valeur }) => valeur)
+      .map(({ cle, valeur }) => `${cle.replace(/_/g, " ")}: ${valeur}`);
+
+    return fragments.join(" | ");
+  }
+
+  /**
+   * S'assure qu'un type (couleur) existe et retourne son identifiant.
+   */
+  static async #assurerType(connection, couleur) {
+    if (!couleur) return null;
+    const valeur = couleur.trim();
+    if (!valeur) return null;
+
+    const [rows] = await connection.query(
+      "SELECT id_type FROM type WHERE LOWER(couleur) = LOWER(?) LIMIT 1",
+      [valeur]
+    );
+    if (rows.length) return rows[0].id_type;
+
+    const [result] = await connection.query(
+      "INSERT INTO type (couleur) VALUES (?)",
+      [valeur]
+    );
+    return result.insertId;
+  }
+
+  /**
+   * S'assure qu'un pays existe et retourne son identifiant.
+   */
+  static async #assurerPays(connection, pays) {
+    if (!pays) return null;
+    const valeur = pays.trim();
+    if (!valeur) return null;
+
+    const [rows] = await connection.query(
+      "SELECT id_pays FROM pays WHERE LOWER(nom) = LOWER(?) LIMIT 1",
+      [valeur]
+    );
+    if (rows.length) return rows[0].id_pays;
+
+    const [result] = await connection.query(
+      "INSERT INTO pays (nom) VALUES (?)",
+      [valeur]
+    );
+    return result.insertId;
+  }
 }
 
 export default ModeleBouteille;
