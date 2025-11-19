@@ -75,6 +75,7 @@ function Inscription() {
               type="text"
               nom="nom"
               genre="un"
+              classCouleurLabel="Clair"
               estObligatoire={true}
               value={utilisateur.nom}
               onChange={(e) => {
@@ -97,6 +98,7 @@ function Inscription() {
               type="email"
               nom="courriel"
               genre="un"
+              classCouleurLabel="Clair"
               estObligatoire={true}
               value={utilisateur.courriel}
               onChange={(e) => {
@@ -119,6 +121,7 @@ function Inscription() {
               type="text"
               nom="mot_de_passe"
               genre="un"
+              classCouleurLabel="Clair"
               estObligatoire={true}
               value={utilisateur.mot_de_passe}
               onChange={(e) => {
@@ -146,6 +149,7 @@ function Inscription() {
               type="text"
               nom="confirmation"
               genre="une"
+              classCouleurLabel="Clair"
               estObligatoire={true}
               value={confirmation}
               onChange={(e) => {
