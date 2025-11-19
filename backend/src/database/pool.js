@@ -10,15 +10,15 @@ import mysql from "mysql2/promise";
 import "dotenv/config";
 
 const pool = mysql.createPool({
-  hote: process.env.DB_HOTE || "localhost",
+  host: process.env.DB_HOTE || "localhost",
   port: Number(process.env.DB_PORT || 3306),
-  utilisateur: process.env.DB_UTILISATEUR || "root",
-  motDePasse: process.env.DB_MOT_DE_PASSE || "",
-  baseDeDonnees: process.env.DB_BASE_DE_DONNEES || "vino_db",
-  attendreLesConnexions: true,
-  limiteDeConnexions: Number(process.env.DB_LIMITE_CONNEXIONS || 10),
-  nomsDeParametres: true,
-  fuseauHoraire: "Z",
+  user: process.env.DB_UTILISATEUR || "root",
+  password: process.env.DB_MOT_DE_PASSE || "",
+  database: process.env.DB_BASE_DE_DONNEES || "vino_db",
+  waitForConnections: true,
+  connectionLimit: Number(process.env.DB_LIMITE_CONNEXIONS || 10),
+  namedPlaceholders: true,
+  timezone: "Z",
 });
 
 export default pool;
