@@ -5,7 +5,7 @@ import FormulaireInput from "../components/components-partages/Formulaire/Formul
 import Bouton from "../components/components-partages/Boutons/Bouton";
 import Message from "../components/components-partages/Message/Message";
 import { regex, validationChamp } from "../lib/validationFormulaire.js";
-// import { recupererUtilisateur, modifierUtilisateur } from "../lib/requetes.js";
+import { recupererUtilisateur, modifierUtilisateur } from "../lib/requetes.js";
 import { useState, useEffect } from "react";
 import { useSearchParams, useParams, useNavigate } from "react-router-dom";
 
@@ -31,7 +31,7 @@ function ModificationProfil() {
    */
   useEffect(() => {
     const chargerUtilisateur = async () => {
-      const utilisateur = await recupererUtilisateur(id); // Fonction a creer requetes.js
+      const utilisateur = await recupererUtilisateur(id);
       if (utilisateur) {
         setUtilisateur({
           id: utilisateur.id,
@@ -60,7 +60,7 @@ function ModificationProfil() {
     e.preventDefault();
 
     // Envoyer les données utilisateur
-    await modifierUtilisateur(utilisateur, navigate); // Creer fonction requetes.js
+    await modifierUtilisateur(utilisateur, navigate);
   };
 
   /**
@@ -125,6 +125,7 @@ function ModificationProfil() {
                 nom="nom"
                 genre="un"
                 estObligatoire={true}
+                classCouleurLabel="Dark"
                 value={utilisateur.nom}
                 onChange={(e) => {
                   setUtilisateur((prev) => ({ ...prev, nom: e.target.value }));
@@ -221,20 +222,22 @@ function ModificationProfil() {
           }
           bouton={
             <>
-              <Bouton
-                taille="moyen"
-                texte="Annuler"
-                type="secondaire"
-                typeHtml="button"
-                action={reinitialiserFormulaire}
-              />
-              <Bouton
-                taille="moyen"
-                texte="Enregistrer"
-                type="primaire"
-                typeHtml="button"
-                action={envoieModificationProfil}
-              />
+              <div className="flex flex-wrap gap-(--rythme-base)">
+                <Bouton
+                  taille="moyen"
+                  texte="Annuler"
+                  type="secondaire"
+                  typeHtml="button"
+                  action={reinitialiserFormulaire}
+                />
+                <Bouton
+                  taille="moyen"
+                  texte="Enregistrer"
+                  type="primaire"
+                  typeHtml="button"
+                  action={envoieModificationProfil}
+                />
+              </div>
             </>
           }
         />
