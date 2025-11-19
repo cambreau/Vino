@@ -30,7 +30,7 @@ const mapper = (row) => ({
   id: row.id_bouteille,
   codeSAQ: row.code_saq,
   nom: row.nom,
-  millesime: row.millenisme,
+  millenisme: row.millenisme,
   region: row.region,
   cepage: row.cepage,
   image: row.image,
