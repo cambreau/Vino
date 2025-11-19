@@ -27,7 +27,7 @@ const router = express.Router();
 
 // GET / - Lister toutes les bouteilles
 router.get("/", listerBouteilles);
-// GET /:id - Recuperer une bouteille par ID
+// GET /:id - Récupérer une bouteille par ID
 router.get("/:id", recupererBouteille);
 // POST /import - Importer des bouteilles depuis SAQ
 router.post("/import", importerBouteillesDepuisSAQ);
