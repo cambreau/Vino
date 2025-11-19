@@ -4,7 +4,7 @@ const router = express.Router();
 import {
   creerUtilisateur,
   recupererUtilisateur,
-  recupererUtilisateurParEmail,
+  recupererUtilisateurParCourriel,
   modifierUtilisateur,
   supprimerUtilisateur,
   connexionUtilisateur
@@ -17,7 +17,7 @@ router.post("/", creerUtilisateur);
 router.get("/:id", recupererUtilisateur);
 
 // GET //email/:email - Trouver par email
-router.get("/email/:email", recupererUtilisateurParEmail);
+router.get("/email/:email", recupererUtilisateurParCourriel);
 
 // PUT //:id - Mettre à jour un utilisateur
 router.put("/:id", modifierUtilisateur);
