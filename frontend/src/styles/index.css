@@ -10,7 +10,7 @@
   --color-principal-100: #f5dfe5; /* Rose Pâle */
   --color-principal-200: #a8427d; /* Primary Dark */
   --color-principal-300: #821250; /* Primary */
-  --color-principal-premier-plan: #fcfcfd;
+  --color-principal-premier-plan: #ffffff; /* Premier plan (foreground) */
 
   /* Palette de couleurs - Fond */
   --color-fond: #f6ebdc;
@@ -22,7 +22,7 @@
 
   /* Palette de couleurs - Alertes */
   --color-erreur: #a31621;
-  --color-succes: #2D5016;
+  --color-succes: #2d5016;
 
   /* Rythmes d'espacement */
   --rythme-tres-serre: 5px;
@@ -51,4 +51,8 @@
   --point-rupture-tablette: 768px; /* Tablettes */
   --point-rupture-portable: 992px; /* Ordinateurs portables */
   --point-rupture-desktop: 1200px; /* Écrans de grande taille */
+}
+
+body {
+  font-family: var(--font-body);
 }

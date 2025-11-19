@@ -1,11 +1,10 @@
 import { MdError, MdCheckCircle, MdInfo, MdClose } from "react-icons/md";
 
-function Message({ 
-  texte, 
-  type = "information",
-  onClose
+function Message({
+  texte,
+  type = "information", //Ou erreur ou succes
+  onFerme,
 }) {
-
   // Classes de base pour les messages
   const classesBase = `
     w-full px-(--rythme-base) py-(--rythme-serre)
@@ -21,35 +20,40 @@ function Message({
   const classesInformation = `bg-texte-secondaire`;
 
   // Sélection des classes selon le type
-  const classesType = type === "erreur" ? classesErreur : type === "succes" ? classesSucces :classesInformation;
+  const classesType =
+    type === "erreur"
+      ? classesErreur
+      : type === "succes"
+      ? classesSucces
+      : classesInformation;
 
   // Icône selon le type
   const getIcone = () => {
-    const iconSize = 24;
-    const iconClass = "";
-    
-    switch(type) {
+    const iconTaille = 24;
+    const iconClasse = "";
+
+    switch (type) {
       case "erreur":
-        return <MdError size={iconSize} className={iconClass} />;
+        return <MdError size={iconTaille} className={iconClasse} />;
       case "succes":
-        return <MdCheckCircle size={iconSize} className={iconClass} />;
+        return <MdCheckCircle size={iconTaille} className={iconClasse} />;
       default:
-        return <MdInfo size={iconSize} className={iconClass} />;
+        return <MdInfo size={iconTaille} className={iconClasse} />;
     }
   };
 
   return (
     <div className={`${classesBase} ${classesType}`} role="alert">
       <div>{getIcone()}</div>
-      
-      <div className="text-center"> 
+
+      <div className="text-center">
         <span>{texte}</span>
       </div>
-      
+
       <div>
-      {onClose && (
+        {onFerme && (
           <button
-            onClick={onClose}
+            onClick={onFerme}
             className="hover:opacity-75 transition-opacity cursor-pointer"
             aria-label="Fermer le message"
           >
