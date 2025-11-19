@@ -8,6 +8,7 @@ import { TiThMenu } from "react-icons/ti"; // Menu
 import { MdLogout } from "react-icons/md"; // Deconnection
 import { PiCastleTurret } from "react-icons/pi"; // Chateau
 import { IoClose } from "react-icons/io5"; // Fermer
+import { formatMajDebut } from "../../../lib/utils";
 
 // Objet qui mappe les noms aux icônes
 const icons = {
@@ -23,22 +24,13 @@ const icons = {
   fermer: IoClose,
 };
 
-function Icon({ nom, size = 24, couleur }) {
-  const IconComponent = icons[nom];
-  // Fonction pour capitaliser la première lettre
-  const IconNomMajuscule = (str) => {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
 function Icon({ name, size = 24, typeMenu }) {
   const IconComponent = icons[name];
 
   return (
-    <div className="flex flex-col items-center gap-[var(--rythme-tres-serre)] w-full text-[${couleur}]">
+    <div className="flex flex-col items-center gap-(--rythme-tres-serre) w-full text-${couleur}">
       <IconComponent size={size} color={couleur} />
-      <p style={{ color: couleur }}>{IconNomMajuscule(nom)}</p>
-    <div>
-      <IconComponent size={size} />
-      {typeMenu === "bas" ? <p>{name}</p> : null}
+      <p style={{ color: couleur }}>{formatMajDebut(nom)}</p>
     </div>
   );
 }
