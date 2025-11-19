@@ -29,7 +29,7 @@ const router = express.Router();
 router.get("/", listerBouteilles);
 // GET /:id - Récupérer une bouteille par ID
 router.get("/:id", recupererBouteille);
-// POST / - Creer une nouvelle bouteille
+// POST / - Créer une nouvelle bouteille
 router.post("/", creerBouteille);
 // PUT /:id - Modifier une bouteille existante
 router.put("/:id", modifierBouteille);
