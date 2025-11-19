@@ -7,51 +7,91 @@ function MenuEnHaut({}) {
   const [estMenuOuvert, setestMenuOuvert] = useState(false);
 
   return (
-    <nav>
-      {/* Bouton hamburger */}
-      <button onClick={() => setestMenuOuvert(!estMenuOuvert)}>
-        {!estMenuOuvert ? (
-          <Icon name="menuHamburger" typeMenu="haut" />
-        ) : (
-          <Icon name="fermer" typeMenu="haut" />
+    <nav className="flex items-center justify-between fixed top-0 max-w-[500px] mx-auto inset-x-0 p-(--rythme-base) bg-(--color-fond-secondaire)">
+      <div className="relative">
+        {/* Bouton hamburger */}
+        <button
+          onClick={() => setestMenuOuvert(!estMenuOuvert)}
+          aria-label={estMenuOuvert ? "Fermer le menu" : "Ouvrir le menu"}
+          aria-expanded={estMenuOuvert}
+        >
+          {!estMenuOuvert ? (
+            <Icon
+              nom="menuHamburger"
+              typeMenu="haut"
+              couleur="(--color-principal-300)"
+            />
+          ) : (
+            <Icon
+              nom="fermer"
+              typeMenu="haut"
+              couleur="(--color-principal-300)"
+            />
+          )}
+        </button>
+
+        {/* Menu déroulant */}
+        {estMenuOuvert && (
+          <div className="absolute mt-(--rythme-tres-serre) py-(--rythme-base) min-w-[300px] bg-(--color-fond-secondaire)">
+            <header className="mb-[var(--rythme-espace)]">
+              <h2 className="text-(--color-principal-300) text-(length:--taille-grand) font-display font-bold">
+                Utilisateur
+              </h2>
+              <small className="text-(--color-principal-300) text-(length:--taille-moyen) font-display">
+                Courriel
+              </small>
+            </header>
+            <div className="flex flex-col gap-(--rythme-base)">
+              <a href="#">
+                <Icon
+                  nom="profil"
+                  typeMenu="haut"
+                  couleur="(--color-principal-300)"
+                />
+              </a>
+              <a href="#">
+                <Icon
+                  nom="chateau"
+                  typeMenu="haut"
+                  couleur="(--color-principal-300)"
+                />
+              </a>
+              <a href="#">
+                <Icon
+                  nom="cellier"
+                  typeMenu="haut"
+                  couleur="(--color-principal-300)"
+                />
+              </a>
+              <a href="#">
+                <Icon
+                  nom="liste"
+                  typeMenu="haut"
+                  couleur="(--color-principal-300)"
+                />
+              </a>
+            </div>
+          </div>
         )}
-      </button>
-      {/* Menu déroulant */}
-      {estMenuOuvert && (
-        <div>
-          <header>
-            <h2>Utilisateur</h2>
-            <small>Courriel</small>
-          </header>
-          <ul>
-            <li>
-              <Icon name="utilisateur" typeMenu="haut" />
-              <p>Profil</p>
-            </li>
-            <li>
-              <Icon name="chateau" typeMenu="haut" />
-              <p>Savoir Plus</p>
-            </li>
-            <li>
-              <Icon name="cellier" typeMenu="haut" />
-              <p>Celliers</p>
-            </li>
-            <li>
-              <Icon name="liste" typeMenu="haut" />
-              <p>Liste d'achat</p>
-            </li>
-          </ul>
-        </div>
-      )}
+      </div>
 
       {/* Logo */}
-      <header>
-        <h2>Vin</h2>
+      <header className="flex items-center">
+        <h2 className="text-(--color-principal-300) text-(length:--taille-grand) font-display">
+          Vin
+        </h2>
         <img src={RasinLogo} alt="Logo raisin" width="43" height="35" />
       </header>
 
       {/* Déconnexion */}
-      <Icon name="deconnection" typeMenu="haut" />
+
+      <button aria-label="Deconnection">
+        <Icon
+          nom="deconnection"
+          typeMenu="haut"
+          couleur="(--color-principal-300)"
+        />
+      </button>
     </nav>
   );
 }
