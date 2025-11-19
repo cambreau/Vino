@@ -7,7 +7,7 @@ function MenuEnHaut({}) {
   const [estMenuOuvert, setestMenuOuvert] = useState(false);
 
   return (
-    <nav className="flex items-center justify-between fixed top-0 w-full p-[var(--rythme-base)] bg-[var(--color-fond-secondaire)]">
+    <nav className="flex items-center justify-between fixed top-0 w-full p-(--rythme-base) bg-(--color-fond-secondaire)">
       <div className="relative">
         {/* Bouton hamburger */}
         <button
@@ -19,67 +19,55 @@ function MenuEnHaut({}) {
             <Icon
               nom="menuHamburger"
               typeMenu="haut"
-              couleur="var(--color-principal-200)"
+              couleur="var(--color-principal-300)"
             />
           ) : (
             <Icon
               nom="fermer"
               typeMenu="haut"
-              couleur="var(--color-principal-200)"
+              couleur="var(--color-principal-300)"
             />
           )}
         </button>
 
         {/* Menu déroulant */}
         {estMenuOuvert && (
-          <div className="absolute mt-[var(--rythme-tres-serre)] py-[var(--rythme-base)] min-w-[300px] bg-[var(--color-fond-secondaire)]">
+          <div className="absolute mt-(--rythme-tres-serre) py-(--rythme-base) min-w-[300px] bg-(--color-fond-secondaire)">
             <header className="mb-[var(--rythme-espace)]">
-              <h2
-                className="text-[var(--color-principal-200)] font-bold"
-                style={{
-                  fontSize: "var(--taille-grand)",
-                  fontFamily: "var(--font-display)",
-                }}
-              >
+              <h2 className="text-(--color-principal-300) text-(length:--taille-grand) font-display font-bold">
                 Utilisateur
               </h2>
-              <small
-                className="text-[var(--color-principal-200)]"
-                style={{
-                  fontSize: "var(--taille-moyen)",
-                  fontFamily: "var(--font-display)",
-                }}
-              >
+              <small className="text-(--color-principal-300) text-(length:--taille-moyen) font-display">
                 Courriel
               </small>
             </header>
-            <div className="flex flex-col gap-[var(--rythme-base)]">
+            <div className="flex flex-col gap-(--rythme-base)">
               <a href="#">
                 <Icon
                   nom="profil"
                   typeMenu="haut"
-                  couleur="var(--color-principal-200)"
+                  couleur="var(--color-principal-300)"
                 />
               </a>
               <a href="#">
                 <Icon
                   nom="chateau"
                   typeMenu="haut"
-                  couleur="var(--color-principal-200)"
+                  couleur="var(--color-principal-300)"
                 />
               </a>
               <a href="#">
                 <Icon
                   nom="cellier"
                   typeMenu="haut"
-                  couleur="var(--color-principal-200)"
+                  couleur="var(--color-principal-300)"
                 />
               </a>
               <a href="#">
                 <Icon
                   nom="liste"
                   typeMenu="haut"
-                  couleur="var(--color-principal-200)"
+                  couleur="var(--color-principal-300)"
                 />
               </a>
             </div>
@@ -89,13 +77,7 @@ function MenuEnHaut({}) {
 
       {/* Logo */}
       <header className="flex items-center">
-        <h2
-          className="text-[var(--color-principal-200)]"
-          style={{
-            fontSize: "var(--taille-grand)",
-            fontFamily: "var(--font-display)",
-          }}
-        >
+        <h2 className="text-(--color-principal-300) text-(length:--taille-grand) font-display">
           Vin
         </h2>
         <img src={RasinLogo} alt="Logo raisin" width="43" height="35" />
@@ -107,7 +89,7 @@ function MenuEnHaut({}) {
         <Icon
           nom="deconnection"
           typeMenu="haut"
-          couleur="var(--color-principal-200)"
+          couleur="var(--color-principal-300)"
         />
       </button>
     </nav>
