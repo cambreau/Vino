@@ -1,13 +1,13 @@
 import "dotenv/config";
+import mysql from "mysql2/promise";
 
-export const connexion = {
-  moteur: "mysql",
-  hote: process.env.DB_HOST,
+export const connexion = await mysql.createConnection({
+  host: process.env.DB_HOST,
   port: process.env.DB_PORT,
-  nomBase: process.env.DB_NAME,
-  utilisateur: process.env.DB_ROOT_USER,
-  motDePasse: process.env.DB_PASSWORD,
-};
+  user: process.env.DB_ROOT_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
 
 export const requetesCritiques = [
   {
