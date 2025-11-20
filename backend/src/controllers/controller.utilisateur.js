@@ -1,6 +1,6 @@
 import modeleUtilisateur from "../models/modele.utilisateur.js";
 import bcrypt from "bcrypt";
-
+import validationCreationUtilisateur from "../middlewares/validation.utilisateur.js";
 /**
  * Fonction asynchrone qui creer un utilisateur.
  */
@@ -90,7 +90,7 @@ try {
     const motDePasseValide = await bcrypt.compare(mot_de_passe, utilisateur.mot_de_passe);
 
     if (!motDePasseValide) {
-      return res.status(401).json({ message: "Courriel ou mot de passe incorrect." });
+    return res.status(401).json({ message: "Courriel ou mot de passe incorrect." });
     }
 
     // Connexion réussie - ne pas renvoyer le mot de passe
