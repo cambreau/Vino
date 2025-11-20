@@ -38,7 +38,7 @@ export const creerUtilisateur = async (datas, navigate) => {
   } catch (error) {
     // Gestion des erreurs réseau (exemple: pas de connexion) ou autres exceptions JavaScript
     console.error("Erreur lors de la création de l'utilisateur :", error);
-    navigate("/inscription?echec=true");
+    navigate("/inscription?echec=1");
     return { succes: false, erreur: error.message };
   }
 };
@@ -108,27 +108,26 @@ export const connexionUtilisateur = async (datas, navigate) => {
 
     if (reponse.ok) {
       const data = await reponse.json();
-      
+
       // Rediriger vers page profil
-      navigate("/profil"); 
-      
+      navigate("/profil");
+
       return { succes: true, utilisateur: data.utilisateur };
     } else {
       // Gestion des erreurs HTTP (400, 401, 500, etc.)
       const erreurData = await reponse.json().catch(() => ({}));
       console.error("Erreur HTTP:", reponse.status, erreurData);
-      
-      return { 
-        succes: false, 
-        erreur: erreurData.message || "Erreur lors de la connexion" 
+
+      return {
+        succes: false,
+        erreur: erreurData.message || "Erreur lors de la connexion",
       };
     }
   } catch (error) {
     console.error("Erreur lors de la connexion de l'utilisateur :", error);
-    return { 
-      succes: false, 
-      erreur: "Erreur de connexion au serveur" 
+    return {
+      succes: false,
+      erreur: "Erreur de connexion au serveur",
     };
   }
 };
-

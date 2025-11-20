@@ -1,6 +1,5 @@
 import modeleUtilisateur from "../models/modele.utilisateur.js";
 import bcrypt from "bcrypt";
-import validationCreationUtilisateur from "../middlewares/validation.utilisateur.js";
 
 /**
  * Fonction asynchrone qui creer un utilisateur.
@@ -20,18 +19,15 @@ export const creerUtilisateur = async (req, res) => {
     // Hasher le mot de passe
     const motDePasseHache = await bcrypt.hash(mot_de_passe, 10);
 
-    // Appel au modèle pour créer l'utilisateur
-    if (!erreursValidation) {
-      const id_utilisateur = await modeleUtilisateur.creer(
-        nom,
-        courriel,
-        motDePasseHache
-      );
-      return res.status(201).json({
-        message: "Utilisateur créé avec succès.",
-        id_utilisateur: id_utilisateur,
-      });
-    }
+    const id_utilisateur = await modeleUtilisateur.creer(
+      nom,
+      courriel,
+      motDePasseHache
+    );
+    return res.status(201).json({
+      message: "Utilisateur créé avec succès.",
+      id_utilisateur: id_utilisateur,
+    });
   } catch (err) {
     console.error("Erreur lors de la création de l'utilisateur :", err);
     return res.status(500).json({
@@ -60,9 +56,9 @@ export const modifierUtilisateur = async (req, res) => {};
  */
 export const supprimerUtilisateur = async (req, res) => {};
 
-/* =========================================================== */
-/* Fonction asynchrone qui connecte un utilisateur.*/
-/* =========================================================== */
+/*
+ * Fonction asynchrone qui connecte un utilisateur.
+ */
 export const connexionUtilisateur = async (req, res) => {
   try {
     const { courriel, mot_de_passe } = req.body;
