@@ -33,7 +33,7 @@ export function validerCreationUtilisateur(req, res, next) {
 
   if (mot_de_passe.length < 6) {
     return res.status(400).json({
-      message: "Le mot de passe doit contenir au moins 6 caractères.",
+      message: "Le mot de passe doit contenir au moins 8 caractères.",
     });
   }
 
