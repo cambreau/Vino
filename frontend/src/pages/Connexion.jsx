@@ -14,7 +14,6 @@ function Connexion() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const succes = searchParams.get("inscriptionSucces") === "true";
-  console.log(succes);
 
   // Les informations de connexion
   const [utilisateur, setUtilisateur] = useState({
