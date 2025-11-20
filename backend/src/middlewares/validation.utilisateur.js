@@ -28,8 +28,8 @@ function validerMotDePasse(mot_de_passe, verifierLongueur = true) {
     return { valide: false, message: "Le mot de passe est requis." };
   }
 
-  if (verifierLongueur && mot_de_passe.length < 6) {
-    return { valide: false, message: "Le mot de passe doit contenir au moins 6 caractères." };
+  if (verifierLongueur && mot_de_passe.length < 8) {
+    return { valide: false, message: "Le mot de passe doit contenir au moins 8 caractères." };
   }
 
   return { valide: true };
@@ -56,7 +56,13 @@ export default function validerCreationUtilisateur(req, res, next) {
   if (!validationMotDePasse.valide) {
     return res.status(400).json({ message: validationMotDePasse.message });
   }
-  
+  if (mot_de_passe.length < 6) {
+    return res.status(400).json({
+      message: "Le mot de passe doit contenir au moins 8 caractères.",
+    });
+  }
+
+  //Si tout est valide
   next();
 }
 

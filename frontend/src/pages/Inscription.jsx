@@ -58,8 +58,12 @@ function Inscription() {
       bg-[linear-gradient(0deg,rgba(0,0,0,0.8)30%,rgba(0,0,0,0)),url('../assets/images/inscriptionCellier.webp')] bg-cover bg-center bg-no-repeat bg-[#e0e0e0]
       "
     >
-      <BoutonRetour />
-      {echec && (
+
+      <header className="px-(--rythme-base)">
+        <BoutonRetour />
+      </header>
+
+      {echecInscription && (
         <Message
           texte="Une erreur est survenue lors de l'inscription. Veuillez réessayer."
           type="erreur"
