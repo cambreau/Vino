@@ -26,7 +26,14 @@ export const creerUtilisateur = async (datas, navigate) => {
     // Gestion des erreurs HTTP (400, 500, etc.)
     const erreurData = await reponse.json().catch(() => ({}));
     console.error("Erreur HTTP:", reponse.status, erreurData);
-    navigate("/inscription?echec=true");
+
+    // Gestion spécifique selon le code d'erreur
+    if (reponse.status === 409) {
+      // Conflit : courriel déjà utilisé
+      navigate("/inscription?echec=2");
+    } else {
+      navigate("/inscription?echec=1");
+    }
     return { succes: false, erreur: erreurData };
   } catch (error) {
     // Gestion des erreurs réseau (exemple: pas de connexion) ou autres exceptions JavaScript
