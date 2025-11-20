@@ -95,7 +95,7 @@ export const rechercherBouteilleParAttributs = async (req, res) => {
 
 		if (!Object.keys(filtres).length) {
 			return res.status(400).json({
-				message: "Au moins un attribut (nom, region, cepage, pays, type) est requis",
+				message: "Au moins un attribut (nom, région, cépage, pays, type) est requis",
 			});
 		}
 
