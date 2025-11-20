@@ -165,11 +165,10 @@ class ModeleBouteille {
         console.log("Mise à jour - payload:", JSON.stringify(payload));
         await connection.query(
           `UPDATE bouteille
-           SET code_saq = ?, nom = ?, millenisme = ?, region = ?, cepage = ?, image = ?,
+           SET nom = ?, millenisme = ?, region = ?, cepage = ?, image = ?,
                description = ?, taux_alcool = ?, prix = ?, id_pays = ?, id_type = ?
          WHERE id_bouteille = ?`,
           [
-            payload.code_saq,
             payload.nom,
             payload.millenisme,
             payload.region,
