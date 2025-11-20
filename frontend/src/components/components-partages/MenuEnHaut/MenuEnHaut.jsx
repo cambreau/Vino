@@ -1,10 +1,17 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Icon from "../Icon/Icon";
 import RasinLogo from "../../../assets/images/grape_logo.svg";
 import FormulaireInput from "../Formulaire/FormulaireInput/FormulaireInput";
+import authentificationStore from "../../../stores/authentificationStore";
 
 function MenuEnHaut({}) {
-  // Dans la propos envoyer les infos de la personne connecter pour les afficher au menu
+  const navigate = useNavigate();
+
+  // Récupérer les données du store
+  const utilisateur = authentificationStore((state) => state.utilisateur);
+  const estConnecte = authentificationStore((state) => state.estConnecte);
+
   const [estMenuOuvert, setestMenuOuvert] = useState(false);
   const [estRechercheOuvert, setestRechercheOuvert] = useState(false);
 
@@ -13,6 +20,14 @@ function MenuEnHaut({}) {
     setRecherche(e.target.value);
   };
   const handleBlur = (e) => {};
+
+  /**
+   * Fonction pour gérer la déconnexion
+   */
+  const gererDeconnexion = () => {
+    authentificationStore.getState().deconnexion();
+    navigate("/connexion?deconnexionSucces=true");
+  };
 
   return (
     <nav className="flex items-center justify-between max-w-[500px] mx-auto inset-x-0 p-(--rythme-base) bg-(--color-fond-secondaire)">
@@ -44,10 +59,12 @@ function MenuEnHaut({}) {
             <div className="flex justify-between mb-(--rythme-espace)">
               <header>
                 <h2 className="text-(--color-principal-300) text-(length:--taille-grand) font-display font-bold">
-                  Utilisateur
+                  {estConnecte && utilisateur ? utilisateur.nom : ""}
                 </h2>
                 <small className="text-(--color-principal-300) text-(length:--taille-moyen) font-display">
-                  Courriel
+                  {estConnecte && utilisateur
+                    ? utilisateur.courriel
+                    : "Courriel"}
                 </small>
               </header>
               <button
@@ -159,13 +176,15 @@ function MenuEnHaut({}) {
         )}
 
         {/* Déconnexion */}
-        <button aria-label="Déconnexion">
-          <Icon
-            nom="deconnection"
-            typeMenu="haut"
-            couleur="(--color-principal-300)"
-          />
-        </button>
+        {estConnecte && (
+          <button onClick={gererDeconnexion} aria-label="Déconnexion">
+            <Icon
+              nom="deconnection"
+              typeMenu="haut"
+              couleur="(--color-principal-300)"
+            />
+          </button>
+        )}
       </div>
     </nav>
   );
