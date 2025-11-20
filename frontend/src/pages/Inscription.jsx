@@ -11,7 +11,8 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 function Inscription() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const echec = searchParams.get("echec") === "true";
+  const echecInscription = searchParams.get("echec") == 1;
+  const echecDoublon = searchParams.get("echec") == 2;
 
   // Les informations utilisateur
   const [utilisateur, setUtilisateur] = useState({
@@ -58,9 +59,17 @@ function Inscription() {
       "
     >
       <BoutonRetour />
-      {echec && (
+      {echecInscription && (
         <Message
           texte="Une erreur est survenue lors de l'inscription. Veuillez réessayer."
+          type="erreur"
+          onClose={fermerMessage}
+        />
+      )}
+
+      {echecDoublon && (
+        <Message
+          texte="L’adresse courriel saisie est déjà enregistrée. Merci de fournir une adresse différente pour poursuivre."
           type="erreur"
           onClose={fermerMessage}
         />
