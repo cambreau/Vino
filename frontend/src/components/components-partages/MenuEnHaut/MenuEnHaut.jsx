@@ -8,11 +8,10 @@ function MenuEnHaut({}) {
   const [estMenuOuvert, setestMenuOuvert] = useState(false);
   const [estRechercheOuvert, setestRechercheOuvert] = useState(false);
 
-  // VOIR COMMENT UTILISER LE FORMINPUT ---- POUR ENLEVER LE BUG
+  // J'ai mis les fonctions pour ne pas avoir d'error, on va gerer ca apres
   const handleChange = (e) => {
     setRecherche(e.target.value);
   };
-
   const handleBlur = (e) => {};
 
   return (
@@ -31,7 +30,7 @@ function MenuEnHaut({}) {
           />
         </button>
 
-        {/* Overlay gris (voile) */}
+        {/* Ombre */}
         {estMenuOuvert && (
           <div
             className="fixed inset-0 bg-black/50"
@@ -121,7 +120,7 @@ function MenuEnHaut({}) {
           />
         </button>
 
-        {/* Overlay gris */}
+        {/* Ombre */}
         {estRechercheOuvert && (
           <div
             className="fixed inset-0 bg-black/50"
