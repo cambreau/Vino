@@ -108,7 +108,7 @@ class ModeleBouteille {
       valeurs.push(`%${filtres.type}%`);
     }
 
-    if (!clauses.length) return [];
+    if (!clauses.length) throw new Error("Au moins un filtre doit être fourni.");
 
     const sql = `${BASE_SELECT} WHERE ${clauses.join(" AND ")}`;
     const [rows] = await connexion.query(sql, valeurs);
