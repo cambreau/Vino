@@ -90,7 +90,7 @@ try {
     const motDePasseValide = await bcrypt.compare(mot_de_passe, utilisateur.mot_de_passe);
 
     if (!motDePasseValide) {
-    return res.status(401).json({ message: "Courriel ou mot de passe incorrect." });
+      return res.status(401).json({ message: "Courriel ou mot de passe incorrect." });
     }
 
     // Connexion réussie - ne pas renvoyer le mot de passe
