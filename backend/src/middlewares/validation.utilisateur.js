@@ -5,7 +5,10 @@ function validerNom(nom) {
   }
 
   if (nom.length < 2) {
-    return { valide: false, message: "Le nom doit contenir au moins 2 caractères." };
+    return {
+      valide: false,
+      message: "Le nom doit contenir au moins 2 caractères.",
+    };
   }
 
   return { valide: true };
@@ -29,7 +32,10 @@ function validerMotDePasse(mot_de_passe, verifierLongueur = true) {
   }
 
   if (verifierLongueur && mot_de_passe.length < 8) {
-    return { valide: false, message: "Le mot de passe doit contenir au moins 8 caractères." };
+    return {
+      valide: false,
+      message: "Le mot de passe doit contenir au moins 8 caractères.",
+    };
   }
 
   return { valide: true };
@@ -55,11 +61,6 @@ export default function validerCreationUtilisateur(req, res, next) {
   const validationMotDePasse = validerMotDePasse(mot_de_passe);
   if (!validationMotDePasse.valide) {
     return res.status(400).json({ message: validationMotDePasse.message });
-  }
-  if (mot_de_passe.length < 6) {
-    return res.status(400).json({
-      message: "Le mot de passe doit contenir au moins 8 caractères.",
-    });
   }
 
   //Si tout est valide
