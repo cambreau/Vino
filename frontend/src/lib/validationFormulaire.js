@@ -25,9 +25,6 @@ export const validerConnexion = (courriel, motDePasse) => {
     case estVide(motDePasse):
       return "Le mot de passe est obligatoire.";
 
-    case !validationChamp(regex.regMotDePasse, motDePasse):
-      return "Le mot de passe doit contenir au moins 8 caractères, dont une lettre majuscule, une lettre minuscule et un caractère spécial.";
-
     default:
       return "";
   }
