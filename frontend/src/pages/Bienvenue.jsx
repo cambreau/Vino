@@ -7,7 +7,7 @@ function Bienvenue() {
   return (
     <main
       className="
-      flex items-end justify-center min-h-screen py-10 px-5
+      flex items-end justify-center min-h-screen py-(--rythme-espace) px-(--rythme-base)
       font-body
        bg-[linear-gradient(0deg,rgba(0,0,0,0.7)25%,rgba(0,0,0,0)),url('../assets/images/heroBienvenue.webp')] bg-cover bg-center
       "
@@ -16,14 +16,13 @@ function Bienvenue() {
         {/* Texte de bienvenue */}
         <header
           className="
-          text-center mb-8
-          text-principal-premier-plan
+          text-center mb-(--rythme-espace)
           "
         >
           <p
             className="
             mb-1
-            text-(length:--taille-petit) font-normal
+            text-(length:--taille-petit) font-normal text-(--color-fond)
             "
           >
             Votre cave personnelle, organisée
@@ -32,7 +31,7 @@ function Bienvenue() {
           <p
             className="
             mb-8
-            text-(length:--taille-petit) font-normal
+            text-(length:--taille-petit) font-normal text-(--color-fond)
             "
           >
             comme vous le souhaitez
@@ -41,7 +40,7 @@ function Bienvenue() {
           <h1
             className="
             mb-12
-            text-(length:--taille-tres-gros) font-display font-bold
+            text-(length:--taille-tres-gros) font-display font-bold text-(--color-fond)
             "
           >
             Bienvenue à Vino
@@ -49,7 +48,7 @@ function Bienvenue() {
         </header>
 
         {/* Boutons d'action */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-(--rythme-base)">
           {/* Bouton Primaire - Se connecter */}
           <Bouton
             texte="Se connecter"
@@ -58,11 +57,11 @@ function Bienvenue() {
           />
 
           {/* Lien "Pas encore de compte?" */}
-          <div className="text-center mt-4">
+          <div className="text-center mt-(--rythme-base)">
             <p
               className="
               text-(length:--taille-petit)
-              text-principal-premier-plan
+              text-(--color-fond)
               "
             >
               Pas encore de compte?{" "}

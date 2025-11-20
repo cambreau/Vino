@@ -32,6 +32,8 @@ function FormulaireInput({
         mb-rythme-serre
         text-(length:--taille-petit) font-medium
         ${classCouleurLabel === "Dark" ? labelDark : labelClair } 
+
+        ${classCouleurLabel === "Dark" ? labelDark : labelClair} 
       `}
         htmlFor={nom}
       >
