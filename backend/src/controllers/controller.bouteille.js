@@ -8,7 +8,21 @@
 import modeleBouteille from "../models/modele.bouteille.js";
 
 export const listerBouteilles = async (req, res) => {
+	try {
+		const bouteilles = await modeleBouteille.trouverTout();
 
+		return res.status(200).json({
+			message: "Liste des bouteilles",
+			total: bouteilles.length,
+			donnees: bouteilles,
+		});
+	} catch (error) {
+		console.error("Erreur lors de la récupération des bouteilles", error);
+		return res.status(500).json({
+			message: "Impossible de récupérer les bouteilles",
+			erreur: error.message,
+		});
+	}
 };
 
 export const recupererBouteille = async (req, res) => {
