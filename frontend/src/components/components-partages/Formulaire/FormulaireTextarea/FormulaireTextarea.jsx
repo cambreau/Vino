@@ -1,5 +1,5 @@
 // Utils
-import { formatteString } from "../../../../lib/utils";
+import { formatString } from "../../../../lib/utils";
 
 function FormulaireTextarea({
   nom,
@@ -9,12 +9,13 @@ function FormulaireTextarea({
 }) {
   return (
     <div className="FormulaireTextarea">
-      <label htmlFor={formatteString(nom)}>{nom} :</label>
+      <label htmlFor={formatString(nom)}>{nom} :</label>
       <textarea
-        id={formatteString(nom)}
-        name={formatteString(nom)}
+        id={formatString(nom)}
+        name={formatString(nom)}
         rows={4}
         minLength={10}
+        className="placeholder:text-(length:--taille-petit) placeholder:font-display"
         placeholder={`Entrez ${genre} ${nom.toLowerCase()}`}
         {...(estObligatoire ? { required: true } : {})}
         {...(defaultValue ? { value: defaultValue } : "")}

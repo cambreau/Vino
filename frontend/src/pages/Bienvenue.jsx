@@ -1,30 +1,84 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Bouton from "../components/components-partages/Boutons/Bouton";
 
 function Bienvenue() {
+  const navigate = useNavigate();
+
   return (
-    <div className="hero-welcome flex items-end justify-center py-10 px-5">
-      <div className="w-full max-w-md">
+    <main
+      className="
+      flex items-end justify-center min-h-screen py-(--rythme-espace) px-(--rythme-base)
+      font-body
+       bg-[linear-gradient(0deg,rgba(0,0,0,0.7)25%,rgba(0,0,0,0)),url('../assets/images/heroBienvenue.webp')] bg-cover bg-center
+      "
+    >
+      <section className="w-full max-w-md">
         {/* Texte de bienvenue */}
-        <div className="text-center text-primary-foreground mb-8">
-          <p className="text-sm mb-1 opacity-95">
+        <header
+          className="
+          text-center mb-(--rythme-espace)
+          "
+        >
+          <p
+            className="
+            mb-1
+            text-(length:--taille-petit) font-normal text-(--color-fond)
+            "
+          >
             Votre cave personnelle, organisée
           </p>
-          <p className="text-sm mb-8 opacity-95">comme vous le souhaitez</p>
 
-          <h1 className="text-5xl font-bold mb-12">Bienvenue à Vino</h1>
-        </div>
+          <p
+            className="
+            mb-8
+            text-(length:--taille-petit) font-normal text-(--color-fond)
+            "
+          >
+            comme vous le souhaitez
+          </p>
+
+          <h1
+            className="
+            mb-12
+            text-(length:--taille-tres-gros) font-display font-bold text-(--color-fond)
+            "
+          >
+            Bienvenue à Vino
+          </h1>
+        </header>
 
         {/* Boutons d'action */}
-        <div className="space-y-4">
-          <Link to="/" className="btn-primary text-center block">
-            Créer votre compte
-          </Link>
-          <Link to="/connexion" className="btn-secondary text-center block">
-            Se connecter
-          </Link>
+        <div className="flex flex-col gap-(--rythme-base)">
+          {/* Bouton Primaire - Se connecter */}
+          <Bouton
+            texte="Se connecter"
+            type="primaire"
+            action={() => navigate("/connexion")}
+          />
+
+          {/* Lien "Pas encore de compte?" */}
+          <div className="text-center mt-(--rythme-base)">
+            <p
+              className="
+              text-(length:--taille-petit)
+              text-(--color-fond)
+              "
+            >
+              Pas encore de compte?{" "}
+              <Link
+                to="/inscription"
+                className="
+                font-semibold
+                text-principal-200
+                hover:text-principal-100 transition-colors"
+              >
+                Je m'inscris
+              </Link>
+            </p>
+          </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
 

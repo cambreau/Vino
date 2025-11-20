@@ -1,0 +1,68 @@
+import { MdError, MdCheckCircle, MdInfo, MdClose } from "react-icons/md";
+
+function Message({
+  texte,
+  type = "information", //Ou erreur ou succes
+  onFerme,
+}) {
+  // Classes de base pour les messages
+  const classesBase = `
+    w-full px-(--rythme-base) py-(--rythme-serre)
+    font-body font-light text-(length:--taille-petit) text-(--color-fond)
+    rounded-(--arrondi-grand) shadow-md
+    transition-all duration-300
+    flex items-center justify-between gap-(--rythme-serre)
+  `;
+
+  // Classes selon le type
+  const classesErreur = `bg-erreur`;
+  const classesSucces = `bg-succes`;
+  const classesInformation = `bg-texte-secondaire`;
+
+  // Sélection des classes selon le type
+  const classesType =
+    type === "erreur"
+      ? classesErreur
+      : type === "succes"
+      ? classesSucces
+      : classesInformation;
+
+  // Icône selon le type
+  const getIcone = () => {
+    const iconTaille = 24;
+    const iconClasse = "";
+
+    switch (type) {
+      case "erreur":
+        return <MdError size={iconTaille} className={iconClasse} />;
+      case "succes":
+        return <MdCheckCircle size={iconTaille} className={iconClasse} />;
+      default:
+        return <MdInfo size={iconTaille} className={iconClasse} />;
+    }
+  };
+
+  return (
+    <div className={`${classesBase} ${classesType}`} role="alert">
+      <div>{getIcone()}</div>
+
+      <div className="text-center">
+        <span>{texte}</span>
+      </div>
+
+      <div>
+        {onFerme && (
+          <button
+            onClick={onFerme}
+            className="hover:opacity-75 transition-opacity cursor-pointer"
+            aria-label="Fermer le message"
+          >
+            <MdClose size={20} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default Message;

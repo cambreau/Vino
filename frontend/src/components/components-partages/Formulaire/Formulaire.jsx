@@ -4,11 +4,18 @@ function Formulaire({
   action = null,
   enfants,
   bouton,
+  classeTitre = "", // accent ou rien
 }) {
+  const titreAccent = "text-(--color-principal-300)";
   return (
-    <section>
-      <h2>{titreFormulaire}</h2>
-      <form method={method} action={action}>
+    <section className="px-(--rythme-base)">
+      <h1
+        className={`text-(length:--taille-grand)  font-display font-bold mb-(--rythme-base)
+      ${classeTitre === "accent" ? titreAccent : "text-(--color-fond)"}`}
+      >
+        {titreFormulaire}
+      </h1>
+      <form method={method} className="flex flex-col gap-(--rythme-base)">
         {enfants}
         {bouton}
       </form>

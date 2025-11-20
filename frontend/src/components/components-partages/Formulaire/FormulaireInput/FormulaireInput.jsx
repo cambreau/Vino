@@ -1,5 +1,5 @@
 // Utils
-import { formatteString } from "../../../../lib/utils";
+import { formatString, formatMajDebut } from "../../../../lib/utils";
 
 function FormulaireInput({
   type,
@@ -7,19 +7,50 @@ function FormulaireInput({
   genre, //Un ou une
   estObligatoire, //Required ou non
   onChange,
+  onBlur,
   value = "",
+  classCouleur = "Dark", //Dark ou Clair
+  classCouleurLabel = "Dark", //Dark ou Clair
 }) {
+  const nomFormat = formatString(nom);
+  const labelClair = "text-(--color-fond)";
+  const labelDark = "text-color-texte-secondaire";
+  const inputClair =
+    "text-(--color-texte) placeholder-(--color-texte-secondaire) placeholder:text-(length:--taille-petit) placeholder:font-display bg-(--color-fond)";
+  const inputDark =
+    "text-(--color-fond) placeholder-(--color-fond) placeholder:text-(length:--taille-petit) placeholder:font-display bg-[#475467]";
+
   return (
-    <div>
-      <label htmlFor={formatteString(nom)}>{nom} :</label>
+    <div
+      className="
+      flex flex-col 
+      gap-rythme-serre 
+      font-font-body"
+    >
+      <label
+        className={`
+        mb-rythme-serre
+        text-(length:--taille-petit) font-medium
+        ${classCouleurLabel === "Dark" ? labelDark : labelClair} 
+      `}
+        htmlFor={nom}
+      >
+        {formatMajDebut(nomFormat)} :
+      </label>
       <input
+        className={`
+          max-w px-(--rythme-serre) py-(--rythme-tres-serre) 
+          text-(length:--taille-normal) font-font-body
+           ${classCouleur === "Dark" ? inputDark : inputClair} 
+          border border-(--color-texte-secondaire) rounded-(--arrondi-base) shadow-sm focus:outline-none focus:border-(--color-principal-200)`}
         type={type}
-        name={formatteString(nom)}
-        id={formatteString(nom)}
+        name={nom}
+        id={nom}
         {...(estObligatoire ? { required: true } : {})}
-        placeholder={`Entrez ${genre} ${nom.toLowerCase()}`}
+        placeholder={`Entrez ${genre} ${nomFormat}`}
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
       />
     </div>
   );

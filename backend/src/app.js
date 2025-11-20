@@ -8,7 +8,6 @@ import morgan from "morgan";
 import "dotenv/config";
 // Routeur principal de l'application
 import vinoRouter from "./routes/routes.js";
-/*----------------------------------------------------------------------------------*/
 
 // Création de l'application Express
 const app = express();
@@ -27,15 +26,9 @@ app.use(express.urlencoded({ extended: true }));
 // Routes api
 app.use("/api/vino", vinoRouter);
 
-// Test route ( Future page d'accueil )
+// Test route
 app.get("/", (req, res) => {
   res.send("Backend fonctionne!");
-});
-
-// Démarrage du serveur sur le port défini dans .env ou 5252 par défaut
-const PORT = process.env.PORT || 5252;
-app.listen(PORT, () => {
-  console.log(`Server est sur http://localhost:${PORT}`);
 });
 
 export default app;
