@@ -9,6 +9,6 @@ const router = express.Router();
 // Routes backend de VINO
 router.use("/utilisateurs", utilisateurRoutes);
 router.use("/bouteilles", bouteilleRoutes);
-router.use("/bouteillesCellier", bouteillCellierRoutes);
+router.use("/bouteillesCellier", bouteilleCellierRoutes);
 
 export default router;

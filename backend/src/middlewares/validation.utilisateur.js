@@ -1,4 +1,4 @@
-export function validerCreationUtilisateur(req, res, next) {
+export default function validerCreationUtilisateur(req, res, next) {
   const { nom, courriel, mot_de_passe } = req.body;
 
   // Valider le nom
