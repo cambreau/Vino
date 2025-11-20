@@ -150,7 +150,12 @@ const genererPlageMillesimes = (debut = 1950) => {
   return range;
 };
 
-// Fonction pour récupérer tous les vins de la SAQ via l'API GraphQL
+/**
+ * Récupère tous les vins de la SAQ via l'API GraphQL.
+ * @param {Object} [options] - Options de filtrage.
+ * @param {Array<number>} [options.millesimes] - Liste des millésimes à récupérer (par défaut: 1950 à année actuelle + 2).
+ * @returns {Promise<Array>} Liste des produits dédupliqués par SKU.
+ */
 export const recupererTousVins = async (options = {}) => {
   const millesimesOption = Array.isArray(options.millesimes)
     ? options.millesimes.filter(Boolean)
