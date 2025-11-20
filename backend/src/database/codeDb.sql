@@ -29,7 +29,7 @@ create table bouteille (
     id_type INT,
     code_saq VARCHAR(20) NOT NULL UNIQUE,
     nom VARCHAR(100) NOT NULL,
-    millenisme YEAR NOT NULL,
+    millenisme SMALLINT DEFAULT NULL,
     region VARCHAR(50) NOT NULL,
     cepage VARCHAR(100) NOT NULL,
     image VARCHAR(255) NOT NULL,

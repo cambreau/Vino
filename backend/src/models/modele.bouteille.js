@@ -14,6 +14,8 @@
 import { connexion } from "../database/connexion.js";
 import { recupererTousVins } from "../services/saqService.js";
 
+const MILLENISME_NON_DISPONIBLE_LIBELLE = "Millésime non disponible";
+
 const BASE_SELECT = `
   SELECT
     b.id_bouteille,
@@ -34,20 +36,23 @@ const BASE_SELECT = `
 `;
 
 // Transforme un enregistrement SQL en représentation API.
-const mapper = (row) => ({
-  id: row.id_bouteille,
-  codeSaq: row.code_saq,
-  nom: row.nom,
-  millenisme: row.millenisme,
-  region: row.region,
-  cepage: row.cepage,
-  image: row.image,
-  description: row.description,
-  tauxAlcool: row.taux_alcool,
-  prix: row.prix,
-  pays: row.pays,
-  type: row.type,
-});
+const mapper = (row) => {
+
+  return {
+    id: row.id_bouteille,
+    codeSaq: row.code_saq,
+    nom: row.nom,
+    millenisme: row.millenisme ?? MILLENISME_NON_DISPONIBLE_LIBELLE,
+    region: row.region,
+    cepage: row.cepage,
+    image: row.image,
+    description: row.description,
+    tauxAlcool: row.taux_alcool,
+    prix: row.prix,
+    pays: row.pays,
+    type: row.type,
+  };
+};
 
 class ModeleBouteille {
   /**
@@ -233,7 +238,7 @@ class ModeleBouteille {
 
     const millesime = this.#validerMillesime(donneesMappees.millesime)
       ? donneesMappees.millesime
-      : 1900;
+      : null;
     const cepageValue = Array.isArray(donneesMappees.cepage)
       ? donneesMappees.cepage.join(", ")
       : donneesMappees.cepage || "Cépage non précisé";
