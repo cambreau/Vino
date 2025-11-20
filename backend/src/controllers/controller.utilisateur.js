@@ -12,9 +12,7 @@ export const creerUtilisateur = async (req, res) => {
     // Vérifier si l'utilisateur existe déjà
     const existant = await modeleUtilisateur.trouverParCourriel(courriel);
     if (existant) {
-      return res
-        .status(409)
-        .json({ message: "Cet courriel est déjà utilisé." });
+      return res.status(409).json({ message: "Cette adresse courriel est déjà utilisée." });
     }
 
     const erreursValidation = validationCreationUtilisateur(req, res);

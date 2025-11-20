@@ -1,6 +1,6 @@
 // Charger les variables d'environnement depuis un fichier .env (si présent)
-import 'dotenv/config';
-import app from './app.js';
+import "dotenv/config";
+import app from "./app.js";
 
 // Définir le port d'écoute
 const PORT = process.env.PORT || 5252;
