@@ -20,6 +20,7 @@ import {
   listerBouteilles,
   modifierBouteille,
   recupererBouteille,
+  rechercherBouteilleParAttributs,
   supprimerBouteille,
 } from "../controllers/controller.bouteille.js";
 
@@ -27,6 +28,8 @@ const router = express.Router();
 
 // GET / - Lister toutes les bouteilles
 router.get("/", listerBouteilles);
+// GET /recherche - Rechercher des bouteilles par attributs
+router.get("/recherche", rechercherBouteilleParAttributs);
 // GET /:id - Récupérer une bouteille par ID
 router.get("/:id", recupererBouteille);
 // POST / - Créer une nouvelle bouteille

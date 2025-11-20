@@ -76,6 +76,45 @@ class ModeleBouteille {
     return rows.length ? mapper(rows[0]) : null;
   }
 
+  /**
+   * Récupère les bouteilles correspondant à une combinaison d'attributs.
+   */
+  static async trouverParAttributs(filtres = {}) {
+    const clauses = [];
+    const valeurs = [];
+
+    if (filtres.nom) {
+      clauses.push("LOWER(b.nom) LIKE LOWER(?)");
+      valeurs.push(`%${filtres.nom}%`);
+    }
+
+    if (filtres.region) {
+      clauses.push("LOWER(b.region) LIKE LOWER(?)");
+      valeurs.push(`%${filtres.region}%`);
+    }
+
+    if (filtres.cepage) {
+      clauses.push("LOWER(b.cepage) LIKE LOWER(?)");
+      valeurs.push(`%${filtres.cepage}%`);
+    }
+
+    if (filtres.pays) {
+      clauses.push("LOWER(p.nom) LIKE LOWER(?)");
+      valeurs.push(`%${filtres.pays}%`);
+    }
+
+    if (filtres.type) {
+      clauses.push("LOWER(t.couleur) LIKE LOWER(?)");
+      valeurs.push(`%${filtres.type}%`);
+    }
+
+    if (!clauses.length) return [];
+
+    const sql = `${BASE_SELECT} WHERE ${clauses.join(" AND ")}`;
+    const [rows] = await connexion.query(sql, valeurs);
+    return rows.map(mapper);
+  }
+
   static async creer() {
     throw new Error("creer non implémenté");
   }
