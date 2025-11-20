@@ -1,15 +1,41 @@
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { recupererUtilisateur } from "../lib/requetes.js";
 import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
 import MenuEnHaut from "../components/components-partages/MenuEnHaut/MenuEnHaut";
 import Bouton from "../components/components-partages/Boutons/Bouton";
 import Icon from "../components/components-partages/Icon/Icon";
 
 function Profil() {
-  const supprimerCompte = () => {};
-  const modifierCompte = () => {};
+  const [utilisateur, setUtilisateur] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const chargerUtilisateur = async () => {
+      const userConnecte = JSON.parse(localStorage.getItem("utilisateur"));
+      if (!userConnecte || !userConnecte.id_utilisateur) {
+        navigate("/connexion");
+        return;
+      }
+
+      const data = await recupererUtilisateur(userConnecte.id_utilisateur);
+      setUtilisateur(data);
+    };
+    chargerUtilisateur();
+  }, [navigate]);
+
+  const supprimerCompte = () => {
+    // TODO : implémenter la suppression
+    console.log("Supprimer compte");
+  };
+  const modifierCompte = () => {
+    // TODO : implémenter la modification
+    console.log("Modifier compte");
+  };
+
   return (
     <>
-      <div className="flex flex-col min-h-screen">
+      <section className="flex flex-col min-h-screen">
         <header>
           <MenuEnHaut />
         </header>
@@ -18,19 +44,18 @@ function Profil() {
             <div className="flex justify-between align-items">
               <header>
                 <h1 className="text-(length:--taille-moyen) font-medium">
-                  Silvia Larois
+                  {utilisateur.nom}
                 </h1>
                 <p className="text-(length:--taille-tres-petit)">
-                  silvialarois54 <span className="underline">@gmail.com</span>
+                  {utilisateur.courriel}
                 </p>
               </header>
               <p>Icone</p>
             </div>
 
             <div className="flex flex-col mt-8 gap-(--rythme-serre)">
-              <p>Nom : Silvia Larois</p>
-              <p>Courriel : silvialarois54@gmail.com</p>
-              <p>Telephone : +1 555 555 5555 </p>
+              <p>{utilisateur.nom}</p>
+              <p>{utilisateur.courriel}</p>
             </div>
           </div>
 
@@ -55,7 +80,7 @@ function Profil() {
         <footer>
           <MenuEnBas />
         </footer>
-      </div>
+      </section>
     </>
   );
 }
