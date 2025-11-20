@@ -1,6 +1,6 @@
 create database vino_db;
 use vino_db;
-
+ 
 -- table utilisateur
  
 create table utilisateur (
@@ -27,9 +27,10 @@ create table bouteille (
     id_bouteille INT AUTO_INCREMENT PRIMARY KEY,
     id_pays INT,
     id_type INT,
+    code_saq VARCHAR(20) NOT NULL UNIQUE,
     nom VARCHAR(100) NOT NULL,
-    millenisme YEAR NOT NULL,
-    region VARCHAR(50) NOT NULL,
+    millenisme SMALLINT NOT NULL,
+    region VARCHAR(255) NOT NULL,
     cepage VARCHAR(100) NOT NULL,
     image VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
@@ -60,7 +61,7 @@ create table bouteilleCellier (
  
 -- table degustation
 create table degustation (
-	date_degustation DATETIME DEFAULT CURRENT_TIMESTAMP PRIMARY KEY,
+    date_degustation DATETIME DEFAULT CURRENT_TIMESTAMP PRIMARY KEY,
     id_bouteille INT,
     id_utilisateur INT,
     commentaire TEXT NOT NULL,
