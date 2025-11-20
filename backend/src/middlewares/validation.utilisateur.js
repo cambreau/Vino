@@ -28,8 +28,8 @@ function validerMotDePasse(mot_de_passe, verifierLongueur = true) {
     return { valide: false, message: "Le mot de passe est requis." };
   }
 
-  if (verifierLongueur && mot_de_passe.length < 6) {
-    return { valide: false, message: "Le mot de passe doit contenir au moins 6 caractères." };
+  if (verifierLongueur && mot_de_passe.length < 8) {
+    return { valide: false, message: "Le mot de passe doit contenir au moins 8 caractères." };
   }
 
   return { valide: true };
