@@ -39,7 +39,20 @@ export const creerUtilisateur = async (req, res) => {
 /**
  * Fonction asynchrone qui recupere un utilisateur.
  */
-export const recupererUtilisateur = async (req, res) => {};
+export const recupererUtilisateur = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const utilisateur = await modeleUtilisateur.trouverParId(id);
+    if (!utilisateur) {
+      return res.status(404).json({ message: "Utilisateur non trouvé." });
+    }
+  } catch (err) {
+    console.error("Erreur lors de la récupération de l'utilisateur :", err);
+    return res.status(500).json({
+      error: "Erreur serveur lors de la récupération de l'utilisateur.",
+    });
+  }
+};
 
 /**
  * Fonction asynchrone qui recherche un utilisateur par son courriel.
