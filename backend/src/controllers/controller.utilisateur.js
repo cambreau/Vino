@@ -1,5 +1,6 @@
 import modeleUtilisateur from "../models/modele.utilisateur.js";
 import bcrypt from "bcrypt";
+import validationCreationUtilisateur from "../middlewares/validation.utilisateur.js";
 
 /**
  * Fonction asynchrone qui creer un utilisateur.
