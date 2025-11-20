@@ -5,9 +5,10 @@ import BoutonRetour from "../components/components-partages/Boutons/BoutonRetour
 import Message from "../components/components-partages/Message/Message";
 
 import { validerConnexion } from "../lib/validationFormulaire.js";
+import { connexionUtilisateur } from "../lib/requetes.js";
 
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function Connexion() {
   const navigate = useNavigate();
@@ -20,6 +21,9 @@ function Connexion() {
 
   // Message d'erreur
   const [messageErreurGeneral, setMessageErreurGeneral] = useState("");
+  
+  // État de chargement
+  const [chargement, setChargement] = useState(false);
 
   /**
    * Fonction qui envoie la connexion
@@ -28,7 +32,7 @@ function Connexion() {
   const envoieConnexion = async (e) => {
     e.preventDefault();
 
-    // Valider les champs avec la fonction de validationFormulaire.js
+    // Validation frontend
     const erreur = validerConnexion(utilisateur.courriel, utilisateur.mot_de_passe);
 
     // Si une erreur existe
@@ -40,20 +44,26 @@ function Connexion() {
     // Réinitialiser le message d'erreur si tout est valide
     setMessageErreurGeneral("");
 
-    // Si tout est valide, afficher les données dans la console
-    console.log("Connexion avec:", utilisateur);
+    // Appel de la requête connexionUtilisateur
+    setChargement(true);
+    
+    const resultat = await connexionUtilisateur(utilisateur, navigate);
+    
+    setChargement(false);
 
-    // backend
-
+    // Gestion des erreurs
+    if (!resultat.succes) {
+      setMessageErreurGeneral(resultat.erreur);
+    }
+    // Si succès, la redirection est déjà gérée dans connexionUtilisateur
   };
 
   return (
     <main
       className="
       min-h-screen py-(--rythme-espace) grid grid-rows-[1fr_5fr] items-end
-      bg-[linear-gradient(0deg,rgba(0,0,0,0.7)25%,rgba(0,0,0,0)),url('../assets/images/connexionBg.webp')] bg-cover bg-center bg-no-repeat bg-[#e0e0e0]"
+      bg-[linear-gradient(0deg,rgba(0,0,0,0.7)25%,rgba(0,0,0,0)),url('../assets/images/bg3.png')] bg-cover bg-center bg-no-repeat bg-[#e0e0e0]"
     >
-
       <header className="px-(--rythme-base)">
         <BoutonRetour />
       </header>
@@ -64,26 +74,26 @@ function Connexion() {
         action={envoieConnexion}
         enfants={
           <>
-          {/* Message d'erreur */}
+            {/* Message d'erreur */}
             {messageErreurGeneral && (
               <div className="mt-4">
                 <Message texte={messageErreurGeneral} type="erreur" />
               </div>
-          )}
+            )}
 
-          {/* Champ courriel */}
+            {/* Champ courriel */}
             <FormulaireInput
               type="email"
               nom="courriel"
               genre="un"
+              classCouleur="Clair"
+              classCouleurLabel="Clair"
               estObligatoire={true}
               value={utilisateur.courriel}
               onChange={(e) => {
                 const valeur = e.target.value;
-                // Mettre à jour la valeur du courriel
                 setUtilisateur((prev) => ({ ...prev, courriel: valeur }));
                 
-                // Effacer le message d'erreur général quand l'utilisateur tape
                 if (messageErreurGeneral) {
                   setMessageErreurGeneral("");
                 }
@@ -95,40 +105,27 @@ function Connexion() {
               type="password"
               nom="mot de passe"
               genre="un"
+              classCouleur="Clair"
+              classCouleurLabel="Clair"
               estObligatoire={true}
               value={utilisateur.mot_de_passe}
               onChange={(e) => {
                 const valeur = e.target.value;
-                // Mettre à jour la valeur du mot de passe
                 setUtilisateur((prev) => ({
                   ...prev,
                   mot_de_passe: valeur,
                 }));
                 
-                // Effacer le message d'erreur
                 if (messageErreurGeneral) {
                   setMessageErreurGeneral("");
                 }
               }}
             />
-
-          {/* Lien "Mot de passe oublié?" */}
-          <div className="text-right mt-2">
-              <Link
-                to="/mot-de-passe-oublie"
-                className="
-                text-(length:--taille-normal)
-                text-principal-premier-plan
-                hover:text-principal-100 transition-colors"
-              >
-                Mot de passe oublié?
-              </Link>
-          </div>
           </>
         }
         bouton={
           <Bouton
-            texte="Se connecter"
+            texte={chargement ? "Connexion en cours..." : "Se connecter"}
             type="primaire"
             typeHtml="submit"
             action={envoieConnexion}

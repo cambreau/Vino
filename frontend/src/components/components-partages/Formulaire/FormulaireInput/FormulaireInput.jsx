@@ -10,6 +10,7 @@ function FormulaireInput({
   onBlur,
   value = "",
   classCouleur = "Dark", //Dark ou Clair
+  classCouleurLabel = "Dark", //Dark ou Clair
 }) {
   const nomFormat = formatString(nom);
   const labelClair = "text-(--color-fond)";
@@ -30,7 +31,7 @@ function FormulaireInput({
         className={`
         mb-rythme-serre
         text-(length:--taille-petit) font-medium
-        ${classCouleur === "Dark" ? labelClair : labelDark} 
+        ${classCouleurLabel === "Dark" ? labelDark : labelClair }
       `}
         htmlFor={nom}
       >
