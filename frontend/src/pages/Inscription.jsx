@@ -58,7 +58,11 @@ function Inscription() {
       bg-[linear-gradient(0deg,rgba(0,0,0,0.8)30%,rgba(0,0,0,0)),url('../assets/images/inscriptionCellier.webp')] bg-cover bg-center bg-no-repeat bg-[#e0e0e0]
       "
     >
-      <BoutonRetour />
+
+      <header className="px-(--rythme-base)">
+        <BoutonRetour />
+      </header>
+
       {echecInscription && (
         <Message
           texte="Une erreur est survenue lors de l'inscription. Veuillez réessayer."
@@ -84,6 +88,7 @@ function Inscription() {
               type="text"
               nom="nom"
               genre="un"
+              classCouleurLabel="Clair"
               estObligatoire={true}
               value={utilisateur.nom}
               onChange={(e) => {
@@ -106,6 +111,7 @@ function Inscription() {
               type="email"
               nom="courriel"
               genre="un"
+              classCouleurLabel="Clair"
               estObligatoire={true}
               value={utilisateur.courriel}
               onChange={(e) => {
@@ -128,6 +134,7 @@ function Inscription() {
               type="text"
               nom="mot_de_passe"
               genre="un"
+              classCouleurLabel="Clair"
               estObligatoire={true}
               value={utilisateur.mot_de_passe}
               onChange={(e) => {
@@ -155,6 +162,7 @@ function Inscription() {
               type="text"
               nom="confirmation"
               genre="une"
+              classCouleurLabel="Clair"
               estObligatoire={true}
               value={confirmation}
               onChange={(e) => {

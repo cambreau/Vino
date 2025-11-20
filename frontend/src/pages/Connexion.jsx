@@ -51,7 +51,7 @@ function Connexion() {
     <main
       className="
       min-h-screen py-(--rythme-espace) grid grid-rows-[1fr_5fr] items-end
-      bg-[linear-gradient(0deg,rgba(0,0,0,0.7)25%,rgba(0,0,0,0)),url('../assets/images/connexionBg.webp')] bg-cover bg-center bg-no-repeat bg-[#e0e0e0]"
+      bg-[linear-gradient(0deg,rgba(0,0,0,0.7)25%,rgba(0,0,0,0)),url('../assets/images/bg3.png')] bg-cover bg-center bg-no-repeat bg-[#e0e0e0]"
     >
 
       <header className="px-(--rythme-base)">
@@ -76,6 +76,8 @@ function Connexion() {
               type="email"
               nom="courriel"
               genre="un"
+              classCouleur="Clair"
+              classCouleurLabel="Clair"
               estObligatoire={true}
               value={utilisateur.courriel}
               onChange={(e) => {
@@ -95,6 +97,8 @@ function Connexion() {
               type="password"
               nom="mot de passe"
               genre="un"
+              classCouleur="Clair"
+              classCouleurLabel="Clair"
               estObligatoire={true}
               value={utilisateur.mot_de_passe}
               onChange={(e) => {
@@ -111,19 +115,7 @@ function Connexion() {
                 }
               }}
             />
-
-          {/* Lien "Mot de passe oublié?" */}
-          <div className="text-right mt-2">
-              <Link
-                to="/mot-de-passe-oublie"
-                className="
-                text-(length:--taille-normal)
-                text-principal-premier-plan
-                hover:text-principal-100 transition-colors"
-              >
-                Mot de passe oublié?
-              </Link>
-          </div>
+            
           </>
         }
         bouton={
