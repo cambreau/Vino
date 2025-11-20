@@ -8,10 +8,13 @@ import { validerConnexion } from "../lib/validationFormulaire.js";
 import { connexionUtilisateur } from "../lib/requetes.js";
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 function Connexion() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const succes = searchParams.get("inscriptionSucces") === "true";
+  console.log(succes);
 
   // Les informations de connexion
   const [utilisateur, setUtilisateur] = useState({
@@ -21,7 +24,7 @@ function Connexion() {
 
   // Message d'erreur
   const [messageErreurGeneral, setMessageErreurGeneral] = useState("");
-  
+
   // État de chargement
   const [chargement, setChargement] = useState(false);
 
@@ -33,7 +36,10 @@ function Connexion() {
     e.preventDefault();
 
     // Validation frontend
-    const erreur = validerConnexion(utilisateur.courriel, utilisateur.mot_de_passe);
+    const erreur = validerConnexion(
+      utilisateur.courriel,
+      utilisateur.mot_de_passe
+    );
 
     // Si une erreur existe
     if (erreur) {
@@ -46,9 +52,9 @@ function Connexion() {
 
     // Appel de la requête connexionUtilisateur
     setChargement(true);
-    
+
     const resultat = await connexionUtilisateur(utilisateur, navigate);
-    
+
     setChargement(false);
 
     // Gestion des erreurs
@@ -56,6 +62,14 @@ function Connexion() {
       setMessageErreurGeneral(resultat.erreur);
     }
     // Si succès, la redirection est déjà gérée dans connexionUtilisateur
+  };
+
+  /**
+   * Ferme le message d'erreur en supprimant le paramètre "echec" de l'URL.
+   */
+  const fermerMessage = () => {
+    searchParams.delete("inscriptionSucces");
+    setSearchParams(searchParams);
   };
 
   return (
@@ -67,7 +81,17 @@ function Connexion() {
       <header className="px-(--rythme-base)">
         <BoutonRetour />
       </header>
-      
+
+      <div className="my-(--rythme-espace) mx-(--rythme-base)">
+        {succes && (
+          <Message
+            texte="Profil créé avec succès. Veuillez vous connecter pour continuer."
+            type="succes"
+            onClose={fermerMessage}
+          />
+        )}
+      </div>
+
       <Formulaire
         titreFormulaire="Se connecter"
         method="POST"
@@ -93,7 +117,7 @@ function Connexion() {
               onChange={(e) => {
                 const valeur = e.target.value;
                 setUtilisateur((prev) => ({ ...prev, courriel: valeur }));
-                
+
                 if (messageErreurGeneral) {
                   setMessageErreurGeneral("");
                 }
@@ -115,7 +139,7 @@ function Connexion() {
                   ...prev,
                   mot_de_passe: valeur,
                 }));
-                
+
                 if (messageErreurGeneral) {
                   setMessageErreurGeneral("");
                 }

@@ -6,7 +6,7 @@
 - Test de l’inscription = validation de la base de données. OK
 - Validation du hash password. OK
 - Validation de la redirection vers la page de connexion. OK
+- Validation du message de succès. Ok
+- Validation du respect des normes graphiques. Ok
 
-- Validation du message de succès.
-
-Validation du respect des normes graphiques. police car light En attente merge ticket connexion pour correction css
+Fait 2025-11-20 Meriem et Camille
