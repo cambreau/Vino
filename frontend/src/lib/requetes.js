@@ -38,7 +38,7 @@ export const creerUtilisateur = async (datas, navigate) => {
   } catch (error) {
     // Gestion des erreurs réseau (exemple: pas de connexion) ou autres exceptions JavaScript
     console.error("Erreur lors de la création de l'utilisateur :", error);
-    navigate("/inscription?echec=true");
+    navigate("/inscription?echec=1");
     return { succes: false, erreur: error.message };
   }
 };
@@ -91,5 +91,43 @@ export const modifierUtilisateur = async (datas, navigate) => {
     console.error("Erreur lors de la modification de l'utilisateur :", error);
     navigate(`/modifier-utilisateur/${datas.id}?echec=true`);
     return { succes: false, erreur: error.message };
+  }
+};
+
+// Fonction connexionUtilisateur
+export const connexionUtilisateur = async (datas, navigate) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_UTILISATEUR_URL}/connexion`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datas),
+      }
+    );
+
+    if (reponse.ok) {
+      const data = await reponse.json();
+
+      // Rediriger vers page profil
+      navigate("/profil");
+
+      return { succes: true, utilisateur: data.utilisateur };
+    } else {
+      // Gestion des erreurs HTTP (400, 401, 500, etc.)
+      const erreurData = await reponse.json().catch(() => ({}));
+      console.error("Erreur HTTP:", reponse.status, erreurData);
+
+      return {
+        succes: false,
+        erreur: erreurData.message || "Erreur lors de la connexion",
+      };
+    }
+  } catch (error) {
+    console.error("Erreur lors de la connexion de l'utilisateur :", error);
+    return {
+      succes: false,
+      erreur: "Erreur de connexion au serveur",
+    };
   }
 };
