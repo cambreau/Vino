@@ -14,9 +14,12 @@
 import { connexion } from "../database/connexion.js";
 import { recupererTousVins } from "../services/saqService.js";
 
+const MILLENISME_NON_DISPONIBLE_LIBELLE = "Millésime non disponible";
+
 const BASE_SELECT = `
   SELECT
     b.id_bouteille,
+    b.code_saq,
     b.nom,
     b.millenisme,
     b.region,
@@ -33,26 +36,32 @@ const BASE_SELECT = `
 `;
 
 // Transforme un enregistrement SQL en représentation API.
-const mapper = (row) => ({
-  id: row.id_bouteille,
-  nom: row.nom,
-  millenisme: row.millenisme,
-  region: row.region,
-  cepage: row.cepage,
-  image: row.image,
-  description: row.description,
-  tauxAlcool: row.taux_alcool,
-  prix: row.prix,
-  pays: row.pays,
-  type: row.type,
-});
+const mapper = (row) => {
+
+  return {
+    id: row.id_bouteille,
+    codeSaq: row.code_saq,
+    nom: row.nom,
+    millenisme: row.millenisme ?? MILLENISME_NON_DISPONIBLE_LIBELLE,
+    region: row.region,
+    cepage: row.cepage,
+    image: row.image,
+    description: row.description,
+    tauxAlcool: row.taux_alcool,
+    prix: row.prix,
+    pays: row.pays,
+    type: row.type,
+  };
+};
 
 class ModeleBouteille {
   /**
    * Récupère l'ensemble des bouteilles disponibles pour l'API.
    */
   static async trouverTout() {
-    const [rows] = await connexion.query(`${BASE_SELECT} ORDER BY b.id_bouteille DESC`);
+    const [rows] = await connexion.query(
+      `${BASE_SELECT} ORDER BY b.id_bouteille DESC`
+    );
     return rows.map(mapper);
   }
 
@@ -60,9 +69,10 @@ class ModeleBouteille {
    * Récupère une bouteille spécifique par identifiant.
    */
   static async trouverParId(id) {
-    const [rows] = await connexion.query(`${BASE_SELECT} WHERE b.id_bouteille = ?`, [
-      id,
-    ]);
+    const [rows] = await connexion.query(
+      `${BASE_SELECT} WHERE b.id_bouteille = ?`,
+      [id]
+    );
     return rows.length ? mapper(rows[0]) : null;
   }
 
@@ -84,22 +94,26 @@ class ModeleBouteille {
   static async importerDepuisEnregistrementsSaq(options = {}) {
     const { limite } = options;
     const enregistrements = await recupererTousVins();
-    const aTraiter = Number.isInteger(limite) && limite > 0
-      ? enregistrements.slice(0, limite)
-      : enregistrements;
+    const aTraiter =
+      Number.isInteger(limite) && limite > 0
+        ? enregistrements.slice(0, limite)
+        : enregistrements;
 
     // Statistiques retournées au contrôleur pour informer le client.
     const stats = {
       totalRecuperes: enregistrements.length,
       traites: aTraiter.length,
+      traitesUniques: 0,
       inseres: 0,
       misAJour: 0,
       ignores: 0,
+      doublons: 0,
     };
 
     if (!aTraiter.length) return stats;
 
     const connection = await connexion.getConnection();
+    const codesTraites = new Set();
     try {
       await connection.beginTransaction();
       for (const enregistrement of aTraiter) {
@@ -115,11 +129,18 @@ class ModeleBouteille {
           continue;
         }
 
+        if (codesTraites.has(payload.code_saq)) {
+          stats.doublons += 1;
+          continue;
+        }
+        codesTraites.add(payload.code_saq);
+
         const action = await this.#persisterBouteille(connection, payload);
         if (action === "insert") stats.inseres += 1;
         else if (action === "update") stats.misAJour += 1;
         else stats.ignores += 1;
       }
+      stats.traitesUniques = codesTraites.size;
       await connection.commit();
       return stats;
     } catch (error) {
@@ -131,23 +152,47 @@ class ModeleBouteille {
   }
 
   /**
-   * Effectue un upsert basé sur (nom, millésime) pour respecter la structure actuelle.
+   * Effectue un upsert basé sur `code_saq` afin d'éviter les doublons.
    */
   static async #persisterBouteille(connection, payload) {
     try {
       const [existants] = await connection.query(
-      "SELECT id_bouteille FROM bouteille WHERE nom = ? AND millenisme = ? LIMIT 1",
-      [payload.nom, payload.millenisme]
-    );
+        "SELECT id_bouteille FROM bouteille WHERE code_saq = ? LIMIT 1",
+        [payload.code_saq]
+      );
 
-    if (existants.length) {
-      console.log("Mise à jour - payload:", JSON.stringify(payload));
-      await connection.query(
-        `UPDATE bouteille
+      if (existants.length) {
+        console.log("Mise à jour - payload:", JSON.stringify(payload));
+        await connection.query(
+          `UPDATE bouteille
            SET nom = ?, millenisme = ?, region = ?, cepage = ?, image = ?,
                description = ?, taux_alcool = ?, prix = ?, id_pays = ?, id_type = ?
          WHERE id_bouteille = ?`,
+          [
+            payload.nom,
+            payload.millenisme,
+            payload.region,
+            payload.cepage,
+            payload.image,
+            payload.description,
+            payload.taux_alcool,
+            payload.prix,
+            payload.id_pays,
+            payload.id_type,
+            existants[0].id_bouteille,
+          ]
+        );
+        return "update";
+      }
+
+      console.log("Insertion - payload:", JSON.stringify(payload));
+      await connection.query(
+        `INSERT INTO bouteille
+  (code_saq, nom, millenisme, region, cepage, image, description,
+    taux_alcool, prix, id_pays, id_type)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
+          payload.code_saq,
           payload.nom,
           payload.millenisme,
           payload.region,
@@ -158,32 +203,9 @@ class ModeleBouteille {
           payload.prix,
           payload.id_pays,
           payload.id_type,
-          existants[0].id_bouteille,
         ]
       );
-      return "update";
-    }
-
-    console.log("Insertion - payload:", JSON.stringify(payload));
-    await connection.query(
-      `INSERT INTO bouteille
-  (nom, millenisme, region, cepage, image, description,
-    taux_alcool, prix, id_pays, id_type)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        payload.nom,
-        payload.millenisme,
-        payload.region,
-        payload.cepage,
-        payload.image,
-        payload.description,
-        payload.taux_alcool,
-        payload.prix,
-        payload.id_pays,
-        payload.id_type,
-      ]
-    );
-    return "insert";
+      return "insert";
     } catch (err) {
       console.error("Erreur SQL #persisterBouteille:", err?.message || err);
       console.error("payload:", payload);
@@ -192,18 +214,30 @@ class ModeleBouteille {
   }
 
   /**
+   * Valide un millésime : doit être > 0 et dans une plage raisonnable (1800 - année actuelle + 2)
+   */
+  static #validerMillesime(millesime) {
+    if (!Number.isInteger(millesime) || millesime <= 0) return false;
+    const anneeActuelle = new Date().getFullYear();
+    return millesime >= 1800 && millesime <= anneeActuelle + 2;
+  }
+
+  /**
    * Valide et complète les données avant insertion SQL.
    */
   static async #normaliserPayload(connection, donneesMappees) {
     if (!donneesMappees?.nom) return null;
 
+    const codeSaqBrut = donneesMappees.codeSAQ || donneesMappees.code_saq;
+    const codeSaq = typeof codeSaqBrut === "string" ? codeSaqBrut.trim() : null;
+    if (!codeSaq) return null; // on ignore les enregistrements sans code unique
+
     const idPays = await this.#assurerPays(connection, donneesMappees.pays);
     const idType = await this.#assurerType(connection, donneesMappees.type);
 
-    const millesime = Number.isInteger(donneesMappees.millesime)
+    const millesime = this.#validerMillesime(donneesMappees.millesime)
       ? donneesMappees.millesime
-      : 1900;
-
+      : null;
     const cepageValue = Array.isArray(donneesMappees.cepage)
       ? donneesMappees.cepage.join(", ")
       : donneesMappees.cepage || "Cépage non précisé";
@@ -213,6 +247,7 @@ class ModeleBouteille {
       : donneesMappees.region || "Origine non précisée";
 
     return {
+      code_saq: codeSaq,
       nom: donneesMappees.nom,
       millenisme: millesime,
       region: regionValue,
@@ -252,14 +287,18 @@ class ModeleBouteille {
         )
       : null;
 
-    const millesime = attrMap.millesime_produit
+    const millesimeBrut = attrMap.millesime_produit
       ? Number.parseInt(attrMap.millesime_produit, 10)
+      : null;
+    const millesime = this.#validerMillesime(millesimeBrut)
+      ? millesimeBrut
       : null;
 
     return {
+      codeSAQ: vue?.sku || product?.sku || null,
       nom: vue.name || product?.name || null,
       prix: Number.isFinite(prix) ? prix : null,
-      millesime: Number.isFinite(millesime) ? millesime : null,
+      millesime,
       region:
         attrMap.region_origine ||
         attrMap.designation_reglementee ||

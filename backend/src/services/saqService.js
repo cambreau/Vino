@@ -125,34 +125,57 @@ const filtrerAttributs = (attributes) => {
   return attributes.filter((a) => conserverAttributs.includes(a.name));
 };
 
-// Fonction pour récupérer tous les vins de la SAQ via l'API GraphQL
-export const recupererTousVins = async () => {
-  const tousProduits = [];
+const filtresCommuns = [
+  { attribute: "categoryPath", eq: "produits/vin" },
+  { attribute: "visibility", in: ["Catalog, Search", "Catalog"] },
+  {
+    attribute: "availability_front",
+    in: [
+      "En ligne",
+      "En succursale",
+      "Disponible bientôt",
+      "Bientôt en loterie",
+      "En loterie",
+    ],
+  },
+  { attribute: "catalog_type", in: ["1"] },
+];
+
+const genererPlageMillesimes = (debut = 1950) => {
+  const range = [];
+  const maximum = new Date().getFullYear() + 2;
+  for (let annee = maximum; annee >= debut; annee -= 1) {
+    range.push(annee);
+  }
+  return range;
+};
+
+/**
+ * Récupère tous les vins de la SAQ via l'API GraphQL.
+ * @param {Object} [options] - Options de filtrage.
+ * @param {Array<number>} [options.millesimes] - Liste des millésimes à récupérer (par défaut: 1950 à année actuelle + 2).
+ * @returns {Promise<Array>} Liste des produits dédupliqués par SKU.
+ */
+export const recupererTousVins = async (options = {}) => {
+  const millesimesOption = Array.isArray(options.millesimes)
+    ? options.millesimes.filter(Boolean)
+    : [];
+  const millesimes = millesimesOption.length
+    ? millesimesOption
+    : genererPlageMillesimes();
+  const produitsParSku = new Map();
   const TAILLE_PAGE = 100;
   const REQUETES_PARALLELES = 10;
 
   // Fonction pour récupérer une page spécifique
-  const recupererPage = async (pageNum) => {
+  const recupererPage = async (pageNum, filtres) => {
     const body = JSON.stringify({
       query,
       variables: {
         phrase: "",
         page_size: TAILLE_PAGE,
         current_page: pageNum,
-        filter: [
-          { attribute: "categoryPath", eq: "produits/vin" },
-          { attribute: "visibility", in: ["Catalog, Search", "Catalog"] },
-          {
-            attribute: "availability_front",
-            in: [
-              "En ligne",
-              "En succursale",
-              "Disponible bientôt",
-              "Bientôt en loterie",
-              "En loterie",
-            ],
-          },
-        ],
+        filter: filtres,
         sort: [{ attribute: "position", direction: "ASC" }],
       },
     });
@@ -177,69 +200,101 @@ export const recupererTousVins = async () => {
   const DELAI_REESSAI = 1000;
 
   // Fonction pour récupérer une page avec des tentatives de réessai en cas d'erreur
-  const recupererPageAvecRetry = async (pageNum, tentatives = 0) => {
-    const resultat = await recupererPage(pageNum);
+  const recupererPageAvecRetry = async (pageNum, filtres, tentatives = 0) => {
+    const resultat = await recupererPage(pageNum, filtres);
     if (resultat.errors && tentatives < TENTATIVES_MAX) {
       await new Promise((resolve) =>
         setTimeout(resolve, DELAI_REESSAI * Math.pow(2, tentatives))
       );
-      return recupererPageAvecRetry(pageNum, tentatives + 1);
+      return recupererPageAvecRetry(pageNum, filtres, tentatives + 1);
     }
     return resultat;
   };
 
-  console.log("Démarrage de la récupération des vins SAQ...");
+  const accumulate = (items) => {
+    for (const item of items) {
+      const sku = item?.productView?.sku || item?.product?.sku;
+      if (!sku || produitsParSku.has(sku)) continue;
+      produitsParSku.set(sku, item);
+    }
+  };
 
-  // Récupérer la première page pour obtenir le nombre total de pages
-  const premiereReponse = await recupererPageAvecRetry(1);
-  if (premiereReponse.errors) {
-    console.error(
-      "Erreur GraphQL:",
-      JSON.stringify(premiereReponse.errors, null, 2)
-    );
-    return tousProduits;
-  }
+  const groupes = [...millesimes, null];
 
-  // Vérifier si les données sont présentes
-  if (!premiereReponse.data) return tousProduits;
+  for (const millesime of groupes) {
+    const filtres = [...filtresCommuns];
+    if (millesime) {
+      filtres.unshift({
+        attribute: "millesime_produit",
+        in: [String(millesime)],
+      });
+    }
 
-  // Traiter la première page de résultats
-  const premiereDonnees = premiereReponse.data.productSearch;
-  tousProduits.push(...premiereDonnees.items);
-  const pagesTotales = premiereDonnees.page_info.total_pages;
+    const etiquette = millesime ? `millesime ${millesime}` : "sans filtre millésime";
+    console.log(`Démarrage récupération (${etiquette})...`);
 
-  // Récupérer les pages restantes en parallèle
-  for (let debut = 2; debut <= pagesTotales; debut += REQUETES_PARALLELES) {
-    const pagePromises = [];
+    const premiereReponse = await recupererPageAvecRetry(1, filtres);
+    if (premiereReponse.errors) {
+      console.error(
+        `Erreur GraphQL (${etiquette}):`,
+        JSON.stringify(premiereReponse.errors, null, 2)
+      );
+      continue;
+    }
+    if (!premiereReponse.data) {
+      console.error(`Erreur: aucune donnée reçue (${etiquette})`);
+      continue;
+    }
+
+    const premiereDonnees = premiereReponse.data.productSearch;
+    accumulate(premiereDonnees.items);
+    const pagesTotales = premiereDonnees.page_info.total_pages;
+
     for (
-      let decalage = 0;
-      decalage < REQUETES_PARALLELES && debut + decalage <= pagesTotales;
-      decalage++
+      let debut = 2;
+      debut <= pagesTotales;
+      debut += REQUETES_PARALLELES
     ) {
-      pagePromises.push(recupererPageAvecRetry(debut + decalage));
-    }
-
-    // Attendre que toutes les promesses soient résolues
-    const resultats = await Promise.all(pagePromises);
-
-    // Traiter les résultats
-    for (let idx = 0; idx < resultats.length; idx++) {
-      const json = resultats[idx];
-      if (json.errors) {
-        console.error("Erreur GraphQL:", JSON.stringify(json.errors, null, 2));
-        continue;
+      const pagePromises = [];
+      for (
+        let decalage = 0;
+        decalage < REQUETES_PARALLELES && debut + decalage <= pagesTotales;
+        decalage++
+      ) {
+        pagePromises.push(
+          recupererPageAvecRetry(debut + decalage, filtres)
+        );
       }
-      if (!json.data) {
-        console.error("Erreur: Aucune donnée reçue pour la page");
-        continue;
+
+      const resultats = await Promise.all(pagePromises);
+      for (let idx = 0; idx < resultats.length; idx++) {
+        const json = resultats[idx];
+        if (json.errors) {
+          console.error(
+            `Erreur GraphQL page ${debut + idx} (${etiquette}):`,
+            JSON.stringify(json.errors, null, 2)
+          );
+          continue;
+        }
+        if (!json.data) {
+          console.error(
+            `Erreur: aucune donnée page ${debut + idx} (${etiquette})`
+          );
+          continue;
+        }
+        const data = json.data.productSearch;
+        console.log(
+          `Récupéré page ${debut + idx} / ${pagesTotales} (${etiquette})`
+        );
+        accumulate(data.items);
       }
-      const data = json.data.productSearch;
-      console.log(`Récupéré page ${debut + idx} / ${pagesTotales}`);
-      if (data) tousProduits.push(...data.items);
     }
+    console.log(
+      `Récupération terminée pour ${etiquette} (${produitsParSku.size} uniques cumulés).`
+    );
   }
-  console.log(`Récupération terminée (${tousProduits.length} produits).`);
-  return tousProduits;
+
+  return Array.from(produitsParSku.values());
 };
 
 // Fonction pour récupérer et sauvegarder les données nettoyées dans un fichier JSON
