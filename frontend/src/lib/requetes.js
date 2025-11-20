@@ -109,9 +109,6 @@ export const connexionUtilisateur = async (datas, navigate) => {
     if (reponse.ok) {
       const data = await reponse.json();
       
-      // Stocker les informations de l'utilisateur dans localStorage
-      localStorage.setItem('utilisateur', JSON.stringify(data.utilisateur));
-      
       // Rediriger vers page profil
       navigate("/profil"); 
       
