@@ -1,6 +1,6 @@
 create database vino_db;
 use vino_db;
-
+ 
 -- table utilisateur
 
 create table utilisateur (
@@ -61,7 +61,7 @@ create table bouteilleCellier (
 
 -- table degustation
 create table degustation (
-	date_degustation DATETIME DEFAULT CURRENT_TIMESTAMP PRIMARY KEY,
+    date_degustation DATETIME DEFAULT CURRENT_TIMESTAMP PRIMARY KEY,
     id_bouteille INT,
     id_utilisateur INT,
     commentaire TEXT NOT NULL,

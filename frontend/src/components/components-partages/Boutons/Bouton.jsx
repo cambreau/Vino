@@ -18,7 +18,7 @@ function Bouton({
     bg-principal-200
     text-fond
     border border-principal-200
-    hover:bg-principal-premier-plan
+    hover:bg-(--color-fond)
     hover:text-principal-300
   `;
   // Classes pour le bouton secondaire
@@ -26,7 +26,7 @@ function Bouton({
     bg-principal-100
     text-texte-premier
     border border-principal-100
-    hover:bg-principal-premier-plan
+    hover:bg-(--color-fond)
     hover:text-principal-300
   `;
 
