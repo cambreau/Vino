@@ -7,13 +7,16 @@ import {
   recupererUtilisateurParCourriel,
   modifierUtilisateur,
   supprimerUtilisateur,
-  connexionUtilisateur
+  connexionUtilisateur,
 } from "../controllers/controller.utilisateur.js";
 
-import { validerConnexionUtilisateur } from "../middlewares/validation.utilisateur.js";
+import {
+  validerConnexionUtilisateur,
+  validerCreationUtilisateur,
+} from "../middlewares/validation.utilisateur.js";
 
 // POST / - Creer un utilisateur
-router.post("/", creerUtilisateur);
+router.post("/", validerCreationUtilisateur, creerUtilisateur);
 
 // GET //:id - Recuperer un utilisateur
 router.get("/:id", recupererUtilisateur);
@@ -27,9 +30,7 @@ router.put("/:id", modifierUtilisateur);
 // DELETE //:id - Supprimer un utilisateur
 router.delete("/:id", supprimerUtilisateur);
 
-
 // POST /connexion - Connexion d'un utilisateur
 router.post("/connexion", validerConnexionUtilisateur, connexionUtilisateur);
-
 
 export default router;
