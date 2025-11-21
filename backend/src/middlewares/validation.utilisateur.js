@@ -84,3 +84,22 @@ export function validerConnexionUtilisateur(req, res, next) {
 
   next();
 }
+
+// Middleware pour la Modification d'utilisateur
+export function validerModificationUtilisateur(req, res, next) {
+  const { nom, courriel } = req.body;
+  // Valider le nom
+  const validationNom = validerNom(nom);
+  if (!validationNom.valide) {
+    return res.status(400).json({ message: validationNom.message });
+  }
+
+  // Valider le courriel
+  const validationCourriel = validerCourriel(courriel);
+  if (!validationCourriel.valide) {
+    return res.status(400).json({ message: validationCourriel.message });
+  }
+
+  //Si tout est valide
+  next();
+}
