@@ -57,17 +57,71 @@ export const recupererUtilisateur = async (req, res) => {
 /**
  * Fonction asynchrone qui recherche un utilisateur par son courriel.
  */
-export const recupererUtilisateurParCourriel = async (req, res) => {};
+export const recupererUtilisateurParCourriel = async (req, res) => { };
 
 /**
  * Fonction asynchrone qui modifie les informations d'un utilisateur.
  */
-export const modifierUtilisateur = async (req, res) => {};
+export const modifierUtilisateur = async (req, res) => {
+  try {
+    const { nom, courriel, mot_de_passe } = req.body;
+    const { id } = req.params;
+
+    // Avoir les informations dans la basse de donnees si l'utilisateur existe
+    const donneesUtilisateur = await modeleUtilisateur.trouverParId(id);
+
+    if (!donneesUtilisateur) {
+      return res.status(404).json({
+        message: "Utilisateur non trouvé."
+      });
+    }
+
+    // Si le courriel enovoye est different de celui dans la base de donnees
+    if (courriel !== donneesUtilisateur.courriel) {
+      const existant = await modeleUtilisateur.trouverParCourriel(courriel);
+      if (existant) {
+        return res.status(409).json({
+          message: "Vous ne pouvez pas utiliser ce courriel."
+        });
+      }
+    }
+
+    // Hasher le mot de passe si fourni
+    let motDePasseHache = null;
+    if (mot_de_passe) {
+      motDePasseHache = await bcrypt.hash(mot_de_passe, 10);
+    }
+
+    // Mettre à jour l'utilisateur
+    const succes = await modeleUtilisateur.modifier(
+      id,
+      nom,
+      courriel,
+      motDePasseHache
+    );
+
+    if (!succes) {
+      return res.status(500).json({
+        message: "Échec de la modification de l'utilisateur.",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Utilisateur modifié avec succès.",
+    });
+
+  } catch (err) {
+    console.error("Erreur lors de la modification de l'utilisateur :", err);
+    return res.status(500).json({
+      error: "Erreur lors de la modification de l'utilisateur.",
+    });
+  }
+};
 
 /**
  * Fonction asynchrone qui supprimme un utilisateur.
  */
-export const supprimerUtilisateur = async (req, res) => {};
+export const supprimerUtilisateur = async (req, res) => { };
 
 /*
  * Fonction asynchrone qui connecte un utilisateur.

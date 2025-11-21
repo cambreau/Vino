@@ -42,7 +42,7 @@ function validerMotDePasse(mot_de_passe, verifierLongueur = true) {
 }
 
 // Middleware pour la CRÉATION d'utilisateur
-export function validerCreationUtilisateur(req, res, next) {
+export function validerDonneesUtilisateur(req, res, next) {
   const { nom, courriel, mot_de_passe } = req.body;
   // Valider le nom
   const validationNom = validerNom(nom);
