@@ -1,6 +1,7 @@
 import MenuEnHaut from "../components/components-partages/MenuEnHaut/MenuEnHaut";
 import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
 import Bouton from "../components/components-partages/Boutons/Bouton";
+import Message from "../components/components-partages/Message/Message";
 
 function Celliers() {
   return (
@@ -18,9 +19,12 @@ function Celliers() {
           <article className="mt-(--rythme-base) p-(--rythme-serre) min-h-[200px] flex flex-col items-center justify-center">
             {/* Contenu des bouteilles dans le cellier à ajouter ici */}
             {/* Message lorsque le cellier est vide */}
-            <p className="mb-(--rythme-base) text-center text-principal-200">
-              Vous n'avez pas encore de bouteilles dans ce cellier.
-            </p>
+            <div className="mb-(--rythme-base) w-full ">
+              <Message
+                type="erreur"
+                texte="Vous n'avez pas encore de bouteilles dans ce cellier."
+              />
+            </div>
             {/* Bouton CTA vers l'ajout d'une bouteille (catalogue) */}
             <Bouton
               taille="moyen"
