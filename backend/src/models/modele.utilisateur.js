@@ -55,11 +55,7 @@ export default class modeleUtilisateur {
   }
 
   //Modifier un utilisateur et retourne si succès
-  static async modifier(
-    id_utilisateur,
-    nom,
-    courriel,
-  ) {
+  static async modifier(id_utilisateur, nom, courriel) {
     const sql = `
       UPDATE utilisateur 
       SET nom = ?, courriel = ? 
@@ -71,6 +67,5 @@ export default class modeleUtilisateur {
       id_utilisateur,
     ]);
     return resultat.affectedRows > 0;
-
   }
 }

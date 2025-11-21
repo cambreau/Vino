@@ -21,35 +21,29 @@ function ModificationProfil() {
     id: id,
     nom: "",
     courriel: "",
-    mot_de_passe: "",
   });
-  // Confirmation du mot de passe (non envoyée au backend)
-  const [confirmation, setConfirmation] = useState("");
 
   /**
    * Recuperer les informations de l'utilisateur cote backend.
    */
   useEffect(() => {
     const chargerUtilisateur = async () => {
-      const utilisateur = await recupererUtilisateur(id);
-      if (utilisateur) {
+      const utilisateurDatas = await recupererUtilisateur(id);
+      if (utilisateurDatas) {
         setUtilisateur({
-          id: utilisateur.id,
-          nom: utilisateur.nom || "",
-          courriel: utilisateur.courriel || "",
-          mot_de_passe: mot_de_passe || "",
+          id: utilisateurDatas.id_utilisateur,
+          nom: utilisateurDatas.nom,
+          courriel: utilisateurDatas.courriel,
         });
       }
     };
     chargerUtilisateur();
-  }, []);
+  }, [id]);
 
   // Regroupe les messages d'erreurs à afficher.
   const [erreurs, setErreurs] = useState({
     nom: "",
     courriel: "",
-    confirmation: "",
-    motDePasse: "",
   });
 
   /**
@@ -79,17 +73,13 @@ function ModificationProfil() {
       const utilisateurData = await recupererUtilisateur(id);
       if (utilisateurData) {
         setUtilisateur({
-          id: utilisateurData.id,
+          id: utilisateurData.id_utilisateur || utilisateurData.id || id,
           nom: utilisateurData.nom || "",
           courriel: utilisateurData.courriel || "",
-          mot_de_passe: "",
         });
-        setConfirmation("");
         setErreurs({
           nom: "",
           courriel: "",
-          confirmation: "",
-          motDePasse: "",
         });
       }
     }
@@ -128,7 +118,10 @@ function ModificationProfil() {
                 classCouleurLabel="Dark"
                 value={utilisateur.nom}
                 onChange={(e) => {
-                  setUtilisateur((prev) => ({ ...prev, nom: e.target.value }));
+                  setUtilisateur((prev) => ({
+                    ...prev,
+                    nom: e.target.value,
+                  }));
                 }}
                 onBlur={(e) => {
                   const valeur = e.target.value;
@@ -151,7 +144,10 @@ function ModificationProfil() {
                 value={utilisateur.courriel}
                 onChange={(e) => {
                   const valeur = e.target.value;
-                  setUtilisateur((prev) => ({ ...prev, courriel: valeur }));
+                  setUtilisateur((prev) => ({
+                    ...prev,
+                    courriel: valeur,
+                  }));
                   if (!validationChamp(regex.regcourriel, valeur)) {
                     const erreur = "Veuillez saisir un courriel valide.";
                     setErreurs((prev) => ({ ...prev, courriel: erreur }));
@@ -163,60 +159,6 @@ function ModificationProfil() {
               />
               {erreurs.courriel && (
                 <Message texte={erreurs.courriel} type="erreur" />
-              )}
-
-              <FormulaireInput
-                type="text"
-                nom="mot_de_passe"
-                genre="un"
-                estObligatoire={true}
-                value={utilisateur.mot_de_passe}
-                onChange={(e) => {
-                  setUtilisateur((prev) => ({
-                    ...prev,
-                    mot_de_passe: e.target.value,
-                  }));
-                }}
-                onBlur={(e) => {
-                  const valeur = e.target.value;
-                  if (!validationChamp(regex.regMotDePasse, valeur)) {
-                    const erreur =
-                      "Le mot de passe doit contenir au moins 8 caractères, dont une lettre majuscule, une lettre minuscule et un caractère spécial";
-                    setErreurs((prev) => ({ ...prev, motDePasse: erreur }));
-                  } else {
-                    setErreurs((prev) => ({ ...prev, motDePasse: "" }));
-                  }
-                }}
-              />
-              {erreurs.motDePasse && (
-                <Message texte={erreurs.motDePasse} type="erreur" />
-              )}
-
-              <FormulaireInput
-                type="text"
-                nom="confirmation"
-                genre="une"
-                estObligatoire={true}
-                value={confirmation}
-                onChange={(e) => {
-                  setConfirmation(e.target.value);
-                }}
-                onBlur={(e) => {
-                  const valeur = e.target.value;
-                  if (utilisateur.mot_de_passe !== valeur) {
-                    const erreur =
-                      "La confirmation du mot de passe n'est pas valide";
-                    setErreurs((prev) => ({
-                      ...prev,
-                      confirmation: erreur,
-                    }));
-                  } else {
-                    setErreurs((prev) => ({ ...prev, confirmation: "" }));
-                  }
-                }}
-              />
-              {erreurs.confirmation && (
-                <Message texte={erreurs.confirmation} type="erreur" />
               )}
             </>
           }

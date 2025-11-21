@@ -43,9 +43,12 @@ export const recupererUtilisateur = async (req, res) => {
   try {
     const { id } = req.params;
     const utilisateur = await modeleUtilisateur.trouverParId(id);
+
     if (!utilisateur) {
       return res.status(404).json({ message: "Utilisateur non trouvé." });
     }
+
+    return res.status(200).json(utilisateur);
   } catch (err) {
     console.error("Erreur lors de la récupération de l'utilisateur :", err);
     return res.status(500).json({
@@ -57,7 +60,7 @@ export const recupererUtilisateur = async (req, res) => {
 /**
  * Fonction asynchrone qui recherche un utilisateur par son courriel.
  */
-export const recupererUtilisateurParCourriel = async (req, res) => { };
+export const recupererUtilisateurParCourriel = async (req, res) => {};
 
 /**
  * Fonction asynchrone qui modifie les informations d'un utilisateur.
@@ -72,7 +75,7 @@ export const modifierUtilisateur = async (req, res) => {
 
     if (!donneesUtilisateur) {
       return res.status(404).json({
-        message: "Utilisateur non trouvé."
+        message: "Utilisateur non trouvé.",
       });
     }
 
@@ -81,7 +84,7 @@ export const modifierUtilisateur = async (req, res) => {
       const existant = await modeleUtilisateur.trouverParCourriel(courriel);
       if (existant) {
         return res.status(409).json({
-          message: "Vous ne pouvez pas utiliser ce courriel."
+          message: "Vous ne pouvez pas utiliser ce courriel.",
         });
       }
     }
@@ -102,7 +105,6 @@ export const modifierUtilisateur = async (req, res) => {
     return res.status(200).json({
       message: "Utilisateur modifié avec succès.",
     });
-
   } catch (err) {
     console.error("Erreur lors de la modification de l'utilisateur :", err);
     return res.status(500).json({
@@ -114,7 +116,7 @@ export const modifierUtilisateur = async (req, res) => {
 /**
  * Fonction asynchrone qui supprimme un utilisateur.
  */
-export const supprimerUtilisateur = async (req, res) => { };
+export const supprimerUtilisateur = async (req, res) => {};
 
 /*
  * Fonction asynchrone qui connecte un utilisateur.

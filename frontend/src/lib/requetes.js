@@ -78,7 +78,15 @@ export const modifierUtilisateur = async (datas, navigate) => {
       }
     );
     if (reponse.ok) {
-      navigate(`/profil/${datas.id}?succes=true`);
+      // Mettre à jour l'utilisateur dans le store avec les nouvelles données
+      const datasUtilisateur = {
+        id: datas.id,
+        nom: datas.nom,
+        courriel: datas.courriel,
+      };
+      authentificationStore.getState().connexion(datasUtilisateur);
+      navigate(`/profil?succes=true`);
+
       return { succes: true };
     }
 
