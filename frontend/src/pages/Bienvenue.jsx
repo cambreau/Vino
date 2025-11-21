@@ -22,7 +22,7 @@ function Bienvenue() {
           <p
             className="
             mb-1
-            text-(length:--taille-petit) font-normal text-(--color-fond)
+            text-(length:--taille-petit) font-normal text-fond
             "
           >
             Votre cave personnelle, organisée
@@ -31,7 +31,7 @@ function Bienvenue() {
           <p
             className="
             mb-8
-            text-(length:--taille-petit) font-normal text-(--color-fond)
+            text-(length:--taille-petit) font-normal text-fond
             "
           >
             comme vous le souhaitez
@@ -40,7 +40,7 @@ function Bienvenue() {
           <h1
             className="
             mb-12
-            text-(length:--taille-tres-gros) font-display font-bold text-(--color-fond)
+            text-(length:--taille-tres-gros) font-display font-bold text-fond
             "
           >
             Bienvenue à Vino
@@ -61,7 +61,7 @@ function Bienvenue() {
             <p
               className="
               text-(length:--taille-petit)
-              text-(--color-fond)
+              text-fond
               "
             >
               Pas encore de compte?{" "}

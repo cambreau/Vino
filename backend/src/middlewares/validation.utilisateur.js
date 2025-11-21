@@ -42,7 +42,7 @@ function validerMotDePasse(mot_de_passe, verifierLongueur = true) {
 }
 
 // Middleware pour la CRÉATION d'utilisateur
-export function validerCreationUtilisateur(req, res, next) {
+export function validerDonneesUtilisateur(req, res, next) {
   const { nom, courriel, mot_de_passe } = req.body;
   // Valider le nom
   const validationNom = validerNom(nom);
@@ -82,5 +82,24 @@ export function validerConnexionUtilisateur(req, res, next) {
     return res.status(400).json({ message: validationMotDePasse.message });
   }
 
+  next();
+}
+
+// Middleware pour la Modification d'utilisateur
+export function validerModificationUtilisateur(req, res, next) {
+  const { nom, courriel } = req.body;
+  // Valider le nom
+  const validationNom = validerNom(nom);
+  if (!validationNom.valide) {
+    return res.status(400).json({ message: validationNom.message });
+  }
+
+  // Valider le courriel
+  const validationCourriel = validerCourriel(courriel);
+  if (!validationCourriel.valide) {
+    return res.status(400).json({ message: validationCourriel.message });
+  }
+
+  //Si tout est valide
   next();
 }

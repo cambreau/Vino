@@ -39,7 +39,23 @@ export const creerUtilisateur = async (req, res) => {
 /**
  * Fonction asynchrone qui recupere un utilisateur.
  */
-export const recupererUtilisateur = async (req, res) => {};
+export const recupererUtilisateur = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const utilisateur = await modeleUtilisateur.trouverParId(id);
+
+    if (!utilisateur) {
+      return res.status(404).json({ message: "Utilisateur non trouvé." });
+    }
+
+    return res.status(200).json(utilisateur);
+  } catch (err) {
+    console.error("Erreur lors de la récupération de l'utilisateur :", err);
+    return res.status(500).json({
+      error: "Erreur serveur lors de la récupération de l'utilisateur.",
+    });
+  }
+};
 
 /**
  * Fonction asynchrone qui recherche un utilisateur par son courriel.
@@ -49,7 +65,53 @@ export const recupererUtilisateurParCourriel = async (req, res) => {};
 /**
  * Fonction asynchrone qui modifie les informations d'un utilisateur.
  */
-export const modifierUtilisateur = async (req, res) => {};
+export const modifierUtilisateur = async (req, res) => {
+  try {
+    const { nom, courriel } = req.body;
+    const { id } = req.params;
+
+    // Avoir les informations dans la basse de donnees si l'utilisateur existe
+    const donneesUtilisateur = await modeleUtilisateur.trouverParId(id);
+
+    if (!donneesUtilisateur) {
+      return res.status(404).json({
+        message: "Utilisateur non trouvé.",
+      });
+    }
+
+    // Si le courriel enovoye est different de celui dans la base de donnees
+    if (courriel !== donneesUtilisateur.courriel) {
+      const existant = await modeleUtilisateur.trouverParCourriel(courriel);
+      if (existant) {
+        return res.status(409).json({
+          message: "Vous ne pouvez pas utiliser ce courriel.",
+        });
+      }
+    }
+
+    // Mettre à jour l'utilisateur
+    const succes = await modeleUtilisateur.modifier(
+      id,
+      nom,
+      courriel,
+    );
+
+    if (!succes) {
+      return res.status(500).json({
+        message: "Échec de la modification de l'utilisateur.",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Utilisateur modifié avec succès.",
+    });
+  } catch (err) {
+    console.error("Erreur lors de la modification de l'utilisateur :", err);
+    return res.status(500).json({
+      error: "Erreur lors de la modification de l'utilisateur.",
+    });
+  }
+};
 
 /**
  * Fonction asynchrone qui supprimme un utilisateur.

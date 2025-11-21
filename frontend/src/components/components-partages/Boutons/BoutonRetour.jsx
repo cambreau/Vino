@@ -14,7 +14,7 @@ function BoutonRetour() {
       className="
         flex items-center justify-center
         w-(--rythme-espace) h-(--rythme-espace)
-        bg-(--color-fond-secondaire)
+        bg-fond-secondaire
         rounded-full
         shadow-md
         hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer
