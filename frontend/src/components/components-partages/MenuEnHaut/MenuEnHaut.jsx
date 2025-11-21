@@ -81,7 +81,7 @@ function MenuEnHaut({}) {
               </button>
             </div>
             <div className="flex flex-col gap-(--rythme-base)">
-              <a href="#">
+              <a href="/profil">
                 <Icon
                   nom="profil"
                   typeMenu="haut"
@@ -90,7 +90,7 @@ function MenuEnHaut({}) {
               </a>
               <a href="#">
                 <Icon
-                  nom="chateau"
+                  nom="À propos"
                   typeMenu="haut"
                   couleur="(--color-principal-300)"
                 />
@@ -115,12 +115,12 @@ function MenuEnHaut({}) {
       </div>
 
       {/* Logo */}
-      <header className="flex items-center">
+      <a href="/" className="flex items-center">
         <h2 className="text-(--color-principal-300) text-(length:--taille-grand) font-display">
           Vin
         </h2>
         <img src={RasinLogo} alt="Logo raisin" width="43" height="35" />
-      </header>
+      </a>
 
       {/* Déconnexion */}
       {estConnecte && (
