@@ -87,7 +87,7 @@ export function validerConnexionUtilisateur(req, res, next) {
 
 // Middleware pour la Modification d'utilisateur
 export function validerModificationUtilisateur(req, res, next) {
-  const { nom, courriel, mot_de_passe } = req.body;
+  const { nom, courriel } = req.body;
   // Valider le nom
   const validationNom = validerNom(nom);
   if (!validationNom.valide) {
