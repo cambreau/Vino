@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Icon from "../Icon/Icon";
 import RasinLogo from "../../../assets/images/grape_logo.svg";
-import FormulaireInput from "../Formulaire/FormulaireInput/FormulaireInput";
 import authentificationStore from "../../../stores/authentificationStore";
 
 function MenuEnHaut({}) {
@@ -13,13 +12,6 @@ function MenuEnHaut({}) {
   const estConnecte = authentificationStore((state) => state.estConnecte);
 
   const [estMenuOuvert, setestMenuOuvert] = useState(false);
-  const [estRechercheOuvert, setestRechercheOuvert] = useState(false);
-
-  // J'ai mis les fonctions pour ne pas avoir d'error, on va gerer ca apres
-  const handleChange = (e) => {
-    setRecherche(e.target.value);
-  };
-  const handleBlur = (e) => {};
 
   /**
    * Fonction pour gérer la déconnexion
@@ -81,46 +73,46 @@ function MenuEnHaut({}) {
               </button>
             </div>
             <div className="flex flex-col gap-(--rythme-base)">
-              <a href="/profil">
+              <Link to="/profil" onClick={() => setestMenuOuvert(false)}>
                 <Icon
                   nom="profil"
                   typeMenu="haut"
                   couleur="(--color-principal-300)"
                 />
-              </a>
-              <a href="#">
+              </Link>
+              <Link to="/catalogue" onClick={() => setestMenuOuvert(false)}>
                 <Icon
-                  nom="À propos"
+                  nom="catalogue"
                   typeMenu="haut"
                   couleur="(--color-principal-300)"
                 />
-              </a>
-              <a href="#">
+              </Link>
+              <Link to="#" onClick={() => setestMenuOuvert(false)}>
                 <Icon
                   nom="cellier"
                   typeMenu="haut"
                   couleur="(--color-principal-300)"
                 />
-              </a>
-              <a href="#">
+              </Link>
+              <Link to="#" onClick={() => setestMenuOuvert(false)}>
                 <Icon
                   nom="liste"
                   typeMenu="haut"
                   couleur="(--color-principal-300)"
                 />
-              </a>
+              </Link>
             </div>
           </div>
         )}
       </div>
 
       {/* Logo */}
-      <a href="/" className="flex items-center">
+      <Link to="/catalogue" className="flex items-center">
         <h2 className="text-(--color-principal-300) text-(length:--taille-grand) font-display">
           Vin
         </h2>
         <img src={RasinLogo} alt="Logo raisin" width="43" height="35" />
-      </a>
+      </Link>
 
       {/* Déconnexion */}
       {estConnecte && (
