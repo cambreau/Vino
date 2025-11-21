@@ -26,11 +26,11 @@ export default class modeleUtilisateur {
   }
 
   //Récupérer un utilisateur par courriel
-  static async trouverParId(id) {
+  static async trouverParId(id_utilisateur) {
     const sql = `
-        select * from utilisateur where id = ? LIMIT 1
+        select * from utilisateur where id_utilisateur = ? LIMIT 1
         `;
-    const [lignes] = await connexion.execute(sql, [id]);
+    const [lignes] = await connexion.execute(sql, [id_utilisateur]);
     return lignes[0] || null;
   }
 
@@ -56,15 +56,15 @@ export default class modeleUtilisateur {
   }
 
   //Modifier un utilisateur et retourne si succès
-  static async modifier(id, nom, courriel, mot_de_passe_hache = null) {
+  static async modifier(id_utilisateur, nom, courriel, mot_de_passe_hache = null) {
     // Si on ne change pas le mot de passe
     if (!mot_de_passe_hache) {
       const sql = `
       UPDATE utilisateur 
       SET nom = ?, courriel = ? 
-      WHERE id = ?
+      WHERE id_utilisateur = ?
     `;
-      const [resultat] = await connexion.execute(sql, [nom, courriel, id]);
+      const [resultat] = await connexion.execute(sql, [nom, courriel, id_utilisateur]);
       return resultat.affectedRows > 0;
     }
 
@@ -72,9 +72,9 @@ export default class modeleUtilisateur {
     const sql = `
     UPDATE utilisateur 
     SET nom = ?, courriel = ?, mot_de_passe = ? 
-    WHERE id = ?
+    WHERE id_utilisateur = ?
   `;
-    const [resultat] = await connexion.execute(sql, [nom, courriel, mot_de_passe_hache, id]);
+    const [resultat] = await connexion.execute(sql, [nom, courriel, mot_de_passe_hache, id_utilisateur]);
     return resultat.affectedRows > 0;
   }
 }
