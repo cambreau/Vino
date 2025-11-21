@@ -26,25 +26,41 @@ export default class modeleUtilisateur {
   }
 
 
-/**
- * Fonction qui recherche un utilisateur par son courriel pour la connexion
-*/
-static async connexionUtilisateur(courriel) {
-  try {
-    const sql = `
+
+  /**
+   * Fonction qui recherche un utilisateur par son courriel pour la connexion
+  */
+  static async connexionUtilisateur(courriel) {
+    try {
+      const sql = `
       SELECT id_utilisateur, nom, courriel, mot_de_passe 
       FROM utilisateur 
       WHERE courriel = ? 
       LIMIT 1
     `;
-    const [resultat] = await connexion.execute(sql, [courriel]);
-    
-    // Si un utilisateur est trouvé, retourner le premier résultat, sinon retourner null
-    return resultat.length > 0 ? resultat[0] : null;
-  } catch (erreur) {
-    console.error('Erreur lors de la recherche de l\'utilisateur:', erreur);
-    throw erreur;
+      const [resultat] = await connexion.execute(sql, [courriel]);
+
+      // Si un utilisateur est trouvé, retourner le premier résultat, sinon retourner null
+      return resultat.length > 0 ? resultat[0] : null;
+    } catch (erreur) {
+      console.error('Erreur lors de la recherche de l\'utilisateur:', erreur);
+      throw erreur;
+    }
   }
-}
+
+  //Récupérer un utilisateur par courriel
+  static async supprimer(id) {
+    const sql = `
+        DELETE FROM utilisateur 
+        WHERE id_utilisateur = ? 
+        LIMIT 1
+    `;
+
+    const [resultat] = await connexion.execute(sql, [id]);
+
+    // Retourne true si un utilisateur a été supprimé
+    return resultat.affectedRows > 0;
+  }
+
 }
 
