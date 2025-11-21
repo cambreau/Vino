@@ -1,6 +1,5 @@
 import { connexion } from "../database/connexion.js";
 export default class modeleUtilisateur {
-
   //Créer un utilisateur er tourne l'ID
   static async creer(nom, courriel, mot_de_passe_hache) {
     const sql = `
@@ -79,3 +78,18 @@ export default class modeleUtilisateur {
   }
 }
 
+  static async trouverParId(id_utilisateur) {
+    try {
+      const sql = `
+      SELECT * FROM utilisateur WHERE id_utilisateur = ? LIMIT 1`;
+      const resultat = await connexion.execute(sql, [id_utilisateur]);
+      return resultat.length > 0 ? resultat[0] : null;
+    } catch (erreur) {
+      console.error(
+        "Erreur lors de la recherche de l'utilisateur par ID:",
+        erreur
+      );
+      throw erreur;
+    }
+  }
+}

@@ -13,8 +13,8 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 function Connexion() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const succes = searchParams.get("inscriptionSucces") === "true";
-  console.log(succes);
+  const inscriptionSucces = searchParams.get("inscriptionSucces") === "true";
+  const deconnexionSucces = searchParams.get("deconnexionSucces") === "true";
 
   // Les informations de connexion
   const [utilisateur, setUtilisateur] = useState({
@@ -83,9 +83,16 @@ function Connexion() {
       </header>
 
       <div className="my-(--rythme-espace) mx-(--rythme-base)">
-        {succes && (
+        {inscriptionSucces && (
           <Message
             texte="Profil créé avec succès. Veuillez vous connecter pour continuer."
+            type="succes"
+            onClose={fermerMessage}
+          />
+        )}
+        {deconnexionSucces && (
+          <Message
+            texte="Vous avez bien été déconnecté. À bientôt !"
             type="succes"
             onClose={fermerMessage}
           />
