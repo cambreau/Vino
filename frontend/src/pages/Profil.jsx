@@ -36,23 +36,39 @@ function Profil() {
         <MenuEnHaut />
       </header>
 
-      <main className="flex flex-col bg-(--color-fond-secondaire) m-(--rythme-base) pt-(--rythme-tres-serre) justify-between grow">
+      <main className="flex flex-col bg-(--color-fond) px-(--rythme-base) pt-(--rythme-espace) justify-between grow">
         <div>
-          <section className="flex justify-between align-items">
+          <section className="flex items-center justify-between">
             <div>
-              <h1 className="text-(length:--taille-moyen) font-medium">
+              <h1 className="text-(length:--taille-moyen) font-display font-bold text-(--color-texte-premier)">
                 {utilisateur?.nom}
               </h1>
               <p className="text-(length:--taille-tres-petit)">
                 {utilisateur?.courriel}
               </p>
             </div>
-            <FaUser size={32} color="#821250" />
+            <FaUser size={32} color="#461243" />
           </section>
 
-          <div className="flex flex-col mt-8 gap-(--rythme-serre)">
-            <p>Nom : {utilisateur?.nom}</p>
-            <p>Courriel : {utilisateur?.courriel}</p>
+          <div className="flex flex-col mt-(--rythme-base) gap-(--rythme-serre)">
+            <p>
+              <span className="text-(--color-texte-premier) font-bold mr-(--rythme-serre)">
+                Nom :
+              </span>
+              {utilisateur?.nom}
+            </p>
+            <p>
+              <span className="text-(--color-texte-premier) font-bold mr-(--rythme-serre)">
+                Courriel :
+              </span>
+              {utilisateur?.courriel}
+            </p>
+            <p>
+              <span className="text-(--color-texte-premier) font-bold mr-(--rythme-serre)">
+                Mot de passe :
+              </span>
+              xxxxxxxxxx
+            </p>
           </div>
         </div>
 
