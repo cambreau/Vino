@@ -36,6 +36,11 @@ function Profil() {
   return (
     <>
       <section className="flex flex-col min-h-screen">
+  const supprimerCompte = () => {};
+  const modifierCompte = () => {};
+  return (
+    <>
+      <div className="flex flex-col min-h-screen">
         <header>
           <MenuEnHaut />
         </header>
@@ -48,6 +53,10 @@ function Profil() {
                 </h1>
                 <p className="text-(length:--taille-tres-petit)">
                   {utilisateur.courriel}
+                  Silvia Larois
+                </h1>
+                <p className="text-(length:--taille-tres-petit)">
+                  silvialarois54 <span className="underline">@gmail.com</span>
                 </p>
               </header>
               <p>Icone</p>
@@ -56,6 +65,9 @@ function Profil() {
             <div className="flex flex-col mt-8 gap-(--rythme-serre)">
               <p>{utilisateur.nom}</p>
               <p>{utilisateur.courriel}</p>
+              <p>Nom : Silvia Larois</p>
+              <p>Courriel : silvialarois54@gmail.com</p>
+              <p>Telephone : +1 555 555 5555 </p>
             </div>
           </div>
 
@@ -81,6 +93,7 @@ function Profil() {
           <MenuEnBas />
         </footer>
       </section>
+      </div>
     </>
   );
 }
