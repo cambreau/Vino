@@ -64,7 +64,7 @@ export const recupererUtilisateurParCourriel = async (req, res) => { };
  */
 export const modifierUtilisateur = async (req, res) => {
   try {
-    const { nom, courriel, mot_de_passe } = req.body;
+    const { nom, courriel } = req.body;
     const { id } = req.params;
 
     // Avoir les informations dans la basse de donnees si l'utilisateur existe
@@ -86,18 +86,11 @@ export const modifierUtilisateur = async (req, res) => {
       }
     }
 
-    // Hasher le mot de passe si fourni
-    let motDePasseHache = null;
-    if (mot_de_passe) {
-      motDePasseHache = await bcrypt.hash(mot_de_passe, 10);
-    }
-
     // Mettre à jour l'utilisateur
     const succes = await modeleUtilisateur.modifier(
       id,
       nom,
       courriel,
-      motDePasseHache
     );
 
     if (!succes) {
