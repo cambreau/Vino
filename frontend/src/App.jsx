@@ -4,6 +4,7 @@ import Connexion from "./pages/Connexion";
 import Inscription from "./pages/Inscription";
 import ModificationProfil from "./pages/ModificationProfil";
 
+
 function App() {
   return (
     <Routes>
@@ -14,6 +15,7 @@ function App() {
         path="/modifier-utilisateur/:id"
         element={<ModificationProfil />}
       />
+
     </Routes>
   );
 }
