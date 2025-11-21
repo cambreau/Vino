@@ -13,13 +13,6 @@ function MenuEnBas({}) {
         <Icon nom="liste" couleur="(--color-principal-100)" typeMenu="bas" />
       </Link>
       <Link href="#">
-        <Icon
-          nom="recherche"
-          couleur="(--color-principal-100)"
-          typeMenu="bas"
-        />
-      </Link>
-      <Link href="#">
         <Icon nom="profil" couleur="(--color-principal-100)" typeMenu="bas" />
       </Link>
     </footer>
