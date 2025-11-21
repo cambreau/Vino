@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import MenuEnHaut from "../components/components-partages/MenuEnHaut/MenuEnHaut";
 import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
 
