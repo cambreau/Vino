@@ -103,7 +103,7 @@ function ModificationProfil() {
       <main
         className="
         px-(--rythme-serre) py-(--rythme-base) grid grid-rows-[1fr_5fr] items-end
-        bg-(--color-fond)
+        bg-fond
         "
       >
         {echec && (

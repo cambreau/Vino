@@ -4,6 +4,7 @@ import Profil from "./pages/Profil";
 import Connexion from "./pages/Connexion";
 import Inscription from "./pages/Inscription";
 import ModificationProfil from "./pages/ModificationProfil";
+import Catalogue from "./pages/Catalogue";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         path="/modifier-utilisateur/:id"
         element={<ModificationProfil />}
       />
+      <Route path="/catalogue" element={<Catalogue />} />
     </Routes>
   );
 }
