@@ -133,7 +133,7 @@ class ModeleBouteille {
       }
 
       // Obtenir l'action effectuée (insert ou update).
-      const action = await this.#persisterBouteille(connection, donnees);
+      const action = await this.#persisterBouteille(connection, payload);
 
       // Si tout es OK, on finit la transaction.
       await connection.commit();
