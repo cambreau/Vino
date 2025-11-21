@@ -58,10 +58,10 @@ function MenuEnHaut({}) {
           <div className="absolute -left-(--rythme-base) mt-(--rythme-tres-serre) p-(--rythme-base) h-screen  min-w-[300px] bg-(--color-fond-secondaire)">
             <div className="flex justify-between mb-(--rythme-espace)">
               <header>
-                <h2 className="text-(--color-principal-300) text-(length:--taille-grand) font-display font-bold">
+                <h2 className="text-(--color-texte-premier) text-(length:--taille-grand) font-display font-bold">
                   {estConnecte && utilisateur ? utilisateur.nom : ""}
                 </h2>
-                <small className="text-(--color-principal-300) text-(length:--taille-moyen) font-display">
+                <small className="text-(--color-texte-premier) text-(length:--taille-moyen) font-display">
                   {estConnecte && utilisateur
                     ? utilisateur.courriel
                     : "Courriel"}
