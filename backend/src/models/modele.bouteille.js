@@ -115,6 +115,7 @@ class ModeleBouteille {
     return rows.map(mapper);
   }
 
+  // Crée une nouvelle bouteille avec les données fournies.
   static async creer(donnees) {
     if (!donnees || !donnees.nom || !donnees.code_saq) {
       throw new Error("Nom et code_saq sont requis");
@@ -122,18 +123,23 @@ class ModeleBouteille {
 
     const connection = await connexion.getConnection();
     try {
+      // Transaction requise comme plusieurs opérations peuvent être éxécutées (voir #normaliserPayload).
       await connection.beginTransaction();
 
+      // Normaliser et valider les données avant insertion.
       const payload = await this.#normaliserPayload(connection, donnees);
       if (!payload) {
         throw new Error("Données invalides pour la création de bouteille");
       }
 
+      // Obtenir l'action effectuée (insert ou update).
       const action = await this.#persisterBouteille(connection, donnees);
 
+      // Si tout es OK, on finit la transaction.
       await connection.commit();
       return action;
     } catch (error) {
+      // Sinon on annule.
       await connection.rollback();
       throw error;
     } finally {
