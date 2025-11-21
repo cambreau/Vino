@@ -122,70 +122,16 @@ function MenuEnHaut({}) {
         <img src={RasinLogo} alt="Logo raisin" width="43" height="35" />
       </header>
 
-      {/* Bouton Recherche */}
-      <div className="flex items-center gap-(--rythme-base) mb-(--rythme-tres-serre) relative">
-        <button
-          onClick={() => setestRechercheOuvert(!estRechercheOuvert)}
-          aria-label={
-            estRechercheOuvert ? "Fermer la recherche" : "Ouvrir la recherche"
-          }
-        >
+      {/* Déconnexion */}
+      {estConnecte && (
+        <button onClick={gererDeconnexion} aria-label="Déconnexion">
           <Icon
-            nom="recherche"
-            couleur="(--color-principal-300)"
+            nom="deconnection"
             typeMenu="haut"
+            couleur="(--color-principal-300)"
           />
         </button>
-
-        {/* Ombre */}
-        {estRechercheOuvert && (
-          <div
-            className="fixed inset-0 bg-black/50"
-            onClick={() => setestRechercheOuvert(false)}
-          />
-        )}
-
-        {/* Menu de recherche déroulant */}
-        {estRechercheOuvert && (
-          <div className="absolute top-full h-screen -right-(--rythme-base) mt-(--rythme-serre) p-(--rythme-espace) px-(--rythme-base) min-w-[300px] bg-(--color-fond-secondaire)">
-            <div>
-              <FormulaireInput
-                type="test"
-                nom=""
-                genre="un"
-                estObligatoire={true}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              <button
-                className="absolute right-(--rythme-base) top-(--rythme-serre)"
-                onClick={() => setestRechercheOuvert(!estRechercheOuvert)}
-                aria-label={
-                  estRechercheOuvert ? "Fermer recherche" : "Ouvrir recherche"
-                }
-                aria-expanded={estRechercheOuvert}
-              >
-                <Icon
-                  nom="fermer"
-                  typeMenu="haut"
-                  couleur="(--color-principal-300)"
-                />
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Déconnexion */}
-        {estConnecte && (
-          <button onClick={gererDeconnexion} aria-label="Déconnexion">
-            <Icon
-              nom="deconnection"
-              typeMenu="haut"
-              couleur="(--color-principal-300)"
-            />
-          </button>
-        )}
-      </div>
+      )}
     </nav>
   );
 }
