@@ -26,7 +26,33 @@ export const listerBouteilles = async (req, res) => {
 };
 
 export const recupererBouteille = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const identifiant = Number.parseInt(id, 10);
+		if (!Number.isInteger(identifiant) || identifiant <= 0) {
+			return res.status(400).json({
+				message: "Identifiant de bouteille invalide",
+			});
+		}
 
+		const bouteille = await modeleBouteille.trouverParId(identifiant);
+		if (!bouteille) {
+			return res.status(404).json({
+				message: "Bouteille introuvable",
+			});
+		}
+
+		return res.status(200).json({
+			message: "Bouteille récupérée",
+			donnees: bouteille,
+		});
+	} catch (error) {
+		console.error("Erreur lors de la récupération d'une bouteille", error);
+		return res.status(500).json({
+			message: "Impossible de récupérer la bouteille",
+			erreur: error.message,
+		});
+	}
 };
 
 export const creerBouteille = async (req, res) => {
@@ -39,6 +65,59 @@ export const modifierBouteille = async (req, res) => {
 
 export const supprimerBouteille = async (req, res) => {
 
+};
+
+export const rechercherBouteilleParAttributs = async (req, res) => {
+	try {
+		const {
+			nom,
+			region,
+			cepage,
+			pays,
+			type,
+		} = req.query;
+
+		const filtresBruts = {
+			nom,
+			region,
+			cepage,
+			pays,
+			type,
+		};
+
+		const filtres = Object.entries(filtresBruts).reduce((acc, [cle, valeur]) => {
+			if (typeof valeur === "string") {
+				const nettoye = valeur.trim();
+				if (nettoye) acc[cle] = nettoye;
+			}
+			return acc;
+		}, {});
+
+		if (!Object.keys(filtres).length) {
+			return res.status(400).json({
+				message: "Au moins un attribut (nom, région, cépage, pays, type) est requis",
+			});
+		}
+
+		const bouteilles = await modeleBouteille.trouverParAttributs(filtres);
+		if (!bouteilles.length) {
+			return res.status(404).json({
+				message: "Aucune bouteille ne correspond aux attributs fournis",
+			});
+		}
+
+		return res.status(200).json({
+			message: "Bouteilles correspondant aux attributs",
+			total: bouteilles.length,
+			donnees: bouteilles,
+		});
+	} catch (error) {
+		console.error("Erreur lors de la recherche par attributs", error);
+		return res.status(500).json({
+			message: "Impossible de rechercher les bouteilles",
+			erreur: error.message,
+		});
+	}
 };
 
 /**
