@@ -55,37 +55,15 @@ export default class modeleUtilisateur {
   }
 
   //Modifier un utilisateur et retourne si succès
-  static async modifier(
-    id_utilisateur,
-    nom,
-    courriel,
-    mot_de_passe_hache = null
-  ) {
-    // Si on ne change pas le mot de passe
-    if (!mot_de_passe_hache) {
-      const sql = `
+  static async modifier(id_utilisateur, nom, courriel) {
+    const sql = `
       UPDATE utilisateur 
       SET nom = ?, courriel = ? 
       WHERE id_utilisateur = ?
     `;
-      const [resultat] = await connexion.execute(sql, [
-        nom,
-        courriel,
-        id_utilisateur,
-      ]);
-      return resultat.affectedRows > 0;
-    }
-
-    // Si on change aussi le mot de passe
-    const sql = `
-    UPDATE utilisateur 
-    SET nom = ?, courriel = ?, mot_de_passe = ? 
-    WHERE id_utilisateur = ?
-  `;
     const [resultat] = await connexion.execute(sql, [
       nom,
       courriel,
-      mot_de_passe_hache,
       id_utilisateur,
     ]);
     return resultat.affectedRows > 0;
