@@ -78,18 +78,3 @@ export default class modeleUtilisateur {
   }
 }
 
-  static async trouverParId(id_utilisateur) {
-    try {
-      const sql = `
-      SELECT * FROM utilisateur WHERE id_utilisateur = ? LIMIT 1`;
-      const resultat = await connexion.execute(sql, [id_utilisateur]);
-      return resultat.length > 0 ? resultat[0] : null;
-    } catch (erreur) {
-      console.error(
-        "Erreur lors de la recherche de l'utilisateur par ID:",
-        erreur
-      );
-      throw erreur;
-    }
-  }
-}
