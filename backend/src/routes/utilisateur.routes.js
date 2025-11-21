@@ -14,6 +14,7 @@ import {
 import {
   validerConnexionUtilisateur,
   validerDonneesUtilisateur,
+  validerModificationUtilisateur
 
 } from "../middlewares/validation.utilisateur.js";
 
@@ -27,7 +28,7 @@ router.get("/:id", recupererUtilisateur);
 router.get("/email/:email", recupererUtilisateurParCourriel);
 
 // PUT //:id - Mettre à jour un utilisateur
-router.put("/:id", validerDonneesUtilisateur, modifierUtilisateur);
+router.put("/:id", validerModificationUtilisateur, modifierUtilisateur);
 
 // DELETE //:id - Supprimer un utilisateur
 router.delete("/:id", supprimerUtilisateur);
