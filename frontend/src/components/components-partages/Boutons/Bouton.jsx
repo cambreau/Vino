@@ -7,7 +7,7 @@ function Bouton({
 }) {
   // Classes de base pour les boutons
   const classesBase = `
-    block text-center p-(--rythme-serre) 
+    block text-center p-(--rythme-serre)
     font-semibold
     rounded-(--arrondi-grand) shadow-md
     hover:shadow-lg hover:-translate-y-0.5
