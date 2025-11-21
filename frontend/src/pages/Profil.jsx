@@ -36,7 +36,7 @@ function Profil() {
         <MenuEnHaut />
       </header>
 
-      <main className="flex flex-col bg-(--color-fond) px-(--rythme-base) pt-(--rythme-espace) justify-between grow">
+      <main className="flex flex-col bg-(--color-fond) px-(--rythme-base) pt-(--rythme-espace) gap-(--rythme-espace) grow">
         <div>
           <section className="flex items-center justify-between">
             <div>
