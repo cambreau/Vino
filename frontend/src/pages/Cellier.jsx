@@ -1,9 +1,11 @@
 import MenuEnHaut from "../components/components-partages/MenuEnHaut/MenuEnHaut";
 import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
+import { useNavigate } from "react-router-dom";
 import Bouton from "../components/components-partages/Boutons/Bouton";
 import Message from "../components/components-partages/Message/Message";
 
 function Celliers() {
+  const navigate = useNavigate();
   return (
     <>
       <header>
@@ -32,7 +34,7 @@ function Celliers() {
               type="primaire"
               typeHtml="button"
               action={() => {
-                window.location.href = "/catalogue";
+                navigate("/catalogue");
               }}
             />
           </article>
