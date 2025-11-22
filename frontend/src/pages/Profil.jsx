@@ -36,11 +36,11 @@ function Profil() {
         <MenuEnHaut />
       </header>
 
-      <main className="flex flex-col bg-(--color-fond) px-(--rythme-base) pt-(--rythme-espace) gap-(--rythme-espace) grow">
+      <main className="flex flex-col bg-fond px-(--rythme-base) pt-(--rythme-espace) gap-(--rythme-espace) grow">
         <div>
           <section className="flex items-center justify-between">
             <div>
-              <h1 className="text-(length:--taille-moyen) font-display font-bold text-(--color-texte-premier)">
+              <h1 className="text-(length:--taille-moyen) font-display font-bold text-texte-premier">
                 {utilisateur?.nom}
               </h1>
               <p className="text-(length:--taille-tres-petit)">
@@ -52,19 +52,19 @@ function Profil() {
 
           <div className="flex flex-col mt-(--rythme-base) gap-(--rythme-serre)">
             <p>
-              <span className="text-(--color-texte-premier) font-bold mr-(--rythme-serre)">
+              <span className="text-texte-premier font-bold mr-(--rythme-serre)">
                 Nom :
               </span>
               {utilisateur?.nom}
             </p>
             <p>
-              <span className="text-(--color-texte-premier) font-bold mr-(--rythme-serre)">
+              <span className="text-texte-premier font-bold mr-(--rythme-serre)">
                 Courriel :
               </span>
               {utilisateur?.courriel}
             </p>
             <p>
-              <span className="text-(--color-texte-premier) font-bold mr-(--rythme-serre)">
+              <span className="text-texte-premier font-bold mr-(--rythme-serre)">
                 Mot de passe :
               </span>
               xxxxxxxxxx
