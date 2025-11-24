@@ -9,13 +9,16 @@ export default class modeleBouteilleCellier {
     if (!idCellier || !idBouteille)
       throw new Error("Un cellier est une bouteille est nécessaire");
 
+    // Si la qualité n'est pas fournie, met à 1 par défaut
     if (typeof quantite !== "number" || quantite <= 0) quantite = 1;
 
+    // Requête SQL pour insérer une bouteille
     const sql = `
     INSERT INTO bouteilleCellier (id_cellier, id_bouteille, quantite)
     VALUES (?, ?, ?)
   `;
 
+    // Résultat dans un tableau
     const [result] = await connexion.query(sql, [
       idCellier,
       idBouteille,
