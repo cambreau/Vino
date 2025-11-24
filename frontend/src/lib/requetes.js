@@ -157,3 +157,34 @@ export const connexionUtilisateur = async (datas, navigate) => {
     };
   }
 };
+
+// Fonction d'ajout d'une bouteille dans un cellier 
+export const ajouterBouteilleCellier = async (idCellier, donnees) => {
+  try {
+    const urlComplete = `${import.meta.env.VITE_BACKEND_CELLIER_URL}/${idCellier}`;
+
+    const reponse = await fetch(urlComplete, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(donnees),
+    });
+
+    const data = await reponse.json();
+
+    if (reponse.ok) {
+      return { succes: true, donnees: data };
+    }
+
+    return {
+      succes: false,
+      erreur: data.message || "Erreur lors de l'ajout de la bouteille",
+    };
+
+  } catch (error) {
+    //Erreur Réseau
+    return {
+      succes: false,
+      erreur: "Le serveur ne répond pas.",
+    };
+  }
+};
