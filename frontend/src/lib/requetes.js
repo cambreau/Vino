@@ -112,6 +112,11 @@ export const modifierUtilisateur = async (datas, navigate) => {
  */
 export const supprimerUtilisateur = async (id, navigate) => {
   try {
+    console.log(
+      "Requête DELETE vers:",
+      `${import.meta.env.VITE_BACKEND_UTILISATEUR_URL}/${id}`
+    );
+
     const reponse = await fetch(
       `${import.meta.env.VITE_BACKEND_UTILISATEUR_URL}/${id}`,
       {
@@ -120,15 +125,31 @@ export const supprimerUtilisateur = async (id, navigate) => {
       }
     );
 
+    console.log("Réponse du serveur:", reponse.status, reponse.statusText);
+
     if (reponse.ok) {
       // Déconnecter l'utilisateur du store
       authentificationStore.getState().deconnexion();
       navigate(`/connexion?supprimerSucces=true`);
       return { succes: true };
+    } else {
+      // Gestion des erreurs HTTP
+      const erreurData = await reponse.json().catch(() => ({}));
+      console.error(
+        "Erreur HTTP lors de la suppression:",
+        reponse.status,
+        erreurData
+      );
+
+      // Rediriger vers le profil avec un message d'erreur
+      navigate(`/profil?echecSuppression=true`);
+      return { succes: false, erreur: erreurData };
     }
   } catch (error) {
     // Gestion des erreurs réseau (exemple: pas de connexion) ou autres exceptions JavaScript
     console.error("Erreur lors de la suppression de l'utilisateur :", error);
+    navigate(`/profil?echecSuppression=true`);
+    return { succes: false, erreur: error.message };
   }
 };
 
