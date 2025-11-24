@@ -24,7 +24,7 @@ const CarteBouteille = ({
         <BoutonAction 
           texte="Ajouter au cellier"
           onClick={() => onAjouter(bouteille)}
-          type="primaire"
+          type="secondaire"
         />
       );
     }
@@ -75,7 +75,7 @@ const CarteBouteille = ({
         rounded-(--arrondi-grand) mb-(--rythme-tres-serre)">
         <img 
           src={bouteille.image || '/placeholder-bottle.png'} 
-          alt={bouteille.nom}
+          alt={`Photo de la bouteille ${bouteille.nom}`}
           className="h-40 w-auto object-contain" 
         />
       </div>

@@ -16,8 +16,8 @@ function BoutonAction({
   `;
 
   // Classes selon le type
-  const classesPrimaire = "bg-principal-200 hover:bg-principal-300";
-  const classesSecondaire = "bg-principal-100 hover:bg-principal-200";
+  const classesPrimaire = "bg-principal-300 hover:bg-principal-200 ";
+  const classesSecondaire = "bg-principal-100 hover:bg-principal-200 text-principal-200 hover:text-principal-100";
   
   const classesType = type === "secondaire" ? classesSecondaire : classesPrimaire;
 
