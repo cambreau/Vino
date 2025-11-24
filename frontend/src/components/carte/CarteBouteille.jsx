@@ -75,7 +75,7 @@ const CarteBouteille = ({
         rounded-(--arrondi-grand) mb-(--rythme-tres-serre)">
         <img 
           src={bouteille.image || '/placeholder-bottle.png'} 
-          alt={bouteille.nom}
+          alt={`Photo de la bouteille ${bouteille.nom}`}
           className="h-40 w-auto object-contain" 
         />
       </div>
