@@ -18,7 +18,6 @@ function MenuEnHaut({}) {
    */
   const gererDeconnexion = () => {
     authentificationStore.getState().deconnexion();
-    navigate("/connexion?deconnexionSucces=true");
   };
 
   return (

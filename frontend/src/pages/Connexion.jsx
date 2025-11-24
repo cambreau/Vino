@@ -66,10 +66,11 @@ function Connexion() {
   };
 
   /**
-   * Ferme le message d'erreur en supprimant le paramètre "echec" de l'URL.
+   * Ferme le message d'erreur en supprimant les paramètres de succès de l'URL.
    */
   const fermerMessage = () => {
     searchParams.delete("inscriptionSucces");
+    searchParams.delete("deconnexionSucces");
     searchParams.delete("supprimerSucces");
     setSearchParams(searchParams);
   };
@@ -94,7 +95,7 @@ function Connexion() {
         )}
         {deconnexionSucces && (
           <Message
-            texte="Vous avez bien été déconnecté. À bientôt !"
+            texte="Vous avez bien été déconnecté!"
             type="succes"
             onClose={fermerMessage}
           />

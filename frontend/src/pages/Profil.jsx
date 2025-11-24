@@ -21,7 +21,7 @@ function Profil() {
 
   useEffect(() => {
     if (!estConnecte || !utilisateur) {
-      navigate("/connexion");
+      navigate("/connexion?deconnexionSucces=true");
       return;
     }
   }, [estConnecte, utilisateur, navigate]);
