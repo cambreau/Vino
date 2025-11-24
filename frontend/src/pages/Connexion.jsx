@@ -44,6 +44,7 @@ function Connexion() {
 
     // Si une erreur existe
     if (erreur) {
+      supprimerMessagesSucces();
       setMessageErreurGeneral(erreur);
       return;
     }
@@ -60,9 +61,23 @@ function Connexion() {
 
     // Gestion des erreurs
     if (!resultat.succes) {
+      supprimerMessagesSucces();
       setMessageErreurGeneral(resultat.erreur);
     }
     // Si succès, la redirection est déjà gérée dans connexionUtilisateur
+  };
+
+  /**
+   * Supprime les messages de succès de l'URL.
+   */
+  const supprimerMessagesSucces = () => {
+    if (deconnexionSucces || inscriptionSucces || supprimerSucces) {
+      const nouveauxParams = new URLSearchParams(searchParams);
+      nouveauxParams.delete("deconnexionSucces");
+      nouveauxParams.delete("inscriptionSucces");
+      nouveauxParams.delete("supprimerSucces");
+      setSearchParams(nouveauxParams);
+    }
   };
 
   /**
@@ -134,7 +149,7 @@ function Connexion() {
               onChange={(e) => {
                 const valeur = e.target.value;
                 setUtilisateur((prev) => ({ ...prev, courriel: valeur }));
-
+                supprimerMessagesSucces();
                 if (messageErreurGeneral) {
                   setMessageErreurGeneral("");
                 }
@@ -156,7 +171,7 @@ function Connexion() {
                   ...prev,
                   mot_de_passe: valeur,
                 }));
-
+                supprimerMessagesSucces();
                 if (messageErreurGeneral) {
                   setMessageErreurGeneral("");
                 }
