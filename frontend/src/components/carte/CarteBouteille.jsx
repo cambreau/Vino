@@ -24,7 +24,7 @@ const CarteBouteille = ({
         <BoutonAction 
           texte="Ajouter au cellier"
           onClick={() => onAjouter(bouteille)}
-          type="primaire"
+          type="secondaire"
         />
       );
     }
