@@ -147,8 +147,48 @@ class ModeleBouteille {
     }
   }
 
-  static async mettreAJour() {
-    throw new Error("mettreAJour non implémenté");
+  static async mettreAJour(id_bouteille, donnees) {
+    if (!id_bouteille) {
+      throw new Error("Identifiant de bouteille requis pour la mise à jour");
+    }
+
+    const connection = await connexion.getConnection();
+
+    try {
+      await connection.beginTransaction();
+
+      const payload = await this.#normaliserPayload(connection, donnees);
+      if (!payload) throw new Error("Données invalides pour la mise à jour");
+
+      const sql = `
+      UPDATE bouteille
+      SET nom = ?, millenisme = ?, region = ?, cepage = ?, image = ?, description = ?, taux_alcool = ?, prix = ?, id_pays = ?, id_type = ?
+      WHERE id_bouteille = ?
+    `;
+
+      const [result] = await connection.query(sql, [
+        payload.nom,
+        payload.millenisme,
+        payload.region,
+        payload.cepage,
+        payload.image,
+        payload.description,
+        payload.taux_alcool,
+        payload.prix,
+        payload.id_pays,
+        payload.id_type,
+        id_bouteille,
+      ]);
+
+      await connection.commit();
+
+      return result.affectedRows > 0;
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
   }
 
   static async supprimer() {
