@@ -148,24 +148,29 @@ class ModeleBouteille {
   }
 
   static async mettreAJour(id_bouteille, donnees) {
+    // Erreur si l'identifiant n'est pas trouvé
     if (!id_bouteille) {
       throw new Error("Identifiant de bouteille requis pour la mise à jour");
     }
 
+    // Obtiens la connection à la base de donnée
     const connection = await connexion.getConnection();
 
     try {
       await connection.beginTransaction();
 
+      // #normaliserPayload pour valider pays/type/payload etc
       const payload = await this.#normaliserPayload(connection, donnees);
       if (!payload) throw new Error("Données invalides pour la mise à jour");
 
+      // Requête SQL update
       const sql = `
       UPDATE bouteille
       SET nom = ?, millenisme = ?, region = ?, cepage = ?, image = ?, description = ?, taux_alcool = ?, prix = ?, id_pays = ?, id_type = ?
       WHERE id_bouteille = ?
     `;
 
+      // Tous les valeurs de la query dans un tableau result
       const [result] = await connection.query(sql, [
         payload.nom,
         payload.millenisme,
@@ -180,8 +185,10 @@ class ModeleBouteille {
         id_bouteille,
       ]);
 
+      // Commit si tout est OK
       await connection.commit();
 
+      // Si vrai, retourne result, sinon rollback
       return result.affectedRows > 0;
     } catch (error) {
       await connection.rollback();
