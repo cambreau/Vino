@@ -12,9 +12,11 @@ export const modifierBouteilleDuCellier = async (req, res) => {};
 
 export const ajouterBouteilleDuCellier = async (req, res) => {
   try {
+    // Obtiens le idCellier avec l'url grâce à la route en utilisant req.params
     const { idCellier } = req.params;
     const identifiantCellier = Number.parseInt(idCellier, 10);
 
+    // Obtiens le idBouteille avec
     const { idBouteille } = req.body;
     const identifiantBouteille = Number.parseInt(idBouteille, 10);
 
@@ -26,6 +28,18 @@ export const ajouterBouteilleDuCellier = async (req, res) => {
       return res
         .status(400)
         .json({ message: "ID cellier et ID bouteille requis" });
+    }
+
+    // Vérifie si la bouteille existe déjà dans le cellier
+    const [rows] = await connexion.query(
+      "SELECT * FROM bouteilleCellier WHERE id_cellier = ? AND id_bouteille = ?",
+      [identifiantCellier, identifiantBouteille]
+    );
+
+    if (rows.length > 0) {
+      return res
+        .status(400)
+        .json({ message: "Cette bouteille est déjà dans le cellier" });
     }
 
     const action = await modeleBouteilleCellier.ajouter(
