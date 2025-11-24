@@ -7,8 +7,8 @@ function BoutonAction({
   // Classes de base
   const classesBase = `
     block text-center
-    px-(--rythme-serre) py-(--rythme-tres-serre)
-    text-principal-100
+    px-(--rythme-base) py-(--rythme-tres-serre)
+    font-semibold text-principal-100
     rounded-(--arrondi-tres-grand) shadow-md
     hover:shadow-lg
     transition-all cursor-pointer
