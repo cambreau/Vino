@@ -36,12 +36,14 @@ export const ajouterBouteilleDuCellier = async (req, res) => {
       [identifiantCellier, identifiantBouteille]
     );
 
+    // Si on obtiens une rangée contenant la même bouteille, lance un message d'erreur
     if (rows.length > 0) {
       return res
         .status(400)
         .json({ message: "Cette bouteille est déjà dans le cellier" });
     }
 
+    // Requête pour ajouter avec informations
     const action = await modeleBouteilleCellier.ajouter(
       identifiantCellier,
       identifiantBouteille,
