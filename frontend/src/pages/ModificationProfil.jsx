@@ -12,7 +12,8 @@ import { useSearchParams, useParams, useNavigate } from "react-router-dom";
 function ModificationProfil() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const echec = searchParams.get("echec") === "true";
+  const echecModification = searchParams.get("echec") == 1;
+  const echecDoublon = searchParams.get("echec") == 2;
 
   //Recuperer id dans l'url
   const { id } = useParams();
@@ -96,9 +97,17 @@ function ModificationProfil() {
         bg-fond
         "
       >
-        {echec && (
+        {echecModification && (
           <Message
             texte="Une erreur est survenue lors de la modification. Veuillez réessayer."
+            type="erreur"
+            onClose={fermerMessage}
+          />
+        )}
+
+        {echecDoublon && (
+          <Message
+            texte="L’adresse courriel saisie est déjà enregistrée. Merci de fournir une adresse différente pour poursuivre."
             type="erreur"
             onClose={fermerMessage}
           />
