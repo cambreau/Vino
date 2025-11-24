@@ -158,3 +158,28 @@ export const connexionUtilisateur = async (datas, navigate) => {
   }
 };
 
+// Fonction d'ajout d'une bouteille dans un cellier 
+export const ajouterBouteilleCellier = async (idCellier, donnees) => {
+  try {
+    // Construire l'URL complète pour l'appel API
+    const urlComplete = `${import.meta.env.VITE_BACKEND_CELLIER_URL}/${idCellier}`;
+
+    // Envoyer la requête POST au backend
+    const reponse = await fetch(urlComplete, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(donnees),
+    });
+
+    // Lire le JSON retourné par le serveur
+    const data = await reponse.json();
+  
+  } catch (error) {
+    // Erreur réseau
+    return {
+      succes: false,
+      erreur: "Impossible de contacter le serveur",
+    };
+  }
+
+  };
