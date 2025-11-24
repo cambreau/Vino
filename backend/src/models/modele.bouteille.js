@@ -384,7 +384,10 @@ class ModeleBouteille {
       image: donneesMappees.image || "",
       description: donneesMappees.description || "Description non fournie",
       taux_alcool: donneesMappees.tauxAlcool ?? null,
-      prix: Number.isFinite(donneesMappees.prix) ? donneesMappees.prix : 0,
+      prix: Number.isFinite(Number(donneesMappees.prix))
+        ? Number(donneesMappees.prix)
+        : 0,
+
       id_pays: idPays,
       id_type: idType,
     };
