@@ -81,7 +81,34 @@ export const creerBouteille = async (req, res) => {
 
 export const modifierBouteille = async (req, res) => {};
 
-export const supprimerBouteille = async (req, res) => {};
+export const supprimerBouteille = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const identifiant = Number.parseInt(id, 10);
+
+    if (!Number.isInteger(identifiant) || identifiant <= 0) {
+      return res.status(400).json({
+        message: "Identifiant de bouteille invalide",
+      });
+    }
+
+    const resultat = await modeleBouteille.supprimer(identifiant);
+    if (!resultat) {
+      return res.status(404).json({
+        message: "Bouteille introuvable ou déjà supprimée",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Bouteille supprimée avec succès",
+    });
+  } catch (error) {
+    console.error("Erreur lors de la suppression d'une bouteille", error);
+    return res.status(500).json({
+      message: "Impossible de supprimer la bouteille",
+    });
+  }
+};
 
 export const rechercherBouteilleParAttributs = async (req, res) => {
   try {
