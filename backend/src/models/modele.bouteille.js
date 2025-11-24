@@ -159,8 +159,20 @@ class ModeleBouteille {
     try {
       await connection.beginTransaction();
 
-      // #normaliserPayload pour valider pays/type/payload etc
-      const payload = await this.#normaliserPayload(connection, donnees);
+      // Récupérer la bouteille existante
+      const existante = await this.trouverParId(id_bouteille);
+      if (!existante) {
+        throw new Error("Bouteille introuvable");
+      }
+
+      // Fusionne les nouvelles données avec les valeurs existantes
+      const payload = await this.#normaliserPayload(connection, {
+        ...existante,
+        //Converti le camelCase  en snake_case pour que la base de donnée le trouve
+        //On garde les valeurs existantes si non fournies
+        code_saq: existante.codeSaq,
+        ...donnees,
+      });
       if (!payload) throw new Error("Données invalides pour la mise à jour");
 
       // Requête SQL update
@@ -349,9 +361,12 @@ class ModeleBouteille {
     const idPays = await this.#assurerPays(connection, donneesMappees.pays);
     const idType = await this.#assurerType(connection, donneesMappees.type);
 
-    const millenisme = this.#validerMillenisme(donneesMappees.millenisme)
-      ? donneesMappees.millenisme
-      : null;
+    let millenisme = donneesMappees.millenisme;
+    if (millenisme !== undefined && millenisme !== null) {
+      millenisme = Number(millenisme);
+      if (!this.#validerMillenisme(millenisme)) millenisme = null;
+    }
+
     const cepageValue = Array.isArray(donneesMappees.cepage)
       ? donneesMappees.cepage.join(", ")
       : donneesMappees.cepage || "Cépage non précisé";
