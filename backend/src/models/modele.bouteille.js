@@ -189,7 +189,7 @@ class ModeleBouteille {
       await connection.commit();
 
       // Si vrai, retourne result, sinon rollback
-      return result.affectedRows > 0;
+      return result.affectedRows > 0 ? "update" : null;
     } catch (error) {
       await connection.rollback();
       throw error;
@@ -330,10 +330,10 @@ class ModeleBouteille {
   /**
    * Valide un millésime : doit être > 0 et dans une plage raisonnable (1800 - année actuelle + 2)
    */
-  static #validerMillesime(millesime) {
-    if (!Number.isInteger(millesime) || millesime <= 0) return false;
+  static #validerMillenisme(millenisme) {
+    if (!Number.isInteger(millenisme) || millenisme <= 0) return false;
     const anneeActuelle = new Date().getFullYear();
-    return millesime >= 1800 && millesime <= anneeActuelle + 2;
+    return millenisme >= 1800 && millenisme <= anneeActuelle + 2;
   }
 
   /**
@@ -349,8 +349,8 @@ class ModeleBouteille {
     const idPays = await this.#assurerPays(connection, donneesMappees.pays);
     const idType = await this.#assurerType(connection, donneesMappees.type);
 
-    const millesime = this.#validerMillesime(donneesMappees.millesime)
-      ? donneesMappees.millesime
+    const millenisme = this.#validerMillenisme(donneesMappees.millenisme)
+      ? donneesMappees.millenisme
       : null;
     const cepageValue = Array.isArray(donneesMappees.cepage)
       ? donneesMappees.cepage.join(", ")
@@ -363,7 +363,7 @@ class ModeleBouteille {
     return {
       code_saq: codeSaq,
       nom: donneesMappees.nom,
-      millenisme: millesime,
+      millenisme: millenisme,
       region: regionValue,
       cepage: cepageValue,
       image: donneesMappees.image || "",
@@ -401,18 +401,18 @@ class ModeleBouteille {
         )
       : null;
 
-    const millesimeBrut = attrMap.millesime_produit
-      ? Number.parseInt(attrMap.millesime_produit, 10)
+    const millenismeBrut = attrMap.millenisme_produit
+      ? Number.parseInt(attrMap.millenisme_produit, 10)
       : null;
-    const millesime = this.#validerMillesime(millesimeBrut)
-      ? millesimeBrut
+    const millenisme = this.#validerMillenisme(millenismeBrut)
+      ? millenismeBrut
       : null;
 
     return {
       codeSAQ: vue?.sku || product?.sku || null,
       nom: vue.name || product?.name || null,
       prix: Number.isFinite(prix) ? prix : null,
-      millesime,
+      millenisme,
       region:
         attrMap.region_origine ||
         attrMap.designation_reglementee ||
