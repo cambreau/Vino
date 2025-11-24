@@ -9,10 +9,8 @@ import { MdLogout } from "react-icons/md"; // Deconnection
 // import { PiCastleTurret } from "react-icons/pi"; // Chateau
 import { IoClose } from "react-icons/io5"; // Fermer
 import { formatMajDebut } from "../../../lib/utils";
-import { AiFillHome } from "react-icons/ai"; // ou une autre icône
 // Objet qui mappe les noms aux icônes
 const icons = {
-  accueil: AiFillHome,
   catalogue: GrCatalog,
   cellier: GiCellarBarrels,
   liste: GiNotebook,
