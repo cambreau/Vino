@@ -19,15 +19,15 @@ function FormulaireSelect({
   return (
     <div
       className="
-        flex flex-col 
-        gap-rythme-serre 
+        flex flex-col
+        gap-rythme-serre
         font-font-body"
     >
       <label
         className={`
         mb-rythme-serre
         text-(length:--taille-petit) font-medium
-        ${classCouleur === "Dark" ? labelClair : labelDark} 
+        ${classCouleur === "Dark" ? labelClair : labelDark}
       `}
         htmlFor={formatString(nom)}
       >
@@ -35,10 +35,10 @@ function FormulaireSelect({
       </label>
       <select
         className={`
-          max-w-[320px] px-(--rythme-serre) py-(--rythme-tres-serre) 
+          max-w-[320px] px-(--rythme-serre) py-(--rythme-tres-serre)
           text-(length:--taille-normal) font-font-body
-           ${classCouleur === "Dark" ? selectDark : selectClair} 
-          border border-(--color-texte-secondaire) rounded-(--arrondi-base) shadow-sm focus:outline-none focus:border-(--color-principal-200)`}
+           ${classCouleur === "Dark" ? selectDark : selectClair}
+          border border-texte-secondaire rounded-(--arrondi-base) shadow-sm focus:outline-none focus:border-principal-200`}
         id={formatString(nom)}
         name={formatString(nom)}
         {...(estObligatoire ? { required: true } : {})}

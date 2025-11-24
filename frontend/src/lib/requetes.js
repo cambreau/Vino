@@ -78,19 +78,36 @@ export const modifierUtilisateur = async (datas, navigate) => {
       }
     );
     if (reponse.ok) {
-      navigate(`/profil/${datas.id}?succes=true`);
+      // Mettre à jour l'utilisateur dans le store avec les nouvelles données
+      const datasUtilisateur = {
+        id: datas.id,
+        nom: datas.nom,
+        courriel: datas.courriel,
+      };
+      authentificationStore.getState().connexion(datasUtilisateur);
+      navigate(`/profil?succes=true`);
       return { succes: true };
     }
 
     // Gestion des erreurs HTTP (400, 500, etc.)
     const erreurData = await reponse.json().catch(() => ({}));
     console.error("Erreur HTTP:", reponse.status, erreurData);
-    navigate(`/modifier-utilisateur/${datas.id}?echec=true`);
-    return { succes: false, erreur: erreurData };
+
+    if (reponse.status === 409) {
+      // Conflit : courriel déjà utilisé
+      navigate(`/modifier-utilisateur/${datas.id}?echec=2`);
+    } else {
+      navigate(`/modifier-utilisateur/${datas.id}?echec=1`);
+    }
+
+    return {
+      succes: false,
+      erreur: erreurData?.message || "Erreur lors de la modification",
+    };
   } catch (error) {
     // Gestion des erreurs réseau (exemple: pas de connexion) ou autres exceptions JavaScript
     console.error("Erreur lors de la modification de l'utilisateur :", error);
-    navigate(`/modifier-utilisateur/${datas.id}?echec=true`);
+    navigate(`/modifier-utilisateur/${datas.id}?echec=1`);
     return { succes: false, erreur: error.message };
   }
 };

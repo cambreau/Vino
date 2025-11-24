@@ -38,9 +38,49 @@ function Inscription() {
    */
   const envoieInscription = async (e) => {
     e.preventDefault();
-
-    // Envoyer les données utilisateur
-    await creerUtilisateur(utilisateur, navigate);
+    // Valider tous les champs avant de soumettre
+    const nouvellesErreurs = { ...erreurs };
+    // Valider le nom
+    if (!validationChamp(regex.regNom, utilisateur.nom)) {
+      nouvellesErreurs.nom =
+        "Le nom doit comporter entre 2 et 50 caractères, uniquement des lettres, des accents et le tiret (-).";
+    } else {
+      nouvellesErreurs.nom = "";
+    }
+    // Valider le courriel
+    if (!validationChamp(regex.regcourriel, utilisateur.courriel)) {
+      nouvellesErreurs.courriel = "Veuillez saisir un courriel valide.";
+    } else {
+      nouvellesErreurs.courriel = "";
+    }
+    // Valider le mot de passe
+    if (!validationChamp(regex.regMotDePasse, utilisateur.mot_de_passe)) {
+      nouvellesErreurs.motDePasse =
+        "Le mot de passe doit contenir au moins 8 caractères, dont une lettre majuscule, une lettre minuscule et un caractère spécial";
+    } else {
+      nouvellesErreurs.motDePasse = "";
+    }
+    // Valider la confirmation
+    if (!confirmation || confirmation.trim() === "") {
+      nouvellesErreurs.confirmation =
+        "La confirmation du mot de passe est requise";
+    } else if (utilisateur.mot_de_passe !== confirmation) {
+      nouvellesErreurs.confirmation =
+        "La confirmation du mot de passe n'est pas valide";
+    } else {
+      nouvellesErreurs.confirmation = "";
+    }
+    setErreurs(nouvellesErreurs);
+    // Vérifier s'il y a des erreurs
+    const aDesErreurs = Object.values(nouvellesErreurs).some(
+      (erreur) => erreur !== ""
+    );
+    if (aDesErreurs) {
+      return; // Ne pas soumettre si il y a des erreurs
+    } else {
+      // Envoyer les données utilisateur
+      await creerUtilisateur(utilisateur, navigate);
+    }
   };
 
   /**
@@ -58,7 +98,6 @@ function Inscription() {
       bg-[linear-gradient(0deg,rgba(0,0,0,0.8)30%,rgba(0,0,0,0)),url('../assets/images/inscriptionCellier.webp')] bg-cover bg-center bg-no-repeat bg-[#e0e0e0]
       "
     >
-
       <header className="px-(--rythme-base)">
         <BoutonRetour />
       </header>
@@ -117,6 +156,12 @@ function Inscription() {
               onChange={(e) => {
                 const valeur = e.target.value;
                 setUtilisateur((prev) => ({ ...prev, courriel: valeur }));
+                // Supprimer le message de doublon si l'utilisateur modifie le courriel
+                if (echecDoublon || echecInscription) {
+                  const nouveauxParams = new URLSearchParams(searchParams);
+                  nouveauxParams.delete("echec");
+                  setSearchParams(nouveauxParams);
+                }
                 if (!validationChamp(regex.regcourriel, valeur)) {
                   const erreur = "Veuillez saisir un courriel valide.";
                   setErreurs((prev) => ({ ...prev, courriel: erreur }));
@@ -131,7 +176,7 @@ function Inscription() {
             )}
 
             <FormulaireInput
-              type="text"
+              type="password"
               nom="mot_de_passe"
               genre="un"
               classCouleurLabel="Clair"
@@ -159,7 +204,7 @@ function Inscription() {
             )}
 
             <FormulaireInput
-              type="text"
+              type="password"
               nom="confirmation"
               genre="une"
               classCouleurLabel="Clair"
@@ -170,7 +215,13 @@ function Inscription() {
               }}
               onBlur={(e) => {
                 const valeur = e.target.value;
-                if (utilisateur.mot_de_passe !== valeur) {
+                if (!valeur || valeur.trim() === "") {
+                  const erreur = "La confirmation du mot de passe est requise";
+                  setErreurs((prev) => ({
+                    ...prev,
+                    confirmation: erreur,
+                  }));
+                } else if (utilisateur.mot_de_passe !== valeur) {
                   const erreur =
                     "La confirmation du mot de passe n'est pas valide";
                   setErreurs((prev) => ({

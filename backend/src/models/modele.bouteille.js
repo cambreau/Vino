@@ -37,7 +37,6 @@ const BASE_SELECT = `
 
 // Transforme un enregistrement SQL en représentation API.
 const mapper = (row) => {
-
   return {
     id: row.id_bouteille,
     codeSaq: row.code_saq,
@@ -108,23 +107,76 @@ class ModeleBouteille {
       valeurs.push(`%${filtres.type}%`);
     }
 
-    if (!clauses.length) throw new Error("Au moins un filtre doit être fourni.");
+    if (!clauses.length)
+      throw new Error("Au moins un filtre doit être fourni.");
 
     const sql = `${BASE_SELECT} WHERE ${clauses.join(" AND ")}`;
     const [rows] = await connexion.query(sql, valeurs);
     return rows.map(mapper);
   }
 
-  static async creer() {
-    throw new Error("creer non implémenté");
+  // Crée une nouvelle bouteille avec les données fournies.
+  static async creer(donnees) {
+    if (!donnees || !donnees.nom || !donnees.code_saq) {
+      throw new Error("Nom et code_saq sont requis");
+    }
+
+    const connection = await connexion.getConnection();
+    try {
+      // Transaction requise comme plusieurs opérations peuvent être éxécutées (voir #normaliserPayload).
+      await connection.beginTransaction();
+
+      // Normaliser et valider les données avant insertion.
+      const payload = await this.#normaliserPayload(connection, donnees);
+      if (!payload) {
+        throw new Error("Données invalides pour la création de bouteille");
+      }
+
+      // Obtenir l'action effectuée (insert ou update).
+      const action = await this.#persisterBouteille(connection, payload);
+
+      // Si tout es OK, on finit la transaction.
+      await connection.commit();
+      return action;
+    } catch (error) {
+      // Sinon on annule.
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
   }
 
   static async mettreAJour() {
     throw new Error("mettreAJour non implémenté");
   }
 
-  static async supprimer() {
-    throw new Error("supprimer non implémenté");
+  static async supprimer(id_bouteille) {
+    // Erreur si l'identifiant n'est pas fourni.
+    if (!id_bouteille) {
+      throw new Error("Identifiant de bouteille requis pour la suppression");
+    }
+
+    // Connexion et transaction.
+    const connection = await connexion.getConnection();
+
+    try {
+      await connection.beginTransaction();
+
+      // Requête sql de suppression avec le résultat dans une variable.
+      const sql = "DELETE FROM bouteille WHERE id_bouteille = ?";
+      const [result] = await connection.query(sql, [id_bouteille]);
+
+      // Commit si tout est OK.
+      await connection.commit();
+      // Retourne vrai si une ligne a été affectée (supprimée).
+      return result.affectedRows > 0;
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
   }
 
   /**

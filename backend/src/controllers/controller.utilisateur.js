@@ -43,9 +43,12 @@ export const recupererUtilisateur = async (req, res) => {
   try {
     const { id } = req.params;
     const utilisateur = await modeleUtilisateur.trouverParId(id);
+
     if (!utilisateur) {
       return res.status(404).json({ message: "Utilisateur non trouvé." });
     }
+
+    return res.status(200).json(utilisateur);
   } catch (err) {
     console.error("Erreur lors de la récupération de l'utilisateur :", err);
     return res.status(500).json({
@@ -64,7 +67,7 @@ export const recupererUtilisateurParCourriel = async (req, res) => { };
  */
 export const modifierUtilisateur = async (req, res) => {
   try {
-    const { nom, courriel, mot_de_passe } = req.body;
+    const { nom, courriel } = req.body;
     const { id } = req.params;
 
     // Avoir les informations dans la basse de donnees si l'utilisateur existe
@@ -72,7 +75,7 @@ export const modifierUtilisateur = async (req, res) => {
 
     if (!donneesUtilisateur) {
       return res.status(404).json({
-        message: "Utilisateur non trouvé."
+        message: "Utilisateur non trouvé.",
       });
     }
 
@@ -81,15 +84,9 @@ export const modifierUtilisateur = async (req, res) => {
       const existant = await modeleUtilisateur.trouverParCourriel(courriel);
       if (existant) {
         return res.status(409).json({
-          message: "Vous ne pouvez pas utiliser ce courriel."
+          message: "Vous ne pouvez pas utiliser ce courriel.",
         });
       }
-    }
-
-    // Hasher le mot de passe si fourni
-    let motDePasseHache = null;
-    if (mot_de_passe) {
-      motDePasseHache = await bcrypt.hash(mot_de_passe, 10);
     }
 
     // Mettre à jour l'utilisateur
@@ -97,7 +94,6 @@ export const modifierUtilisateur = async (req, res) => {
       id,
       nom,
       courriel,
-      motDePasseHache
     );
 
     if (!succes) {
@@ -109,7 +105,6 @@ export const modifierUtilisateur = async (req, res) => {
     return res.status(200).json({
       message: "Utilisateur modifié avec succès.",
     });
-
   } catch (err) {
     console.error("Erreur lors de la modification de l'utilisateur :", err);
     return res.status(500).json({
@@ -121,7 +116,22 @@ export const modifierUtilisateur = async (req, res) => {
 /**
  * Fonction asynchrone qui supprimme un utilisateur.
  */
-export const supprimerUtilisateur = async (req, res) => { };
+export const supprimerUtilisateur = async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    const supprimer = await modeleUtilisateur.supprimer(id);
+    return res.status(201).json({
+      message: "Utilisateur supprimeé avec succès.",
+    });
+  } catch (error) {
+    console.error("Erreur lors de la suppretion de l'utilisateur :", err);
+    return res.status(500).json({
+      error: "Erreur serveur lors de la suppretion de l'utilisateur.",
+    });
+  }
+
+};
 
 /*
  * Fonction asynchrone qui connecte un utilisateur.

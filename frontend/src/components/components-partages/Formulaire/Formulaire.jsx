@@ -11,7 +11,7 @@ function Formulaire({
     <section className="px-(--rythme-base)">
       <h1
         className={`text-(length:--taille-grand)  font-display font-bold mb-(--rythme-base)
-      ${classeTitre === "accent" ? titreAccent : "text-(--color-fond)"}`}
+      ${classeTitre === "accent" ? titreAccent : "text-fond"}`}
       >
         {titreFormulaire}
       </h1>

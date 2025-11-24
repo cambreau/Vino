@@ -35,7 +35,7 @@ export default class modeleUtilisateur {
 
   /**
    * Fonction qui recherche un utilisateur par son courriel pour la connexion
-  */
+   */
   static async connexionUtilisateur(courriel) {
     try {
       const sql = `
@@ -49,47 +49,40 @@ export default class modeleUtilisateur {
       // Si un utilisateur est trouvé, retourner le premier résultat, sinon retourner null
       return resultat.length > 0 ? resultat[0] : null;
     } catch (erreur) {
-      console.error('Erreur lors de la recherche de l\'utilisateur:', erreur);
+      console.error("Erreur lors de la recherche de l'utilisateur:", erreur);
       throw erreur;
     }
   }
 
   //Modifier un utilisateur et retourne si succès
-  static async modifier(id_utilisateur, nom, courriel, mot_de_passe_hache = null) {
-    // Si on ne change pas le mot de passe
-    if (!mot_de_passe_hache) {
-      const sql = `
+  static async modifier(id_utilisateur, nom, courriel) {
+    const sql = `
       UPDATE utilisateur 
       SET nom = ?, courriel = ? 
       WHERE id_utilisateur = ?
     `;
-      const [resultat] = await connexion.execute(sql, [nom, courriel, id_utilisateur]);
-      return resultat.affectedRows > 0;
-    }
+    const [resultat] = await connexion.execute(sql, [
+      nom,
+      courriel,
+      id_utilisateur,
+    ]);
+    return resultat.affectedRows > 0;
+  }
 
-    // Si on change aussi le mot de passe
+  //Supprimer un utilisateur par id
+  static async supprimer(id) {
     const sql = `
-    UPDATE utilisateur 
-    SET nom = ?, courriel = ?, mot_de_passe = ? 
-    WHERE id_utilisateur = ?
-  `;
-    const [resultat] = await connexion.execute(sql, [nom, courriel, mot_de_passe_hache, id_utilisateur]);
+          DELETE FROM utilisateur 
+          WHERE id_utilisateur = ? 
+          LIMIT 1
+      `;
+
+    const [resultat] = await connexion.execute(sql, [id]);
+
+    // Retourne true si un utilisateur a été supprimé
     return resultat.affectedRows > 0;
   }
 }
 
-  static async trouverParId(id_utilisateur) {
-    try {
-      const sql = `
-      SELECT * FROM utilisateur WHERE id_utilisateur = ? LIMIT 1`;
-      const resultat = await connexion.execute(sql, [id_utilisateur]);
-      return resultat.length > 0 ? resultat[0] : null;
-    } catch (erreur) {
-      console.error(
-        "Erreur lors de la recherche de l'utilisateur par ID:",
-        erreur
-      );
-      throw erreur;
-    }
-  }
-}
+
+

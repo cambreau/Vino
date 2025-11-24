@@ -8,6 +8,7 @@ const authentificationStore = create(
   persist(
     (set) => ({
       // État initial
+      // Format de l'objet utilisateur: { id: number, nom: string, courriel: string }
       utilisateur: null,
       estConnecte: false,
 
