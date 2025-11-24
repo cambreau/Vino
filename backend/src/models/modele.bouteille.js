@@ -151,8 +151,27 @@ class ModeleBouteille {
     throw new Error("mettreAJour non implémenté");
   }
 
-  static async supprimer() {
-    throw new Error("supprimer non implémenté");
+  static async supprimer(id_bouteille) {
+    if (!id_bouteille) {
+      throw new Error("Identifiant de bouteille requis pour la suppression");
+    }
+
+    const connection = await connexion.getConnection();
+
+    try {
+      await connection.beginTransaction();
+
+      const sql = "DELETE FROM bouteille WHERE id_bouteille = ?";
+      const [result] = await connection.query(sql, [id_bouteille]);
+
+      await connection.commit();
+      return result.affectedRows > 0;
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
   }
 
   /**
