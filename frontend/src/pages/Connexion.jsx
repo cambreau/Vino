@@ -15,6 +15,7 @@ function Connexion() {
   const [searchParams, setSearchParams] = useSearchParams();
   const inscriptionSucces = searchParams.get("inscriptionSucces") === "true";
   const deconnexionSucces = searchParams.get("deconnexionSucces") === "true";
+  const supprimerSucces = searchParams.get("supprimerSucces") === "true";
 
   // Les informations de connexion
   const [utilisateur, setUtilisateur] = useState({
@@ -69,6 +70,7 @@ function Connexion() {
    */
   const fermerMessage = () => {
     searchParams.delete("inscriptionSucces");
+    searchParams.delete("supprimerSucces");
     setSearchParams(searchParams);
   };
 
@@ -93,6 +95,13 @@ function Connexion() {
         {deconnexionSucces && (
           <Message
             texte="Vous avez bien été déconnecté. À bientôt !"
+            type="succes"
+            onClose={fermerMessage}
+          />
+        )}
+        {supprimerSucces && (
+          <Message
+            texte="Votre compte a bien été supprimé. !"
             type="succes"
             onClose={fermerMessage}
           />

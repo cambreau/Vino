@@ -103,6 +103,35 @@ export const modifierUtilisateur = async (datas, navigate) => {
   }
 };
 
+/**
+ * Supprime un utilisateur de la base de données via l'API backend.
+ * Redirige vers la page de connexion en cas de succès ou affiche une erreur en cas d'échec.
+ * @param {string|number} id - L'identifiant unique de l'utilisateur à supprimer
+ * @param {Function} navigate - Fonction de navigation de react-router-dom pour rediriger l'utilisateur
+ * @returns {Promise<{succes: boolean, erreur?: Object|string}>} Un objet indiquant le succès de l'opération et l'erreur éventuelle
+ */
+export const supprimerUtilisateur = async (id, navigate) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_UTILISATEUR_URL}/${id}`,
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    if (reponse.ok) {
+      // Déconnecter l'utilisateur du store
+      authentificationStore.getState().deconnexion();
+      navigate(`/connexion?supprimerSucces=true`);
+      return { succes: true };
+    }
+  } catch (error) {
+    // Gestion des erreurs réseau (exemple: pas de connexion) ou autres exceptions JavaScript
+    console.error("Erreur lors de la suppression de l'utilisateur :", error);
+  }
+};
+
 // Fonction connexionUtilisateur
 export const connexionUtilisateur = async (datas, navigate) => {
   try {
