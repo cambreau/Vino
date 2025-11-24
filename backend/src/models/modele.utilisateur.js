@@ -68,30 +68,21 @@ export default class modeleUtilisateur {
     ]);
     return resultat.affectedRows > 0;
   }
-}
-      const [resultat] = await connexion.execute(sql, [courriel]);
 
-      // Si un utilisateur est trouvé, retourner le premier résultat, sinon retourner null
-      return resultat.length > 0 ? resultat[0] : null;
-    } catch (erreur) {
-      console.error('Erreur lors de la recherche de l\'utilisateur:', erreur);
-      throw erreur;
-    }
-  }
-
-  //Récupérer un utilisateur par courriel
+  //Supprimer un utilisateur par id
   static async supprimer(id) {
     const sql = `
-        DELETE FROM utilisateur 
-        WHERE id_utilisateur = ? 
-        LIMIT 1
-    `;
+          DELETE FROM utilisateur 
+          WHERE id_utilisateur = ? 
+          LIMIT 1
+      `;
 
     const [resultat] = await connexion.execute(sql, [id]);
 
     // Retourne true si un utilisateur a été supprimé
     return resultat.affectedRows > 0;
   }
-
 }
+
+
 
