@@ -60,7 +60,7 @@ export const recupererUtilisateur = async (req, res) => {
 /**
  * Fonction asynchrone qui recherche un utilisateur par son courriel.
  */
-export const recupererUtilisateurParCourriel = async (req, res) => {};
+export const recupererUtilisateurParCourriel = async (req, res) => { };
 
 /**
  * Fonction asynchrone qui modifie les informations d'un utilisateur.
@@ -116,7 +116,22 @@ export const modifierUtilisateur = async (req, res) => {
 /**
  * Fonction asynchrone qui supprimme un utilisateur.
  */
-export const supprimerUtilisateur = async (req, res) => {};
+export const supprimerUtilisateur = async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    const supprimer = await modeleUtilisateur.supprimer(id);
+    return res.status(201).json({
+      message: "Utilisateur supprimeé avec succès.",
+    });
+  } catch (error) {
+    console.error("Erreur lors de la suppretion de l'utilisateur :", err);
+    return res.status(500).json({
+      error: "Erreur serveur lors de la suppretion de l'utilisateur.",
+    });
+  }
+
+};
 
 /*
  * Fonction asynchrone qui connecte un utilisateur.

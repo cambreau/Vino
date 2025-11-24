@@ -68,4 +68,21 @@ export default class modeleUtilisateur {
     ]);
     return resultat.affectedRows > 0;
   }
+
+  //Supprimer un utilisateur par id
+  static async supprimer(id) {
+    const sql = `
+          DELETE FROM utilisateur 
+          WHERE id_utilisateur = ? 
+          LIMIT 1
+      `;
+
+    const [resultat] = await connexion.execute(sql, [id]);
+
+    // Retourne true si un utilisateur a été supprimé
+    return resultat.affectedRows > 0;
+  }
 }
+
+
+
