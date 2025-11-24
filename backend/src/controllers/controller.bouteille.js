@@ -81,6 +81,7 @@ export const creerBouteille = async (req, res) => {
 
 export const modifierBouteille = async (req, res) => {
   try {
+    // Obtiens le id et validation que c'est en int et non string
     const { id } = req.params;
     const identifiant = Number.parseInt(id, 10);
 
@@ -89,14 +90,17 @@ export const modifierBouteille = async (req, res) => {
         message: "Identifiant de bouteille invalide",
       });
     }
+    // Enregistre l'action dans une variable en passant req.body (Données entrées par le client)
     const action = await modeleBouteille.mettreAJour(identifiant, req.body);
 
+    // Si l'action ne retourne pas de résultat, retourne un message d'erreur
     if (!action) {
       return res.status(404).json({
         message: "Bouteille introuvable ou aucune modification effectuée",
       });
     }
 
+    // Si tout est OK, retourne message de succès
     return res.status(200).json({
       success: true,
       action,
