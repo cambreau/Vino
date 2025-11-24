@@ -13,15 +13,15 @@ function Celliers() {
         {/* Menu haut fixe */}
         <MenuEnHaut titre="Vin" />
       </header>
-      <main className="flex gap-(--rythme-base) min-h-screen font-body max-w-[500px] mx-auto inset-x-0 bg-fond">
-        <picture>
+      <main className="flex gap-(--rythme-tres-serre) h-screen font-body max-w-[500px] mx-auto inset-x-0 bg-fond">
+        <picture className="w-2/5">
           <img
             src={heroBienvenue}
             alt=""
             className="w-full h-full object-cover"
           />
         </picture>
-        <div className="flex flex-col py-(--rythme-base)">
+        <div className="flex flex-col flex-1 py-(--rythme-base) px-(--rythme-serre)">
           <header>
             <h1>titre du vin, un teste pour un nom trop long</h1>
             <hr className="my-(--rythme-serre)" />
