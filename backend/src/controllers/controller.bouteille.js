@@ -83,6 +83,7 @@ export const modifierBouteille = async (req, res) => {};
 
 export const supprimerBouteille = async (req, res) => {
   try {
+    // Récupère et valide l'identifiant
     const { id } = req.params;
     const identifiant = Number.parseInt(id, 10);
 
@@ -92,7 +93,10 @@ export const supprimerBouteille = async (req, res) => {
       });
     }
 
+    // Applique la requête SQL
     const resultat = await modeleBouteille.supprimer(identifiant);
+
+    // Si retourne faux, retourne un message d'erreur, sinon on envoie la requête
     if (!resultat) {
       return res.status(404).json({
         message: "Bouteille introuvable ou déjà supprimée",
