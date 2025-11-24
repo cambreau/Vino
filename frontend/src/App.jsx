@@ -6,6 +6,7 @@ import Inscription from "./pages/Inscription";
 import ModificationProfil from "./pages/ModificationProfil";
 import Catalogue from "./pages/Catalogue";
 import Celliers from "./pages/Cellier";
+import Vin from "./pages/Vin";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       />
       <Route path="/celliers" element={<Celliers />} />
       <Route path="/catalogue" element={<Catalogue />} />
+      <Route path="/vin" element={<Vin />} />
     </Routes>
   );
 }
