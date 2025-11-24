@@ -6,4 +6,4 @@ export const recupererCellier = async (req, res) => {};
 
 export const modifierCellier = async (req, res) => {};
 
-export const suprimmerCellier = async (req, res) => {};
+export const supprimerCellier = async (req, res) => {};
