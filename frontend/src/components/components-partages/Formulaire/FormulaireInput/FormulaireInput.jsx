@@ -23,15 +23,15 @@ function FormulaireInput({
   return (
     <div
       className="
-      flex flex-col 
-      gap-rythme-serre 
+      flex flex-col
+      gap-rythme-serre
       font-font-body"
     >
       <label
         className={`
         mb-rythme-serre
         text-(length:--taille-petit) font-medium
-        ${classCouleurLabel === "Dark" ? labelDark : labelClair }
+        ${classCouleurLabel === "Dark" ? labelDark : labelClair}
       `}
         htmlFor={nom}
       >
@@ -39,10 +39,10 @@ function FormulaireInput({
       </label>
       <input
         className={`
-          max-w px-(--rythme-serre) py-(--rythme-tres-serre) 
+          max-w px-(--rythme-serre) py-(--rythme-tres-serre)
           text-(length:--taille-normal) font-font-body
-           ${classCouleur === "Dark" ? inputDark : inputClair} 
-          border border-(--color-texte-secondaire) rounded-(--arrondi-base) shadow-sm focus:outline-none focus:border-(--color-principal-200)`}
+           ${classCouleur === "Dark" ? inputDark : inputClair}
+          border border-texte-secondaire rounded-(--arrondi-base) shadow-sm focus:outline-none focus:border-principal-200`}
         type={type}
         name={nom}
         id={nom}

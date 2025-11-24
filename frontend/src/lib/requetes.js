@@ -1,4 +1,5 @@
 // Ce fichier regroupe toutes les fonctions permettant de communiquer avec le backend.
+import authentificationStore from "../stores/authentificationStore";
 
 /**
  * Crée un nouvel utilisateur dans la base de données via l'API backend.
@@ -77,7 +78,15 @@ export const modifierUtilisateur = async (datas, navigate) => {
       }
     );
     if (reponse.ok) {
-      navigate(`/profil/${datas.id}?succes=true`);
+      // Mettre à jour l'utilisateur dans le store avec les nouvelles données
+      const datasUtilisateur = {
+        id: datas.id,
+        nom: datas.nom,
+        courriel: datas.courriel,
+      };
+      authentificationStore.getState().connexion(datasUtilisateur);
+      navigate(`/profil?succes=true`);
+
       return { succes: true };
     }
 
@@ -108,6 +117,14 @@ export const connexionUtilisateur = async (datas, navigate) => {
 
     if (reponse.ok) {
       const data = await reponse.json();
+      const datasUtilisateur = {
+        id: data.utilisateur.id_utilisateur,
+        nom: data.utilisateur.nom,
+        courriel: data.utilisateur.courriel,
+      };
+
+      // Sauvegarder l'utilisateur dans le store
+      authentificationStore.getState().connexion(datasUtilisateur);
 
       // Rediriger vers page profil
       navigate("/profil");

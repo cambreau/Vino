@@ -37,7 +37,6 @@ const BASE_SELECT = `
 
 // Transforme un enregistrement SQL en représentation API.
 const mapper = (row) => {
-
   return {
     id: row.id_bouteille,
     codeSaq: row.code_saq,
@@ -76,8 +75,76 @@ class ModeleBouteille {
     return rows.length ? mapper(rows[0]) : null;
   }
 
-  static async creer() {
-    throw new Error("creer non implémenté");
+  /**
+   * Récupère les bouteilles correspondant à une combinaison d'attributs.
+   */
+  static async trouverParAttributs(filtres = {}) {
+    const clauses = [];
+    const valeurs = [];
+
+    if (filtres.nom) {
+      clauses.push("LOWER(b.nom) LIKE LOWER(?)");
+      valeurs.push(`%${filtres.nom}%`);
+    }
+
+    if (filtres.region) {
+      clauses.push("LOWER(b.region) LIKE LOWER(?)");
+      valeurs.push(`%${filtres.region}%`);
+    }
+
+    if (filtres.cepage) {
+      clauses.push("LOWER(b.cepage) LIKE LOWER(?)");
+      valeurs.push(`%${filtres.cepage}%`);
+    }
+
+    if (filtres.pays) {
+      clauses.push("LOWER(p.nom) LIKE LOWER(?)");
+      valeurs.push(`%${filtres.pays}%`);
+    }
+
+    if (filtres.type) {
+      clauses.push("LOWER(t.couleur) LIKE LOWER(?)");
+      valeurs.push(`%${filtres.type}%`);
+    }
+
+    if (!clauses.length)
+      throw new Error("Au moins un filtre doit être fourni.");
+
+    const sql = `${BASE_SELECT} WHERE ${clauses.join(" AND ")}`;
+    const [rows] = await connexion.query(sql, valeurs);
+    return rows.map(mapper);
+  }
+
+  // Crée une nouvelle bouteille avec les données fournies.
+  static async creer(donnees) {
+    if (!donnees || !donnees.nom || !donnees.code_saq) {
+      throw new Error("Nom et code_saq sont requis");
+    }
+
+    const connection = await connexion.getConnection();
+    try {
+      // Transaction requise comme plusieurs opérations peuvent être éxécutées (voir #normaliserPayload).
+      await connection.beginTransaction();
+
+      // Normaliser et valider les données avant insertion.
+      const payload = await this.#normaliserPayload(connection, donnees);
+      if (!payload) {
+        throw new Error("Données invalides pour la création de bouteille");
+      }
+
+      // Obtenir l'action effectuée (insert ou update).
+      const action = await this.#persisterBouteille(connection, payload);
+
+      // Si tout es OK, on finit la transaction.
+      await connection.commit();
+      return action;
+    } catch (error) {
+      // Sinon on annule.
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
   }
 
   static async mettreAJour() {
