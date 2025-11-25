@@ -1,12 +1,55 @@
 import MenuEnHaut from "../components/components-partages/MenuEnHaut/MenuEnHaut";
 import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
-import { useNavigate } from "react-router-dom";
 import Bouton from "../components/components-partages/Boutons/Bouton";
 import Message from "../components/components-partages/Message/Message";
 import heroBienvenue from "../assets/images/heroBienvenue.webp";
 
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 function Bouteille() {
   const navigate = useNavigate();
+  //Recuperer id dans l'url
+  const { id } = useParams();
+  // Les informations utilisateur
+  const [bouteille, setBouteille] = useState({
+    id: id,
+    nom: "",
+    millenisme: "",
+    region: "",
+    cepage: "",
+    image: "",
+    description: "",
+    tauxAlcool: "",
+    prix: "",
+    pays: "",
+    type: "",
+  });
+
+  /**
+   * Recuperer les informations d'une bouteille' cote backend.
+   */
+  useEffect(() => {
+    const chargerBouteille = async () => {
+      const bouteilleDatas = await recupererBouteille(id);
+      if (bouteilleDatas) {
+        setBouteille({
+          id: bouteilleDatas.id,
+          nom: bouteilleDatas.nom,
+          millenisme: bouteilleDatas.millenisme,
+          region: bouteilleDatas.region,
+          cepage: bouteilleDatas.cepage,
+          image: bouteilleDatas.image,
+          description: bouteilleDatas.description,
+          tauxAlcool: bouteilleDatas.tauxAlcool,
+          prix: bouteilleDatas.prix,
+          pays: bouteilleDatas.pays,
+          type: bouteilleDatas.type,
+        });
+      }
+    };
+    chargerUtilisateur();
+  }, [id]);
+
   return (
     <>
       <header>

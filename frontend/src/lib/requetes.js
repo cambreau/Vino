@@ -308,3 +308,22 @@ export const creerCellier = async (id_utilisateur, nom) => {
 
 export const modifierCellier = async (id_utilisateur, id_cellier) => {};
 export const supprimerCellier = async (id_utilisateur, id_cellier) => {};
+
+
+// BOUTEILLE
+
+/**
+ * Récupère les informations d'une bouteille par son identifiant via l'API backend.
+ * @param {string|number} id - L'identifiant unique d'une bouteille à récupérer
+ * @returns {Promise<Object|null>} Les données de la bouteille ou null en cas d'erreur
+ */
+export const recupererBouteille = async (id) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_BOUTEILLES_URL}/${id}`
+    );
+    return reponse.json();
+  } catch (error) {
+    console.log(error);
+  }
+};
