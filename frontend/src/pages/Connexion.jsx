@@ -15,6 +15,7 @@ function Connexion() {
   const [searchParams, setSearchParams] = useSearchParams();
   const inscriptionSucces = searchParams.get("inscriptionSucces") === "true";
   const deconnexionSucces = searchParams.get("deconnexionSucces") === "true";
+  const supprimerSucces = searchParams.get("supprimerSucces") === "true";
 
   // Les informations de connexion
   const [utilisateur, setUtilisateur] = useState({
@@ -43,6 +44,7 @@ function Connexion() {
 
     // Si une erreur existe
     if (erreur) {
+      supprimerMessagesSucces();
       setMessageErreurGeneral(erreur);
       return;
     }
@@ -59,9 +61,23 @@ function Connexion() {
 
     // Gestion des erreurs
     if (!resultat.succes) {
+      supprimerMessagesSucces();
       setMessageErreurGeneral(resultat.erreur);
     }
     // Si succès, la redirection est déjà gérée dans connexionUtilisateur
+  };
+
+  /**
+   * Supprime les messages de succès de l'URL.
+   */
+  const supprimerMessagesSucces = () => {
+    if (deconnexionSucces || inscriptionSucces || supprimerSucces) {
+      const nouveauxParams = new URLSearchParams(searchParams);
+      nouveauxParams.delete("deconnexionSucces");
+      nouveauxParams.delete("inscriptionSucces");
+      nouveauxParams.delete("supprimerSucces");
+      setSearchParams(nouveauxParams);
+    }
   };
 
   /**
@@ -70,6 +86,7 @@ function Connexion() {
   const fermerMessage = () => {
     searchParams.delete("inscriptionSucces");
     searchParams.delete("deconnexionSucces");
+    searchParams.delete("supprimerSucces");
     setSearchParams(searchParams);
   };
 
@@ -94,6 +111,13 @@ function Connexion() {
         {deconnexionSucces && (
           <Message
             texte="Vous avez bien été déconnecté!"
+            type="succes"
+            onClose={fermerMessage}
+          />
+        )}
+        {supprimerSucces && (
+          <Message
+            texte="Votre compte a bien été supprimé. !"
             type="succes"
             onClose={fermerMessage}
           />
@@ -125,7 +149,7 @@ function Connexion() {
               onChange={(e) => {
                 const valeur = e.target.value;
                 setUtilisateur((prev) => ({ ...prev, courriel: valeur }));
-
+                supprimerMessagesSucces();
                 if (messageErreurGeneral) {
                   setMessageErreurGeneral("");
                 }
@@ -147,7 +171,7 @@ function Connexion() {
                   ...prev,
                   mot_de_passe: valeur,
                 }));
-
+                supprimerMessagesSucces();
                 if (messageErreurGeneral) {
                   setMessageErreurGeneral("");
                 }

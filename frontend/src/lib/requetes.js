@@ -112,6 +112,56 @@ export const modifierUtilisateur = async (datas, navigate) => {
   }
 };
 
+/**
+ * Supprime un utilisateur de la base de données via l'API backend.
+ * Redirige vers la page de connexion en cas de succès ou affiche une erreur en cas d'échec.
+ * @param {string|number} id - L'identifiant unique de l'utilisateur à supprimer
+ * @param {Function} navigate - Fonction de navigation de react-router-dom pour rediriger l'utilisateur
+ * @returns {Promise<{succes: boolean, erreur?: Object|string}>} Un objet indiquant le succès de l'opération et l'erreur éventuelle
+ */
+export const supprimerUtilisateur = async (id, navigate) => {
+  try {
+    console.log(
+      "Requête DELETE vers:",
+      `${import.meta.env.VITE_BACKEND_UTILISATEUR_URL}/${id}`
+    );
+
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_UTILISATEUR_URL}/${id}`,
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    console.log("Réponse du serveur:", reponse.status, reponse.statusText);
+
+    if (reponse.ok) {
+      // Déconnecter l'utilisateur du store
+      authentificationStore.getState().deconnexion();
+      navigate(`/connexion?supprimerSucces=true`);
+      return { succes: true };
+    } else {
+      // Gestion des erreurs HTTP
+      const erreurData = await reponse.json().catch(() => ({}));
+      console.error(
+        "Erreur HTTP lors de la suppression:",
+        reponse.status,
+        erreurData
+      );
+
+      // Rediriger vers le profil avec un message d'erreur
+      navigate(`/profil?echecSuppression=true`);
+      return { succes: false, erreur: erreurData };
+    }
+  } catch (error) {
+    // Gestion des erreurs réseau (exemple: pas de connexion) ou autres exceptions JavaScript
+    console.error("Erreur lors de la suppression de l'utilisateur :", error);
+    navigate(`/profil?echecSuppression=true`);
+    return { succes: false, erreur: error.message };
+  }
+};
+
 // Fonction connexionUtilisateur
 export const connexionUtilisateur = async (datas, navigate) => {
   try {
@@ -154,6 +204,37 @@ export const connexionUtilisateur = async (datas, navigate) => {
     return {
       succes: false,
       erreur: "Erreur de connexion au serveur",
+    };
+  }
+};
+
+// Fonction d'ajout d'une bouteille dans un cellier 
+export const ajouterBouteilleCellier = async (idCellier, donnees) => {
+  try {
+    const urlComplete = `${import.meta.env.VITE_BACKEND_CELLIER_URL}/${idCellier}`;
+
+    const reponse = await fetch(urlComplete, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(donnees),
+    });
+
+    const data = await reponse.json();
+
+    if (reponse.ok) {
+      return { succes: true, donnees: data };
+    }
+
+    return {
+      succes: false,
+      erreur: data.message || "Erreur lors de l'ajout de la bouteille",
+    };
+
+  } catch (error) {
+    //Erreur Réseau
+    return {
+      succes: false,
+      erreur: "Le serveur ne répond pas.",
     };
   }
 };
