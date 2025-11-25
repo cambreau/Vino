@@ -11,7 +11,7 @@ function MenuEnBas({}) {
         />
       </Link>
       {/* ATTENTION LIEN A FAIRE */}
-      <Link to="#">
+      <Link to="/sommaire-cellier">
         <Icon nom="cellier" couleur="(--color-principal-100)" typeMenu="bas" />
       </Link>
       {/* ATTENTION LIEN A FAIRE */}

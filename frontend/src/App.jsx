@@ -6,6 +6,7 @@ import Inscription from "./pages/Inscription";
 import ModificationProfil from "./pages/ModificationProfil";
 import Catalogue from "./pages/Catalogue";
 import Celliers from "./pages/Cellier";
+import SommaireCellier from "./pages/SommaireCellier";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       />
       <Route path="/celliers" element={<Celliers />} />
       <Route path="/catalogue" element={<Catalogue />} />
+      <Route path="/sommaire-cellier" element={<SommaireCellier />} />
     </Routes>
   );
 }
