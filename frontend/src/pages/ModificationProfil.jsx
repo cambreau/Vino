@@ -88,9 +88,8 @@ function ModificationProfil() {
 
   return (
     <>
-      <header>
-        <MenuEnHaut />
-      </header>
+      <MenuEnHaut />
+
       <main
         className="
         px-(--rythme-serre) py-(--rythme-base) grid grid-rows-[1fr_5fr] items-end
@@ -199,9 +198,8 @@ function ModificationProfil() {
           }
         />
       </main>
-      <footer>
-        <MenuEnBas />
-      </footer>
+
+      <MenuEnBas />
     </>
   );
 }
