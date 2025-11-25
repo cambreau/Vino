@@ -100,4 +100,35 @@ export const modifierCellier = async (req, res) => {
   }
 };
 
-export const supprimerCellier = async (req, res) => {};
+export const supprimerCellier = async (req, res) => {
+  try {
+    // Récupère les ID depuis les paramètres de l'URL
+    const { id_cellier, id_utilisateur } = req.params;
+
+    // Validation des entrées
+    if (!id_utilisateur || !id_cellier) {
+      return res.status(400).json({
+        message: "Identifiant de cellier invalide",
+      });
+    }
+
+    // Applique la requête SQL
+    const resultat = await ModeleCellier.supprimer(id_cellier, id_utilisateur);
+
+    // Si retourne faux, retourne un message d'erreur, sinon on envoie la requête
+    if (!resultat) {
+      return res.status(404).json({
+        message: "Cellier introuvable ou déjà supprimée",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Cellier supprimée avec succès",
+    });
+  } catch (error) {
+    console.error("Erreur lors de la suppression de ce cellier", error);
+    return res.status(500).json({
+      message: "Impossible de supprimer le cellier",
+    });
+  }
+};
