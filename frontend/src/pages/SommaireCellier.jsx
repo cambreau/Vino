@@ -51,6 +51,12 @@ function SommaireCellier() {
     }
   };
 
+  // Fonction pour modifier un cellier
+  const gererModifierCellier = (idCellier) => {};
+
+  // Fonction pour supprimer un cellier
+  const gererSupprimerCellier = (idCellier) => {};
+
   return (
     <>
       <header>
@@ -89,6 +95,8 @@ function SommaireCellier() {
                   key={cellier.id_cellier}
                   titre={cellier.nom}
                   idCellier={cellier.id_cellier}
+                  onModifier={gererModifierCellier}
+                  onSupprimer={gererSupprimerCellier}
                 />
               ))}
             </div>

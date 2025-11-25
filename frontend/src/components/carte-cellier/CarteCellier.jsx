@@ -1,31 +1,60 @@
 import { Link } from "react-router-dom";
+import Bouton from "../components-partages/Boutons/Bouton";
 
-function CarteCellier({ titre, idCellier }) {
+function CarteCellier({ titre, idCellier, onModifier, onSupprimer }) {
   return (
-    <Link
+    <div
       className="
-        block
+        relative
         aspect-square
-        p-(--rythme-base)
         rounded-(--arrondi-grand)
         border-2
         border-[var(--color-principal-200)]
         bg-[var(--color-fond-secondaire)]
-        text-[var(--color-texte-premier)]
         shadow-md
-        hover:bg-[var(--color-principal-200)]
-        hover:text-[var(--color-principal-100)]
-        transition-colors
-        duration-300
-        flex
-        items-center
-        justify-center
+        p-(--rythme-serre)
+        content-center
         text-center
       "
-      to={`/cellier?${idCellier}`}
     >
-      {titre}
-    </Link>
+      <Link
+        to={`/cellier?${idCellier}`}
+        className="
+          text-[var(--color-texte-premier)]
+          text-(length:--taille-moyen)
+          font-bold
+          text-center
+          mb-(--rythme-serre)
+          hover:text-[var(--color-principal-200)]
+          hover:underline
+          transition-colors
+        "
+      >
+        {titre}
+      </Link>
+      <div className="flex gap-(--rythme-tres-serre) justify-center mt-(--rythme-serre)">
+        <Bouton
+          texte="Modifier"
+          type="secondaire"
+          typeHtml="button"
+          action={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (onModifier) onModifier(idCellier);
+          }}
+        />
+        <Bouton
+          texte="Supprimer"
+          type="primaire"
+          typeHtml="button"
+          action={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (onSupprimer) onSupprimer(idCellier);
+          }}
+        />
+      </div>
+    </div>
   );
 }
 
