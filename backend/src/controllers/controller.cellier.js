@@ -60,10 +60,13 @@ export const recupererTousCelliers = async (req, res) => {
 
 export const modifierCellier = async (req, res) => {
   try {
+    // Récupère les ID depuis les paramètres de l'URL
     const { id_utilisateur, id_cellier } = req.params;
 
+    // Récupère le nom depuis le corps de la requête
     const { nom } = req.body;
 
+    // Validation des entrées
     if (!id_utilisateur || !id_cellier) {
       return res.status(400).json({
         message: "ID utilisateur et ID cellier requis",
@@ -74,16 +77,19 @@ export const modifierCellier = async (req, res) => {
       return res.status(400).json({ message: "Nom invalide" });
     }
 
+    // Appel du modèle pour modifier le cellier
     const action = await ModeleCellier.modifier(
       id_cellier,
       id_utilisateur,
       nom
     );
 
+    // Si aucun cellier n'a été modifié
     if (!action) {
       return res.status(404).json({ message: "Cellier non trouvé" });
     }
 
+    // Réponse de succès
     res.status(200).json({
       message: "Cellier modifié avec succès",
       id: action,
