@@ -5,7 +5,7 @@ import Bouton from "../components/components-partages/Boutons/Bouton";
 import Message from "../components/components-partages/Message/Message";
 import heroBienvenue from "../assets/images/heroBienvenue.webp";
 
-function Celliers() {
+function Bouteille() {
   const navigate = useNavigate();
   return (
     <>
@@ -90,4 +90,4 @@ function Celliers() {
   );
 }
 
-export default Celliers;
+export default Bouteille;
