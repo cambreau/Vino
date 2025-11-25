@@ -59,4 +59,26 @@ export const ajouterBouteilleDuCellier = async (req, res) => {
   }
 };
 
-export const supprimerBouteilleDuCellier = async (req, res) => {};
+export const supprimerBouteilleDuCellier = async (req, res) => {
+  try {
+    const { idCellier, idBouteille } = req.params;
+
+    const resultat = await modeleBouteilleCellier.supprimer(
+      idCellier,
+      idBouteille
+    );
+
+    if (resultat) {
+      res
+        .status(200)
+        .json({ message: "Bouteille supprimée du cellier avec succès" });
+    } else {
+      res
+        .status(404)
+        .json({ message: "Bouteille non trouvée dans le cellier" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erreur serveur lors de la suppression" });
+  }
+};

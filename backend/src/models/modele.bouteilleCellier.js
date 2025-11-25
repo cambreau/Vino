@@ -31,5 +31,10 @@ export default class modeleBouteilleCellier {
   static async modifier(idCellier, idBouteilles, quantite, notes) {}
 
   // Requête pour supprimer une bouteille d'un cellier
-  static async supprimer(idCellier, idBouteille) {}
+  static async supprimer(idCellier, idBouteille) {
+    const sql =
+      "DELETE FROM bouteilleCellier WHERE id_cellier = ? AND id_bouteille = ?";
+    const [result] = await connexion.query(sql, [idCellier, idBouteille]);
+    return result.affectedRows > 0;
+  }
 }
