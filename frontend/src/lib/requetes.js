@@ -306,5 +306,55 @@ export const creerCellier = async (id_utilisateur, nom) => {
   }
 };
 
-export const modifierCellier = async (id_utilisateur, id_cellier) => {};
+/**
+ * Modifie les informations d'un cellier existant dans la base de données.
+ * Redirige vers la page de sommaire celliers.
+ * @param {string|number} id_utilisateur - Id utilisateur
+ * @param {string|number} id_cellier - Id du cellier à modifier
+ * @param {string} nom - Le nouveau nom du cellier
+ * @param {Function} navigate - Fonction de navigation de react-router-dom pour rediriger l'utilisateur
+ * @returns {Promise<>} Un objet indiquant le succès de l'opération et l'erreur éventuelle
+ */
+export const modifierCellier = async (
+  id_utilisateur,
+  id_cellier,
+  nom,
+  navigate
+) => {
+  try {
+    const reponse = await fetch(
+      `${
+        import.meta.env.VITE_BACKEND_CELLIER_URL
+      }/${id_utilisateur}/${id_cellier}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nom }),
+      }
+    );
+
+    if (reponse.ok) {
+      navigate(`/sommaire-celliers?succes=true`);
+      return { succes: true };
+    }
+
+    // Gestion des erreurs HTTP (400, 500, etc.)
+    const erreurData = await reponse.json().catch(() => ({}));
+    console.error("Erreur HTTP:", reponse.status, erreurData);
+
+    navigate(`/sommaire-celliers?echec=true`);
+
+    return {
+      succes: false,
+      erreur:
+        erreurData?.message || "Erreur lors de la modification du cellier",
+    };
+  } catch (error) {
+    // Gestion des erreurs réseau (exemple: pas de connexion)
+    console.error("Erreur lors de la modification du cellier :", error);
+    navigate(`/sommaire-celliers?echec=true`);
+    return { succes: false, erreur: error.message };
+  }
+};
+
 export const supprimerCellier = async (id_utilisateur, id_cellier) => {};

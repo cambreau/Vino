@@ -58,8 +58,6 @@ export const recupererTousCelliers = async (req, res) => {
   }
 };
 
-export const recupererCellier = async (req, res) => {};
-
 export const modifierCellier = async (req, res) => {};
 
 export const supprimerCellier = async (req, res) => {};

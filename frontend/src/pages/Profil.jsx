@@ -67,10 +67,8 @@ function Profil() {
   };
 
   return (
-    <section className="flex flex-col min-h-screen font-body max-w-[500px] mx-auto inset-x-0 relative">
-      <header>
-        <MenuEnHaut />
-      </header>
+    <div className="flex flex-col min-h-screen font-body max-w-[500px] mx-auto inset-x-0 relative">
+      <MenuEnHaut />
 
       <main className="flex flex-col bg-fond px-(--rythme-base) pt-(--rythme-espace) gap-(--rythme-espace) grow">
         {/* Boîte modale de confirmation de suppression  */}
@@ -97,7 +95,6 @@ function Profil() {
           />
         )}
 
-      <main className="flex flex-col max-w-[500px] w-full mx-auto inset-x-0  bg-fond px-(--rythme-base) pt-(--rythme-espace) gap-(--rythme-espace) grow">
         <div>
           <section className="flex items-center justify-between">
             <div>
@@ -151,10 +148,8 @@ function Profil() {
         </div>
       </main>
 
-      <footer>
-        <MenuEnBas />
-      </footer>
-    </section>
+      <MenuEnBas />
+    </div>
   );
 }
 
