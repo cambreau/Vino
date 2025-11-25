@@ -86,7 +86,10 @@ function MenuEnHaut({}) {
                   couleur="(--color-principal-300)"
                 />
               </Link>
-              <Link to="#" onClick={() => setestMenuOuvert(false)}>
+              <Link
+                to="/sommaire-cellier"
+                onClick={() => setestMenuOuvert(false)}
+              >
                 <Icon
                   nom="cellier"
                   typeMenu="haut"

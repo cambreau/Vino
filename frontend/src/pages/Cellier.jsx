@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Bouton from "../components/components-partages/Boutons/Bouton";
 import Message from "../components/components-partages/Message/Message";
 
-function Celliers() {
+function Cellier() {
   const navigate = useNavigate();
   return (
     <>
@@ -48,4 +48,4 @@ function Celliers() {
   );
 }
 
-export default Celliers;
+export default Cellier;
