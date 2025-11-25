@@ -358,3 +358,26 @@ export const modifierCellier = async (
 };
 
 export const supprimerCellier = async (id_utilisateur, id_cellier) => {};
+
+
+// *************************** Bouteilles (Catalogue)
+/**
+ * Récupère toutes les bouteilles disponibles dans le catalogue
+ * @returns {Promise<Array|null>} Array des bouteilles ou null en cas d'erreur
+ */
+export const recupererBouteilles = async () => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_BOUTEILLES_URL}`
+    );
+    
+    if (!reponse.ok) {
+      throw new Error(`Erreur HTTP: ${reponse.status}`);
+    }
+    
+    return await reponse.json();
+  } catch (error) {
+    console.error("Erreur lors de la récupération des bouteilles:", error);
+    return null;
+  }
+};
