@@ -228,7 +228,6 @@ export const creerCellier = async (id_utilisateur, nom) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id_utilisateur,
           nom,
         }),
       }

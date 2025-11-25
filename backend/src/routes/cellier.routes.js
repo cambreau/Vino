@@ -11,15 +11,15 @@ import {
 
 // Récupérer tous les celliers d'un utilisateur ou un seul
 router.get("/", recupererTousCelliers); // tous les celliers (avec query param id_utilisateur)
-router.get("/:idUtilisateur/:idCellier", recupererCellier); // cellier spécifique
+router.get("/:id_utilisateur/:id_cellier", recupererCellier); // cellier spécifique
 
 // Ajouter un cellier
-router.post("/:idUtilisateur", ajouterCellier);
+router.post("/:id_utilisateur", ajouterCellier);
 
 // Modifier un cellier (nom ou autre info)
-router.put("/:idUtilisateur/:idCellier", modifierCellier);
+router.put("/:id_utilisateur/:id_cellier", modifierCellier);
 
 // Supprimer un cellier
-router.delete("/:idUtilisateur/:idCellier", supprimerCellier);
+router.delete("/:id_utilisateur/:id_cellier", supprimerCellier);
 
 export default router;
