@@ -3,6 +3,7 @@ import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
 import authentificationStore from "../stores/authentificationStore.js";
 import { useState, useEffect } from "react";
 import { recupererTousCellier } from "../lib/requetes.js";
+import Bouton from "../components/components-partages/Boutons/Bouton";
 
 function SommaireCellier() {
   const utilisateur = authentificationStore((state) => state.utilisateur);
@@ -33,7 +34,20 @@ function SommaireCellier() {
       >
         <div className="absolute inset-0 bg-white/40 pointer-events-none"></div>
 
-        <section className="relative pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)"></section>
+        <section className="relative pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)">
+          <div className="mb-(--rythme-base)">
+            <Bouton
+              taille="moyen"
+              texte="Ajouter un cellier"
+              type="primaire"
+              typeHtml="button"
+              action={() => {
+                // TODO: Implémenter la création d'un cellier
+                console.log("Ajouter un cellier");
+              }}
+            />
+          </div>
+        </section>
       </main>
       <footer>
         <MenuEnBas />
