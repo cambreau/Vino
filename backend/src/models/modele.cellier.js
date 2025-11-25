@@ -28,7 +28,7 @@ export default class ModeleCellier {
   }
 
   // Requête pour récupére un cellier d'un utilisateur
-  static async recuperer(id_utilisateur) {}
+  static async recuperer(id_utilisateur) { }
 
   // Requête pour récupérer les celliers d'un utilisateur
   static async recupererTous(id_utilisateur) {
@@ -83,5 +83,41 @@ export default class ModeleCellier {
   }
 
   // Requête pour suprimmer un cellier
-  static async supprimer(id_cellier) {}
+  static async supprimer(id_cellier, id_utilisateur) {
+    // S'assure que les ID sont des nombres valides
+    const idUtilisateur = Number.parseInt(id_utilisateur, 10);
+    const idCellier = Number.parseInt(id_cellier, 10);
+
+    // Validation des entrées
+    if (!Number.isInteger(idUtilisateur) || idUtilisateur <= 0) {
+      throw new Error("ID utilisateur invalide");
+    }
+
+    if (!Number.isInteger(idCellier) || idCellier <= 0) {
+      throw new Error("ID cellier invalide");
+    }
+
+    // Connexion et transaction.
+    const connection = await connexion.getConnection();
+
+    try {
+      await connection.beginTransaction();
+
+      // Requête sql de suppression avec le résultat dans une variable.
+      const sql = "DELETE FROM cellier WHERE id_utilisateur = ? AND id_cellier = ?";
+      const [result] = await connection.query(sql, [id_cellier, id_utilisateur]);
+
+      // Commit si tout est OK.
+      await connection.commit();
+      // Retourne vrai si une ligne a été affectée (supprimée).
+      return result.affectedRows > 0;
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+
+  }
+
 }
