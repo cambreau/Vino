@@ -2,7 +2,7 @@ import Icon from "../Icon/Icon";
 import { Link } from "react-router-dom";
 function MenuEnBas({}) {
   return (
-    <footer className="grid grid-cols-4 mt-auto max-w-[500px] mx-auto inset-x-0 p-[var(--rythme-base)] bg-[var(--color-principal-300)]">
+    <footer className="grid grid-cols-4 mt-auto p-[var(--rythme-base)] bg-[var(--color-principal-300)]">
       <Link to="/catalogue">
         <Icon
           nom="catalogue"
