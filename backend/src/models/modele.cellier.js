@@ -45,9 +45,11 @@ export default class ModeleCellier {
 
   // Requête pour modifier un cellier
   static async modifier(id_cellier, id_utilisateur, nom) {
+    // S'assure que les ID sont des nombres valides
     const idUtilisateur = Number.parseInt(id_utilisateur, 10);
     const idCellier = Number.parseInt(id_cellier, 10);
 
+    // Validation des entrées
     if (!Number.isInteger(idUtilisateur) || idUtilisateur <= 0) {
       throw new Error("ID utilisateur invalide");
     }
@@ -60,6 +62,7 @@ export default class ModeleCellier {
       throw new Error("Le nom du cellier est invalide");
     }
 
+    // Vérifie si le cellier existe pour cet utilisateur
     const sqlCheck = `SELECT * FROM cellier WHERE id_cellier = ? AND id_utilisateur = ?`;
     const [rows] = await connexion.query(sqlCheck, [idCellier, idUtilisateur]);
 
@@ -67,6 +70,7 @@ export default class ModeleCellier {
       throw new Error("Cellier non trouvé pour cet utilisateur");
     }
 
+    // Met à jour le nom du cellier
     const sqlUpdate = `UPDATE cellier SET nom = ? WHERE id_cellier = ? AND id_utilisateur = ?`;
     const [result] = await connexion.query(sqlUpdate, [
       nom.trim(),
@@ -74,6 +78,7 @@ export default class ModeleCellier {
       idUtilisateur,
     ]);
 
+    // Retourne true si une ligne a été affectée (modifiée)
     return result.affectedRows > 0;
   }
 
