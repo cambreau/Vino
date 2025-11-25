@@ -5,7 +5,9 @@ import Connexion from "./pages/Connexion";
 import Inscription from "./pages/Inscription";
 import ModificationProfil from "./pages/ModificationProfil";
 import Catalogue from "./pages/Catalogue";
-import Celliers from "./pages/Cellier";
+import Cellier from "./pages/Cellier";
+import Bouteille from "./pages/Bouteille";
+import SommaireCellier from "./pages/SommaireCellier";
 
 function App() {
   return (
@@ -18,8 +20,10 @@ function App() {
         path="/modifier-utilisateur/:id"
         element={<ModificationProfil />}
       />
-      <Route path="/celliers" element={<Celliers />} />
+      <Route path="/cellier/:idCellier" element={<Cellier />} />
       <Route path="/catalogue" element={<Catalogue />} />
+      <Route path="/bouteilles/:id" element={<Bouteille />} />
+      <Route path="/sommaire-cellier" element={<SommaireCellier />} />
     </Routes>
   );
 }

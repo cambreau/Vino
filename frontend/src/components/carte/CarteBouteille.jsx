@@ -6,7 +6,8 @@ const CarteBouteille = ({
   type = "catalogue", 
   onAugmenter = () => {},
   onDiminuer = () => {}, 
-  onAjouter = () => {} 
+  onAjouter = () => {},
+  disabled = false  //désactiver le bouton
 }) => {
 
   /**
@@ -22,9 +23,10 @@ const CarteBouteille = ({
     if (type === "catalogue") {
       return (
         <BoutonAction 
-          texte="Ajouter au cellier"
+          texte={disabled ? "Déjà dans le cellier" : "Ajouter au cellier"}
           onClick={() => onAjouter(bouteille)}
           type="secondaire"
+          disabled={disabled} 
         />
       );
     }

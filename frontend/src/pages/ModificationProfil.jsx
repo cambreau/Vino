@@ -88,9 +88,8 @@ function ModificationProfil() {
 
   return (
     <>
-      <header>
-        <MenuEnHaut />
-      </header>
+      <MenuEnHaut />
+
       <main
         className="
         px-(--rythme-serre) py-(--rythme-base) grid grid-rows-[1fr_5fr] items-end
@@ -157,6 +156,12 @@ function ModificationProfil() {
                     ...prev,
                     courriel: valeur,
                   }));
+                  // Supprimer le message de doublon si l'utilisateur modifie le courriel
+                  if (echecDoublon || echecModification) {
+                    const nouveauxParams = new URLSearchParams(searchParams);
+                    nouveauxParams.delete("echec");
+                    setSearchParams(nouveauxParams);
+                  }
                   if (!validationChamp(regex.regcourriel, valeur)) {
                     const erreur = "Veuillez saisir un courriel valide.";
                     setErreurs((prev) => ({ ...prev, courriel: erreur }));
@@ -193,9 +198,8 @@ function ModificationProfil() {
           }
         />
       </main>
-      <footer>
-        <MenuEnBas />
-      </footer>
+
+      <MenuEnBas />
     </>
   );
 }

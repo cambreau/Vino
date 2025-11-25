@@ -1,6 +1,7 @@
 // Ce fichier regroupe toutes les fonctions permettant de communiquer avec le backend.
 import authentificationStore from "../stores/authentificationStore";
 
+// *************************** Utilisateur
 /**
  * Crée un nouvel utilisateur dans la base de données via l'API backend.
  * Redirige vers la page de connexion en cas de succès ou vers la page d'inscription en cas d'erreur.
@@ -112,6 +113,56 @@ export const modifierUtilisateur = async (datas, navigate) => {
   }
 };
 
+/**
+ * Supprime un utilisateur de la base de données via l'API backend.
+ * Redirige vers la page de connexion en cas de succès ou affiche une erreur en cas d'échec.
+ * @param {string|number} id - L'identifiant unique de l'utilisateur à supprimer
+ * @param {Function} navigate - Fonction de navigation de react-router-dom pour rediriger l'utilisateur
+ * @returns {Promise<{succes: boolean, erreur?: Object|string}>} Un objet indiquant le succès de l'opération et l'erreur éventuelle
+ */
+export const supprimerUtilisateur = async (id, navigate) => {
+  try {
+    console.log(
+      "Requête DELETE vers:",
+      `${import.meta.env.VITE_BACKEND_UTILISATEUR_URL}/${id}`
+    );
+
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_UTILISATEUR_URL}/${id}`,
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    console.log("Réponse du serveur:", reponse.status, reponse.statusText);
+
+    if (reponse.ok) {
+      // Déconnecter l'utilisateur du store
+      authentificationStore.getState().deconnexion();
+      navigate(`/connexion?supprimerSucces=true`);
+      return { succes: true };
+    } else {
+      // Gestion des erreurs HTTP
+      const erreurData = await reponse.json().catch(() => ({}));
+      console.error(
+        "Erreur HTTP lors de la suppression:",
+        reponse.status,
+        erreurData
+      );
+
+      // Rediriger vers le profil avec un message d'erreur
+      navigate(`/profil?echecSuppression=true`);
+      return { succes: false, erreur: erreurData };
+    }
+  } catch (error) {
+    // Gestion des erreurs réseau (exemple: pas de connexion) ou autres exceptions JavaScript
+    console.error("Erreur lors de la suppression de l'utilisateur :", error);
+    navigate(`/profil?echecSuppression=true`);
+    return { succes: false, erreur: error.message };
+  }
+};
+
 // Fonction connexionUtilisateur
 export const connexionUtilisateur = async (datas, navigate) => {
   try {
@@ -155,5 +206,195 @@ export const connexionUtilisateur = async (datas, navigate) => {
       succes: false,
       erreur: "Erreur de connexion au serveur",
     };
+  }
+};
+
+// *************************** Bouteille Cellier
+// Fonction d'ajout d'une bouteille dans un cellier
+export const ajouterBouteilleCellier = async (idCellier, donnees) => {
+  try {
+    const urlComplete = `${
+      import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
+    }/${idCellier}`;
+
+    const reponse = await fetch(urlComplete, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(donnees),
+    });
+
+    const data = await reponse.json();
+
+    if (reponse.ok) {
+      return { succes: true, donnees: data };
+    }
+
+    return {
+      succes: false,
+      erreur: data.message || "Erreur lors de l'ajout de la bouteille",
+    };
+  } catch (error) {
+    //Erreur Réseau
+    return {
+      succes: false,
+      erreur: "Le serveur ne répond pas.",
+    };
+  }
+};
+
+// *************************** Cellier
+/**
+ * Récupère tous les celliers d'un utilisateur via l'API backend.
+ * @param {string|number} id_utilisateur - L'id de l'utilisateur
+ * @returns {Promise<Array|null>} Array des celliers de l'utilisateur ou null en cas d'erreur
+ */
+export const recupererTousCellier = async (id_utilisateur) => {
+  try {
+    const reponse = await fetch(
+      `${
+        import.meta.env.VITE_BACKEND_CELLIER_URL
+      }?id_utilisateur=${id_utilisateur}`
+    );
+    return reponse.json();
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+export const recupererCellier = async (id_utilisateur, id_cellier) => {};
+
+/**
+ * Creer un nouveau cellier pour un utilisateur.
+ * @param {string|number} id_utilisateur - L'identifiant de l'utilisateur
+ * @param {string} [nom] - Le nom du cellier
+ * @returns {Promise<>}
+ */
+export const creerCellier = async (id_utilisateur, nom) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_CELLIER_URL}/${id_utilisateur}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nom,
+        }),
+      }
+    );
+
+    if (reponse.ok) {
+      const data = await reponse.json();
+      return { succes: true, id: data.id };
+    }
+
+    // Gestion des erreurs HTTP (400, 500, etc.)
+    const erreurData = await reponse.json().catch(() => ({}));
+    console.error("Erreur HTTP:", reponse.status, erreurData);
+
+    return {
+      succes: false,
+      erreur: erreurData.message || "Erreur lors de la création du cellier",
+    };
+  } catch (error) {
+    // Gestion des erreurs réseau (exemple: pas de connexion) ou autres exceptions JavaScript
+    console.error("Erreur lors de la création du cellier :", error);
+    return {
+      succes: false,
+      erreur: "Erreur de connexion au serveur",
+    };
+  }
+};
+
+/**
+ * Modifie les informations d'un cellier existant dans la base de données.
+ * Redirige vers la page de sommaire celliers.
+ * @param {string|number} id_utilisateur - Id utilisateur
+ * @param {string|number} id_cellier - Id du cellier à modifier
+ * @param {string} nom - Le nouveau nom du cellier
+ * @param {Function} navigate - Fonction de navigation de react-router-dom pour rediriger l'utilisateur
+ * @returns {Promise<>} Un objet indiquant le succès de l'opération et l'erreur éventuelle
+ */
+export const modifierCellier = async (
+  id_utilisateur,
+  id_cellier,
+  nom,
+  navigate
+) => {
+  try {
+    const reponse = await fetch(
+      `${
+        import.meta.env.VITE_BACKEND_CELLIER_URL
+      }/${id_utilisateur}/${id_cellier}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nom }),
+      }
+    );
+
+    if (reponse.ok) {
+      navigate(`/sommaire-cellier?succes=true`);
+      return { succes: true };
+    }
+
+    // Gestion des erreurs HTTP (400, 500, etc.)
+    const erreurData = await reponse.json().catch(() => ({}));
+    console.error("Erreur HTTP:", reponse.status, erreurData);
+
+    navigate(`/sommaire-cellier?echec=true`);
+
+    return {
+      succes: false,
+      erreur:
+        erreurData?.message || "Erreur lors de la modification du cellier",
+    };
+  } catch (error) {
+    // Gestion des erreurs réseau (exemple: pas de connexion)
+    console.error("Erreur lors de la modification du cellier :", error);
+    navigate(`/sommaire-cellier?echec=true`);
+    return { succes: false, erreur: error.message };
+  }
+};
+
+export const supprimerCellier = async (id_utilisateur, id_cellier) => {};
+
+// BOUTEILLE
+
+/**
+ * Récupère les informations d'une bouteille par son identifiant via l'API backend.
+ * @param {string|number} id - L'identifiant unique d'une bouteille à récupérer
+ * @returns {Promise<Object|null>} Les données de la bouteille ou null en cas d'erreur
+ */
+export const recupererBouteille = async (id) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_BOUTEILLES_URL}/${id}`
+    );
+    return reponse.json();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// *************************** Bouteilles (Catalogue)
+/**
+ * Récupère toutes les bouteilles disponibles dans le catalogue
+ * @returns {Promise<Array|null>} Array des bouteilles ou null en cas d'erreur
+ */
+export const recupererBouteilles = async () => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_BOUTEILLES_URL}`
+    );
+    
+    if (!reponse.ok) {
+      throw new Error(`Erreur HTTP: ${reponse.status}`);
+    }
+    
+    return await reponse.json();
+  } catch (error) {
+    console.error("Erreur lors de la récupération des bouteilles:", error);
+    return null;
   }
 };

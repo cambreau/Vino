@@ -3,6 +3,7 @@ import express from "express";
 import bouteilleRoutes from "./bouteille.routes.js";
 import utilisateurRoutes from "./utilisateur.routes.js";
 import bouteilleCellierRoutes from "./bouteilleCellier.routes.js";
+import cellierRoutes from "./cellier.routes.js";
 
 const router = express.Router();
 
@@ -10,5 +11,6 @@ const router = express.Router();
 router.use("/utilisateurs", utilisateurRoutes);
 router.use("/bouteilles", bouteilleRoutes);
 router.use("/bouteillesCellier", bouteilleCellierRoutes);
+router.use("/cellier", cellierRoutes);
 
 export default router;

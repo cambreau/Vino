@@ -3,22 +3,21 @@ const router = express.Router();
 
 import {
   ajouterCellier,
-  recupererCellier,
   modifierCellier,
   supprimerCellier,
+  recupererTousCelliers,
 } from "../controllers/controller.cellier.js";
 
 // Récupérer tous les celliers d'un utilisateur ou un seul
-router.get("/", recupererCellier); // tous les celliers
-router.get("/:idCellier", recupererCellier); // cellier spécifique
+router.get("/", recupererTousCelliers); // tous les celliers (avec query param id_utilisateur)
 
 // Ajouter un cellier
-router.post("/", ajouterCellier);
+router.post("/:id_utilisateur", ajouterCellier);
 
 // Modifier un cellier (nom ou autre info)
-router.put("/:idCellier", modifierCellier);
+router.put("/:id_utilisateur/:id_cellier", modifierCellier);
 
 // Supprimer un cellier
-router.delete("/:idCellier", supprimerCellier);
+router.delete("/:id_utilisateur/:id_cellier", supprimerCellier);
 
 export default router;

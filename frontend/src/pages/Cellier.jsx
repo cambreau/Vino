@@ -4,14 +4,12 @@ import { useNavigate } from "react-router-dom";
 import Bouton from "../components/components-partages/Boutons/Bouton";
 import Message from "../components/components-partages/Message/Message";
 
-function Celliers() {
+function Cellier() {
   const navigate = useNavigate();
   return (
     <>
-      <header>
-        {/* Menu haut fixe */}
-        <MenuEnHaut titre="Celliers" />
-      </header>
+      <MenuEnHaut titre="Celliers" />
+
       <main className="min-h-screen font-body max-w-[500px] mx-auto inset-x-0 bg-fond">
         <section className="pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)">
           {/* Contenu du catalogue (celliers) à ajouter ici */}
@@ -40,12 +38,10 @@ function Celliers() {
           </article>
         </section>
       </main>
-      <footer>
-        {/* Menu bas fixe */}
-        <MenuEnBas />
-      </footer>
+
+      <MenuEnBas />
     </>
   );
 }
 
-export default Celliers;
+export default Cellier;
