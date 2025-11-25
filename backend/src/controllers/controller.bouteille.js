@@ -79,7 +79,42 @@ export const creerBouteille = async (req, res) => {
   }
 };
 
-export const modifierBouteille = async (req, res) => {};
+export const modifierBouteille = async (req, res) => {
+  try {
+    // Obtiens le id et validation que c'est en int et non string
+    const { id } = req.params;
+    const identifiant = Number.parseInt(id, 10);
+
+    if (!Number.isInteger(identifiant) || identifiant <= 0) {
+      return res.status(400).json({
+        message: "Identifiant de bouteille invalide",
+      });
+    }
+    // Enregistre l'action dans une variable en passant req.body (Données entrées par le client)
+    const action = await modeleBouteille.mettreAJour(identifiant, req.body);
+
+    // Si l'action ne retourne pas de résultat, retourne un message d'erreur
+    if (!action) {
+      return res.status(404).json({
+        message: "Bouteille introuvable ou aucune modification effectuée",
+      });
+    }
+
+    // Si tout est OK, retourne message de succès
+    return res.status(200).json({
+      success: true,
+      action,
+      message: "Bouteille modifié avec succès",
+    });
+  } catch (error) {
+    console.error("Erreur lors de la modification d'une bouteille", error);
+
+    return res.status(400).json({
+      success: false,
+      message: "Impossible de modifier la bouteille",
+    });
+  }
+};
 
 export const supprimerBouteille = async (req, res) => {
   try {
