@@ -5,7 +5,8 @@ export default class modeleBouteilleCellier {
   static async recuperer(idCellier) {}
 
   // Requête pour ajouter une bouteille dans un cellier
-  static async ajouter(idCellier, idBouteille, quantite, notes) {}
+  static async ajouter(idCellier, idBouteille, quantite = 1) {}
+  
 
   // Requête pour Modifier quantité, notes, etc.
   static async modifier(idCellier, idBouteilles, quantite, notes) {}
