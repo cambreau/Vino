@@ -147,8 +147,67 @@ class ModeleBouteille {
     }
   }
 
-  static async mettreAJour() {
-    throw new Error("mettreAJour non implémenté");
+  static async mettreAJour(id_bouteille, donnees) {
+    // Erreur si l'identifiant n'est pas trouvé
+    if (!id_bouteille) {
+      throw new Error("Identifiant de bouteille requis pour la mise à jour");
+    }
+
+    // Obtiens la connection à la base de donnée
+    const connection = await connexion.getConnection();
+
+    try {
+      await connection.beginTransaction();
+
+      // Récupérer la bouteille existante
+      const existante = await this.trouverParId(id_bouteille);
+      if (!existante) {
+        throw new Error("Bouteille introuvable");
+      }
+
+      // Fusionne les nouvelles données avec les valeurs existantes
+      const payload = await this.#normaliserPayload(connection, {
+        ...existante,
+        //Converti le camelCase  en snake_case pour que la base de donnée le trouve
+        //On garde les valeurs existantes si non fournies
+        code_saq: existante.codeSaq,
+        ...donnees,
+      });
+      if (!payload) throw new Error("Données invalides pour la mise à jour");
+
+      // Requête SQL update
+      const sql = `
+      UPDATE bouteille
+      SET nom = ?, millenisme = ?, region = ?, cepage = ?, image = ?, description = ?, taux_alcool = ?, prix = ?, id_pays = ?, id_type = ?
+      WHERE id_bouteille = ?
+    `;
+
+      // Tous les valeurs de la query dans un tableau result
+      const [result] = await connection.query(sql, [
+        payload.nom,
+        payload.millenisme,
+        payload.region,
+        payload.cepage,
+        payload.image,
+        payload.description,
+        payload.taux_alcool,
+        payload.prix,
+        payload.id_pays,
+        payload.id_type,
+        id_bouteille,
+      ]);
+
+      // Commit si tout est OK
+      await connection.commit();
+
+      // Si vrai, retourne result, sinon rollback
+      return result.affectedRows > 0 ? "update" : null;
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
   }
 
   static async supprimer(id_bouteille) {
@@ -307,10 +366,10 @@ class ModeleBouteille {
   /**
    * Valide un millésime : doit être > 0 et dans une plage raisonnable (1800 - année actuelle + 2)
    */
-  static #validerMillesime(millesime) {
-    if (!Number.isInteger(millesime) || millesime <= 0) return false;
+  static #validerMillenisme(millenisme) {
+    if (!Number.isInteger(millenisme) || millenisme <= 0) return false;
     const anneeActuelle = new Date().getFullYear();
-    return millesime >= 1800 && millesime <= anneeActuelle + 2;
+    return millenisme >= 1800 && millenisme <= anneeActuelle + 2;
   }
 
   /**
@@ -326,9 +385,12 @@ class ModeleBouteille {
     const idPays = await this.#assurerPays(connection, donneesMappees.pays);
     const idType = await this.#assurerType(connection, donneesMappees.type);
 
-    const millesime = this.#validerMillesime(donneesMappees.millesime)
-      ? donneesMappees.millesime
-      : null;
+    let millenisme = donneesMappees.millenisme;
+    if (millenisme !== undefined && millenisme !== null) {
+      millenisme = Number(millenisme);
+      if (!this.#validerMillenisme(millenisme)) millenisme = null;
+    }
+
     const cepageValue = Array.isArray(donneesMappees.cepage)
       ? donneesMappees.cepage.join(", ")
       : donneesMappees.cepage || "Cépage non précisé";
@@ -340,13 +402,16 @@ class ModeleBouteille {
     return {
       code_saq: codeSaq,
       nom: donneesMappees.nom,
-      millenisme: millesime,
+      millenisme: millenisme,
       region: regionValue,
       cepage: cepageValue,
       image: donneesMappees.image || "",
       description: donneesMappees.description || "Description non fournie",
       taux_alcool: donneesMappees.tauxAlcool ?? null,
-      prix: Number.isFinite(donneesMappees.prix) ? donneesMappees.prix : 0,
+      prix: Number.isFinite(Number(donneesMappees.prix))
+        ? Number(donneesMappees.prix)
+        : 0,
+
       id_pays: idPays,
       id_type: idType,
     };
@@ -378,18 +443,18 @@ class ModeleBouteille {
         )
       : null;
 
-    const millesimeBrut = attrMap.millesime_produit
-      ? Number.parseInt(attrMap.millesime_produit, 10)
+    const millenismeBrut = attrMap.millenisme_produit
+      ? Number.parseInt(attrMap.millenisme_produit, 10)
       : null;
-    const millesime = this.#validerMillesime(millesimeBrut)
-      ? millesimeBrut
+    const millenisme = this.#validerMillenisme(millenismeBrut)
+      ? millenismeBrut
       : null;
 
     return {
       codeSAQ: vue?.sku || product?.sku || null,
       nom: vue.name || product?.name || null,
       prix: Number.isFinite(prix) ? prix : null,
-      millesime,
+      millenisme,
       region:
         attrMap.region_origine ||
         attrMap.designation_reglementee ||

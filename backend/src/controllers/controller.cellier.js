@@ -58,8 +58,46 @@ export const recupererTousCelliers = async (req, res) => {
   }
 };
 
-export const recupererCellier = async (req, res) => {};
+export const modifierCellier = async (req, res) => {
+  try {
+    // Récupère les ID depuis les paramètres de l'URL
+    const { id_utilisateur, id_cellier } = req.params;
 
-export const modifierCellier = async (req, res) => {};
+    // Récupère le nom depuis le corps de la requête
+    const { nom } = req.body;
+
+    // Validation des entrées
+    if (!id_utilisateur || !id_cellier) {
+      return res.status(400).json({
+        message: "ID utilisateur et ID cellier requis",
+      });
+    }
+
+    if (!nom || typeof nom !== "string" || nom.trim().length === 0) {
+      return res.status(400).json({ message: "Nom invalide" });
+    }
+
+    // Appel du modèle pour modifier le cellier
+    const action = await ModeleCellier.modifier(
+      id_cellier,
+      id_utilisateur,
+      nom
+    );
+
+    // Si aucun cellier n'a été modifié
+    if (!action) {
+      return res.status(404).json({ message: "Cellier non trouvé" });
+    }
+
+    // Réponse de succès
+    res.status(200).json({
+      message: "Cellier modifié avec succès",
+      id: action,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
 
 export const supprimerCellier = async (req, res) => {};
