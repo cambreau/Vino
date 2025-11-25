@@ -114,14 +114,12 @@ function SommaireCellier() {
   const gererSupprimerCellier = (idCellier) => {};
 
   return (
-    <>
+    <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
       <header>
-        <MenuEnHaut titre="Sommaire celliers" />
+        <MenuEnHaut />
       </header>
-      <main
-        className="min-h-screen font-body max-w-[500px] mx-auto inset-x-0 relative
-      bg-[linear-gradient(0deg,rgba(0,0,0,0.05)25%,rgba(0,0,0,0)),url('../assets/images/sommaireCellier.webp')] bg-cover bg-center bg-fond"
-      >
+      
+      <main className="bg-fond overflow-y-auto relative">
         <div className="absolute inset-0 bg-white/40 pointer-events-none"></div>
 
         <section className="relative pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)">
@@ -145,7 +143,7 @@ function SommaireCellier() {
 
           {/* Liste des celliers */}
           {celliers.length > 0 && (
-            <div className="mt-(--rythme-base) grid grid-cols-2 gap-(--rythme-base)">
+            <div className="flex flex-wrap mt-(--rythme-base) gap-(--rythme-base) max-w-6xl mx-auto">
               {celliers.map((cellier) => (
                 <CarteCellier
                   key={cellier.id_cellier}
@@ -233,10 +231,9 @@ function SommaireCellier() {
           )}
         </section>
       </main>
-      <footer>
-        <MenuEnBas />
-      </footer>
-    </>
+
+      <MenuEnBas />
+    </div>
   );
 }
 
