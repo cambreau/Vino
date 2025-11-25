@@ -4,7 +4,7 @@ export default class modeleBouteilleCellier {
   // Requête pour récuperer les bouteilles dans un cellier
   static async recuperer(idCellier) {}
 
-  // Requête pour ajouter une bouteille dans un cellier
+  // Requête pour ajouter une bouteille dans un cellier} 
   static async ajouter(idCellier, idBouteille, quantite = 1) {
     if (!idCellier || !idBouteille)
       throw new Error("Un cellier est une bouteille est nécessaire");
