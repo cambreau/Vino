@@ -334,7 +334,7 @@ export const modifierCellier = async (
     );
 
     if (reponse.ok) {
-      navigate(`/sommaire-celliers?succes=true`);
+      navigate(`/sommaire-cellier?succes=true`);
       return { succes: true };
     }
 
@@ -342,7 +342,7 @@ export const modifierCellier = async (
     const erreurData = await reponse.json().catch(() => ({}));
     console.error("Erreur HTTP:", reponse.status, erreurData);
 
-    navigate(`/sommaire-celliers?echec=true`);
+    navigate(`/sommaire-cellier?echec=true`);
 
     return {
       succes: false,
@@ -352,7 +352,7 @@ export const modifierCellier = async (
   } catch (error) {
     // Gestion des erreurs réseau (exemple: pas de connexion)
     console.error("Erreur lors de la modification du cellier :", error);
-    navigate(`/sommaire-celliers?echec=true`);
+    navigate(`/sommaire-cellier?echec=true`);
     return { succes: false, erreur: error.message };
   }
 };
