@@ -4,11 +4,15 @@ import authentificationStore from "../stores/authentificationStore.js";
 import { useState, useEffect } from "react";
 import { recupererTousCellier, creerCellier } from "../lib/requetes.js";
 import Bouton from "../components/components-partages/Boutons/Bouton";
+import FormulaireInput from "../components/components-partages/Formulaire/FormulaireInput/FormulaireInput";
+import BoiteModale from "../components/components-partages/BoiteModale/BoiteModale";
 
 function SommaireCellier() {
   const utilisateur = authentificationStore((state) => state.utilisateur);
   const idUtilisateur = utilisateur?.id; // Si null ou undefined = undefined
   const [celliers, setCelliers] = useState([]);
+  const [estModaleOuverte, setEstModaleOuverte] = useState(false);
+  const [nomCellier, setNomCellier] = useState("");
 
   // Fonction pour charger les celliers
   const chargerCelliers = async () => {
@@ -25,16 +29,30 @@ function SommaireCellier() {
     chargerCelliers();
   }, [idUtilisateur]); // Permet de charger au montage du component
 
-  // Fonction pour gerer la creation d'un nouveau cellier
-  const gererCreerCellier = async () => {
-    const resultat = await creerCellier(idUtilisateur);
-    await chargerCelliers();
+  // Fonction pour ouvrir la boite modale de creation
+  const gererCreerCellier = () => {
+    setEstModaleOuverte(true);
+  };
+
+  // Fonction pour fermer la boite modale de creation
+  const fermerModale = () => {
+    setEstModaleOuverte(false);
+    setNomCellier("");
+  };
+
+  // Fonction pour creer le cellier avec le nom
+  const creerCellierAvecNom = async () => {
+    const resultat = await creerCellier(idUtilisateur, nomCellier);
+    if (resultat.succes) {
+      await chargerCelliers();
+      fermerModale();
+    }
   };
 
   return (
     <>
       <header>
-        <MenuEnHaut titre="Sommaire cellier" />
+        <MenuEnHaut titre="Sommaire celliers" />
       </header>
       <main
         className="min-h-screen font-body max-w-[500px] mx-auto inset-x-0 relative
@@ -43,15 +61,50 @@ function SommaireCellier() {
         <div className="absolute inset-0 bg-white/40 pointer-events-none"></div>
 
         <section className="relative pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)">
-          <div className="mb-(--rythme-base)">
-            <Bouton
-              taille="moyen"
-              texte="Ajouter un cellier"
-              type="primaire"
-              typeHtml="button"
-              action={gererCreerCellier}
+          <Bouton
+            taille="moyen"
+            texte="Ajouter un cellier"
+            type="primaire"
+            typeHtml="button"
+            action={gererCreerCellier}
+          />
+
+          {/* Modale pour creer un cellier */}
+          {estModaleOuverte && (
+            <BoiteModale
+              texte="Créer un nouveau cellier"
+              contenu={
+                <>
+                  <FormulaireInput
+                    type="text"
+                    nom="nom du cellier"
+                    genre="un"
+                    estObligatoire={true}
+                    classCouleur="Dark"
+                    classCouleurLabel="Dark"
+                    value={nomCellier}
+                    onChange={(e) => setNomCellier(e.target.value)}
+                  />
+                </>
+              }
+              bouton={
+                <>
+                  <Bouton
+                    texte="Annuler"
+                    type="secondaire"
+                    typeHtml="button"
+                    action={fermerModale}
+                  />
+                  <Bouton
+                    texte="Ajouter"
+                    type="primaire"
+                    typeHtml="button"
+                    action={creerCellierAvecNom}
+                  />
+                </>
+              }
             />
-          </div>
+          )}
         </section>
       </main>
       <footer>
