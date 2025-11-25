@@ -18,7 +18,7 @@ function CarteCellier({ titre, idCellier, onModifier, onSupprimer }) {
       "
     >
       <Link
-        to={`/cellier?${idCellier}`}
+        to={`/cellier/${idCellier}`}
         className="
           text-[var(--color-texte-premier)]
           text-(length:--taille-moyen)
