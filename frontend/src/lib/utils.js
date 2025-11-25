@@ -25,3 +25,23 @@ export const formatString = (nomString) => {
 export function formatMajDebut(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
+
+/**
+ * Fonction qui transforme la description dans un format lisible
+ * @param {string} string
+ * @returns string transformé.
+ */
+export const formatDetailsBouteille = (texte) => {
+  if (!texte) return "";
+
+  // Remplacer les | par des virgules
+  let texteFormate = texte.replaceAll("|", ",");
+
+  formatMajDebut(texte);
+
+  // Nettoyer les espaces multiples
+  texteFormate = texteFormate.replace(/\s+/g, " ").trim();
+
+  return texteFormate;
+};
