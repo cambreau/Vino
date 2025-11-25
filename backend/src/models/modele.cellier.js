@@ -44,7 +44,38 @@ export default class ModeleCellier {
   }
 
   // Requête pour modifier un cellier
-  static async modifier(id_cellier, donnees) {}
+  static async modifier(id_cellier, id_utilisateur, nom) {
+    const idUtilisateur = Number.parseInt(id_utilisateur, 10);
+    const idCellier = Number.parseInt(id_cellier, 10);
+
+    if (!Number.isInteger(idUtilisateur) || idUtilisateur <= 0) {
+      throw new Error("ID utilisateur invalide");
+    }
+
+    if (!Number.isInteger(idCellier) || idCellier <= 0) {
+      throw new Error("ID utilisateur invalide");
+    }
+
+    if (typeof nom !== "string" || nom.trim().length === 0) {
+      throw new Error("Le nom du cellier est invalide");
+    }
+
+    const sqlCheck = `SELECT * FROM cellier WHERE id_cellier = ? AND id_utilisateur = ?`;
+    const [rows] = await connexion.query(sqlCheck, [idCellier, idUtilisateur]);
+
+    if (rows.length === 0) {
+      throw new Error("Cellier non trouvé pour cet utilisateur");
+    }
+
+    const sqlUpdate = `UPDATE cellier SET nom = ? WHERE id_cellier = ? AND id_utilisateur = ?`;
+    const [result] = await connexion.query(sqlUpdate, [
+      nom.trim(),
+      idCellier,
+      idUtilisateur,
+    ]);
+
+    return result.affectedRows > 0;
+  }
 
   // Requête pour suprimmer un cellier
   static async supprimer(id_cellier) {}
