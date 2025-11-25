@@ -1,6 +1,7 @@
 // Ce fichier regroupe toutes les fonctions permettant de communiquer avec le backend.
 import authentificationStore from "../stores/authentificationStore";
 
+// *************************** Utilisateur
 /**
  * Crée un nouvel utilisateur dans la base de données via l'API backend.
  * Redirige vers la page de connexion en cas de succès ou vers la page d'inscription en cas d'erreur.
@@ -208,10 +209,13 @@ export const connexionUtilisateur = async (datas, navigate) => {
   }
 };
 
-// Fonction d'ajout d'une bouteille dans un cellier 
+// *************************** Bouteille Cellier
+// Fonction d'ajout d'une bouteille dans un cellier
 export const ajouterBouteilleCellier = async (idCellier, donnees) => {
   try {
-    const urlComplete = `${import.meta.env.VITE_BACKEND_CELLIER_URL}/${idCellier}`;
+    const urlComplete = `${
+      import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
+    }/${idCellier}`;
 
     const reponse = await fetch(urlComplete, {
       method: "POST",
@@ -229,7 +233,6 @@ export const ajouterBouteilleCellier = async (idCellier, donnees) => {
       succes: false,
       erreur: data.message || "Erreur lors de l'ajout de la bouteille",
     };
-
   } catch (error) {
     //Erreur Réseau
     return {
@@ -238,3 +241,70 @@ export const ajouterBouteilleCellier = async (idCellier, donnees) => {
     };
   }
 };
+
+// *************************** Cellier
+/**
+ * Récupère tous les celliers d'un utilisateur via l'API backend.
+ * @param {string|number} id_utilisateur - L'id de l'utilisateur
+ * @returns {Promise<Array|null>} Array des celliers de l'utilisateur ou null en cas d'erreur
+ */
+export const recupererTousCellier = async (id_utilisateur) => {
+  try {
+    const reponse = await fetch(
+      `${
+        import.meta.env.VITE_BACKEND_CELLIER_URL
+      }?id_utilisateur=${id_utilisateur}`
+    );
+    return reponse.json();
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+export const recupererCellier = async (id_utilisateur, id_cellier) => {};
+
+/**
+ * Creer un nouveau cellier pour un utilisateur.
+ * @param {string|number} id_utilisateur - L'identifiant de l'utilisateur
+ * @param {string} [nom] - Le nom du cellier
+ * @returns {Promise<>}
+ */
+export const creerCellier = async (id_utilisateur, nom) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_CELLIER_URL}/${id_utilisateur}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nom,
+        }),
+      }
+    );
+
+    if (reponse.ok) {
+      const data = await reponse.json();
+      return { succes: true, id: data.id };
+    }
+
+    // Gestion des erreurs HTTP (400, 500, etc.)
+    const erreurData = await reponse.json().catch(() => ({}));
+    console.error("Erreur HTTP:", reponse.status, erreurData);
+
+    return {
+      succes: false,
+      erreur: erreurData.message || "Erreur lors de la création du cellier",
+    };
+  } catch (error) {
+    // Gestion des erreurs réseau (exemple: pas de connexion) ou autres exceptions JavaScript
+    console.error("Erreur lors de la création du cellier :", error);
+    return {
+      succes: false,
+      erreur: "Erreur de connexion au serveur",
+    };
+  }
+};
+
+export const modifierCellier = async (id_utilisateur, id_cellier) => {};
+export const supprimerCellier = async (id_utilisateur, id_cellier) => {};
