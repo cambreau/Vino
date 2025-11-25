@@ -2,7 +2,7 @@ import MenuEnHaut from "../components/components-partages/MenuEnHaut/MenuEnHaut"
 import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
 import authentificationStore from "../stores/authentificationStore.js";
 import { useState, useEffect } from "react";
-import { recupererTousCellier } from "../lib/requetes.js";
+import { recupererTousCellier, creerCellier } from "../lib/requetes.js";
 import Bouton from "../components/components-partages/Boutons/Bouton";
 
 function SommaireCellier() {
@@ -10,18 +10,26 @@ function SommaireCellier() {
   const idUtilisateur = utilisateur?.id; // Si null ou undefined = undefined
   const [celliers, setCelliers] = useState([]);
 
-  // Charger les celliers au montage du composant
-  useEffect(() => {
-    const chargerCelliers = async () => {
-      if (idUtilisateur) {
-        const celliersData = await recupererTousCellier(idUtilisateur);
-        if (celliersData) {
-          setCelliers(celliersData);
-        }
+  // Fonction pour charger les celliers
+  const chargerCelliers = async () => {
+    if (idUtilisateur) {
+      const celliersDatas = await recupererTousCellier(idUtilisateur);
+      if (celliersDatas) {
+        setCelliers(celliersDatas);
       }
-    };
+    }
+  };
+
+  // Charger les celliers
+  useEffect(() => {
     chargerCelliers();
-  }, [idUtilisateur]);
+  }, [idUtilisateur]); // Permet de charger au montage du component
+
+  // Fonction pour gerer la creation d'un nouveau cellier
+  const gererCreerCellier = async () => {
+    const resultat = await creerCellier(idUtilisateur);
+    await chargerCelliers();
+  };
 
   return (
     <>
@@ -41,10 +49,7 @@ function SommaireCellier() {
               texte="Ajouter un cellier"
               type="primaire"
               typeHtml="button"
-              action={() => {
-                // TODO: Implémenter la création d'un cellier
-                console.log("Ajouter un cellier");
-              }}
+              action={gererCreerCellier}
             />
           </div>
         </section>
