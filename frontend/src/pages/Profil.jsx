@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
 import MenuEnHaut from "../components/components-partages/MenuEnHaut/MenuEnHaut";
+import BoiteModale from "../components/components-partages/BoiteModale/BoiteModale";
+import { supprimerUtilisateur } from "../lib/requetes.js";
 import Bouton from "../components/components-partages/Boutons/Bouton";
 import { FaUser } from "react-icons/fa";
 import authentificationStore from "../stores/authentificationStore";
@@ -13,6 +15,10 @@ function Profil() {
   const utilisateur = authentificationStore((state) => state.utilisateur);
   const estConnecte = authentificationStore((state) => state.estConnecte);
 
+  // État pour gérer l'ouverture de la boîte modale de suppression
+  const [estModaleSuppressionOuverte, setEstModaleSuppressionOuverte] =
+    useState(false);
+
   useEffect(() => {
     if (!estConnecte || !utilisateur) {
       navigate("/connexion?deconnexionSucces=true");
@@ -20,10 +26,40 @@ function Profil() {
     }
   }, [estConnecte, utilisateur, navigate]);
 
-  const supprimerCompte = () => {
-    // TODO : implémenter la suppression
-    console.log("Supprimer compte");
+  /**
+   * Ouvre la boîte modale de confirmation de suppression du profil
+   */
+  const gestionSuppressionProfil = () => {
+    setEstModaleSuppressionOuverte(true);
   };
+
+  /**
+   * Fonction qui confirme et exécute la suppression du profil de l'utilisateur
+   */
+  const confirmerSuppressionProfil = async () => {
+    setEstModaleSuppressionOuverte(false);
+    if (utilisateur && utilisateur.id) {
+      console.log("Tentative de suppression du profil, ID:", utilisateur.id);
+      const resultat = await supprimerUtilisateur(utilisateur.id, navigate);
+      if (!resultat || !resultat.succes) {
+        console.error("Erreur lors de la suppression:", resultat?.erreur);
+        // Optionnel: afficher un message d'erreur à l'utilisateur
+      }
+    } else {
+      console.error(
+        "Impossible de supprimer: utilisateur ou ID manquant",
+        utilisateur
+      );
+    }
+  };
+
+  /**
+   * Ferme la boîte modale de suppression
+   */
+  const annulerSuppressionProfil = () => {
+    setEstModaleSuppressionOuverte(false);
+  };
+
   const modifierCompte = () => {
     if (utilisateur && utilisateur.id) {
       navigate(`/modifier-utilisateur/${utilisateur.id}`);
@@ -35,6 +71,31 @@ function Profil() {
       <header>
         <MenuEnHaut />
       </header>
+
+      <main className="flex flex-col bg-fond px-(--rythme-base) pt-(--rythme-espace) gap-(--rythme-espace) grow">
+        {/* Boîte modale de confirmation de suppression  */}
+        {estModaleSuppressionOuverte && (
+          <BoiteModale
+            texte="Êtes-vous certain de vouloir supprimer votre profil ?"
+            onClose={annulerSuppressionProfil}
+            bouton={
+              <div className="flex flex-wrap gap-(--rythme-base) justify-center">
+                <Bouton
+                  texte="Non"
+                  type="secondaire"
+                  typeHtml="button"
+                  action={annulerSuppressionProfil}
+                />
+                <Bouton
+                  texte="Oui"
+                  type="primaire"
+                  typeHtml="button"
+                  action={confirmerSuppressionProfil}
+                />
+              </div>
+            }
+          />
+        )}
 
       <main className="flex flex-col max-w-[500px] w-full mx-auto inset-x-0  bg-fond px-(--rythme-base) pt-(--rythme-espace) gap-(--rythme-espace) grow">
         <div>
@@ -78,7 +139,7 @@ function Profil() {
             texte="Supprimer"
             type="secondaire"
             typeHtml="button"
-            action={supprimerCompte}
+            action={gestionSuppressionProfil}
           />
           <Bouton
             taille="moyen"
