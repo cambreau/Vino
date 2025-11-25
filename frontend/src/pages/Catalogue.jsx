@@ -14,24 +14,23 @@ function Catalogue() {
     const chargerBouteilles = async () => {
       try {
         const data = await recupererBouteilles();
-        
+
         if (!data || !data.donnees) {
-          setMessage({ 
-            texte: "Impossible de charger le catalogue", 
-            type: "erreur" 
+          setMessage({
+            texte: "Impossible de charger le catalogue",
+            type: "erreur",
           });
           setChargement(false);
           return;
         }
-        
+
         setBouteilles(data.donnees);
         setChargement(false);
-
       } catch (erreur) {
         console.error("Erreur:", erreur);
-        setMessage({ 
-          texte: "Impossible de charger le catalogue", 
-          type: "erreur" 
+        setMessage({
+          texte: "Impossible de charger le catalogue",
+          type: "erreur",
         });
         setChargement(false);
       }
@@ -41,14 +40,13 @@ function Catalogue() {
   }, []);
 
   return (
-    <>
+    <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
       <header>
-        <MenuEnHaut titre="Catalogue" />
+        <MenuEnHaut />
       </header>
 
-      <main className="min-h-screen font-body max-w-[500px] mx-auto inset-x-0 bg-fond">
+      <main className="font-body bg-fond overflow-y-auto">
         <section className="pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)">
-          
           {message.texte && (
             <div className="mb-4">
               <Message texte={message.texte} type={message.type} />
@@ -57,13 +55,15 @@ function Catalogue() {
 
           {chargement ? (
             <div className="text-center py-8">
-              <p className="text-texte-secondaire">Chargement du catalogue...</p>
+              <p className="text-texte-secondaire">
+                Chargement du catalogue...
+              </p>
             </div>
           ) : (
             <>
               {bouteilles.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {bouteilles.map((bouteille) => ( 
+                  {bouteilles.map((bouteille) => (
                     <CarteBouteille
                       key={bouteille.id}
                       bouteille={bouteille}
@@ -84,7 +84,7 @@ function Catalogue() {
       </main>
 
       <MenuEnBas />
-    </>
+    </div>
   );
 }
 
