@@ -157,6 +157,12 @@ function ModificationProfil() {
                     ...prev,
                     courriel: valeur,
                   }));
+                  // Supprimer le message de doublon si l'utilisateur modifie le courriel
+                  if (echecDoublon || echecModification) {
+                    const nouveauxParams = new URLSearchParams(searchParams);
+                    nouveauxParams.delete("echec");
+                    setSearchParams(nouveauxParams);
+                  }
                   if (!validationChamp(regex.regcourriel, valeur)) {
                     const erreur = "Veuillez saisir un courriel valide.";
                     setErreurs((prev) => ({ ...prev, courriel: erreur }));
