@@ -5,7 +5,6 @@ function CarteCellier({ titre, idCellier, onModifier, onSupprimer }) {
   return (
     <div
       className="
-        relative
         aspect-square
         rounded-(--arrondi-grand)
         border-2
@@ -32,7 +31,7 @@ function CarteCellier({ titre, idCellier, onModifier, onSupprimer }) {
       >
         {titre}
       </Link>
-      <div className="flex gap-(--rythme-tres-serre) justify-center mt-(--rythme-serre)">
+      <div className="flex flex-wrap gap-(--rythme-tres-serre) justify-center mt-(--rythme-serre)">
         <Bouton
           texte="Modifier"
           type="secondaire"
