@@ -37,7 +37,7 @@ export const recupererTousCelliers = async (req, res) => {
       });
     }
 
-    const celliers = await ModeleCellier.recuperer(id_utilisateur);
+    const celliers = await ModeleCellier.recupererTous(id_utilisateur);
 
     return res.status(200).json(celliers);
   } catch (err) {

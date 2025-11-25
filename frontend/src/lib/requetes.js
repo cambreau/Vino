@@ -164,7 +164,7 @@ export const connexionUtilisateur = async (datas, navigate) => {
 export const ajouterBouteilleCellier = async (idCellier, donnees) => {
   try {
     const urlComplete = `${
-      import.meta.env.VITE_BACKEND_CELLIER_URL
+      import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
     }/${idCellier}`;
 
     const reponse = await fetch(urlComplete, {
@@ -191,3 +191,27 @@ export const ajouterBouteilleCellier = async (idCellier, donnees) => {
     };
   }
 };
+
+// *************************** Cellier
+/**
+ * Récupère tous les celliers d'un utilisateur via l'API backend.
+ * @param {string|number} id_utilisateur - L'id de l'utilisateur
+ * @returns {Promise<Array|null>} Array des celliers de l'utilisateur ou null en cas d'erreur
+ */
+export const recupererTousCellier = async (id_utilisateur) => {
+  try {
+    const reponse = await fetch(
+      `${
+        import.meta.env.VITE_BACKEND_CELLIER_URL
+      }?id_utilisateur=${id_utilisateur}`
+    );
+    return reponse.json();
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+export const recupererCellier = async (id_utilisateur, id_cellier) => {};
+export const creerCellier = async (id_utilisateur) => {};
+export const modifierCellier = async (id_utilisateur, id_cellier) => {};
+export const supprimerCellier = async (id_utilisateur, id_cellier) => {};
