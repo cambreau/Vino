@@ -7,7 +7,7 @@ import ModificationProfil from "./pages/ModificationProfil";
 import Catalogue from "./pages/Catalogue";
 import Cellier from "./pages/Cellier";
 import Bouteille from "./pages/Bouteille";
-import SommaireCellier from   "./pages/SommaireCellier"
+import SommaireCellier from "./pages/SommaireCellier";
 
 function App() {
   return (
@@ -22,7 +22,7 @@ function App() {
       />
       <Route path="/cellier/:idCellier" element={<Cellier />} />
       <Route path="/catalogue" element={<Catalogue />} />
-      <Route path="/bouteille" element={<Bouteille />} />
+      <Route path="/bouteilles/:id" element={<Bouteille />} />
       <Route path="/sommaire-cellier" element={<SommaireCellier />} />
     </Routes>
   );

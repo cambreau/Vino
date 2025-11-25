@@ -359,25 +359,20 @@ export const modifierCellier = async (
 
 export const supprimerCellier = async (id_utilisateur, id_cellier) => {};
 
+// BOUTEILLE
 
-// *************************** Bouteilles (Catalogue)
 /**
- * Récupère toutes les bouteilles disponibles dans le catalogue
- * @returns {Promise<Array|null>} Array des bouteilles ou null en cas d'erreur
+ * Récupère les informations d'une bouteille par son identifiant via l'API backend.
+ * @param {string|number} id - L'identifiant unique d'une bouteille à récupérer
+ * @returns {Promise<Object|null>} Les données de la bouteille ou null en cas d'erreur
  */
-export const recupererBouteilles = async () => {
+export const recupererBouteille = async (id) => {
   try {
     const reponse = await fetch(
-      `${import.meta.env.VITE_BACKEND_BOUTEILLES_URL}`
+      `${import.meta.env.VITE_BACKEND_BOUTEILLES_URL}/${id}`
     );
-    
-    if (!reponse.ok) {
-      throw new Error(`Erreur HTTP: ${reponse.status}`);
-    }
-    
-    return await reponse.json();
+    return reponse.json();
   } catch (error) {
-    console.error("Erreur lors de la récupération des bouteilles:", error);
-    return null;
+    console.log(error);
   }
 };
