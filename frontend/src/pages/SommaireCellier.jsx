@@ -7,7 +7,10 @@ function SommaireCellier() {
       <header>
         <MenuEnHaut titre="Sommaire cellier" />
       </header>
-      <main className="min-h-screen font-body max-w-[500px] mx-auto inset-x-0 bg-fond">
+      <main
+        className="min-h-screen font-body max-w-[500px] mx-auto inset-x-0 
+      bg-[linear-gradient(0deg,rgba(0,0,0,0.7)25%,rgba(0,0,0,0)),url('../assets/images/sommaireCellier.webp')] bg-cover bg-centerbg-fond"
+      >
         <section className="pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)"></section>
       </main>
       <footer>
