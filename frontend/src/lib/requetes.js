@@ -1,6 +1,7 @@
 // Ce fichier regroupe toutes les fonctions permettant de communiquer avec le backend.
 import authentificationStore from "../stores/authentificationStore";
 
+// *************************** Utilisateur
 /**
  * Crée un nouvel utilisateur dans la base de données via l'API backend.
  * Redirige vers la page de connexion en cas de succès ou vers la page d'inscription en cas d'erreur.
@@ -158,10 +159,13 @@ export const connexionUtilisateur = async (datas, navigate) => {
   }
 };
 
-// Fonction d'ajout d'une bouteille dans un cellier 
+// *************************** Bouteille Cellier
+// Fonction d'ajout d'une bouteille dans un cellier
 export const ajouterBouteilleCellier = async (idCellier, donnees) => {
   try {
-    const urlComplete = `${import.meta.env.VITE_BACKEND_CELLIER_URL}/${idCellier}`;
+    const urlComplete = `${
+      import.meta.env.VITE_BACKEND_CELLIER_URL
+    }/${idCellier}`;
 
     const reponse = await fetch(urlComplete, {
       method: "POST",
@@ -179,7 +183,6 @@ export const ajouterBouteilleCellier = async (idCellier, donnees) => {
       succes: false,
       erreur: data.message || "Erreur lors de l'ajout de la bouteille",
     };
-
   } catch (error) {
     //Erreur Réseau
     return {

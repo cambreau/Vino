@@ -27,6 +27,27 @@ export const ajouterCellier = async (req, res) => {
   }
 };
 
+export const recupererTousCelliers = async (req, res) => {
+  try {
+    const { id_utilisateur } = req.query;
+
+    if (!id_utilisateur) {
+      return res.status(400).json({
+        message: "Id utilisateur requis pour récupérer les celliers",
+      });
+    }
+
+    const celliers = await ModeleCellier.recuperer(id_utilisateur);
+
+    return res.status(200).json(celliers);
+  } catch (err) {
+    console.error("Erreur lors de la récupération des celliers :", err);
+    return res.status(500).json({
+      error: "Erreur serveur lors de la récupération des celliers.",
+    });
+  }
+};
+
 export const recupererCellier = async (req, res) => {};
 
 export const modifierCellier = async (req, res) => {};
