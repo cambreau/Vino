@@ -11,7 +11,7 @@ function Celliers() {
     <>
       <header>
         {/* Menu haut fixe */}
-        <MenuEnHaut titre="Vin" />
+        <MenuEnHaut titre="Bouteille" />
       </header>
       <main className="flex gap-(--rythme-tres-serre) h-screen font-body max-w-[500px] mx-auto inset-x-0 bg-fond">
         <picture className="w-2/5">
