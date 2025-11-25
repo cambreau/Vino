@@ -3,7 +3,6 @@ const router = express.Router();
 
 import {
   ajouterCellier,
-  recupererCellier,
   modifierCellier,
   supprimerCellier,
   recupererTousCelliers,
@@ -11,7 +10,6 @@ import {
 
 // Récupérer tous les celliers d'un utilisateur ou un seul
 router.get("/", recupererTousCelliers); // tous les celliers (avec query param id_utilisateur)
-router.get("/:id_utilisateur/:id_cellier", recupererCellier); // cellier spécifique
 
 // Ajouter un cellier
 router.post("/:id_utilisateur", ajouterCellier);
