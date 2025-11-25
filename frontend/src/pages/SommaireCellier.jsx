@@ -6,6 +6,8 @@ import { recupererTousCellier, creerCellier } from "../lib/requetes.js";
 import Bouton from "../components/components-partages/Boutons/Bouton";
 import FormulaireInput from "../components/components-partages/Formulaire/FormulaireInput/FormulaireInput";
 import BoiteModale from "../components/components-partages/BoiteModale/BoiteModale";
+import Message from "../components/components-partages/Message/Message";
+import CarteCellier from "../components/carte-cellier/CarteCellier";
 
 function SommaireCellier() {
   const utilisateur = authentificationStore((state) => state.utilisateur);
@@ -68,6 +70,29 @@ function SommaireCellier() {
             typeHtml="button"
             action={gererCreerCellier}
           />
+
+          {/* Message si aucun cellier */}
+          {celliers.length === 0 && (
+            <div className="mt-(--rythme-base)">
+              <Message
+                type="information"
+                texte="Vous n'avez pas encore de celliers. Cliquez sur 'Ajouter un cellier' pour en créer un."
+              />
+            </div>
+          )}
+
+          {/* Liste des celliers */}
+          {celliers.length > 0 && (
+            <div className="mt-(--rythme-base) grid grid-cols-2 gap-(--rythme-base)">
+              {celliers.map((cellier) => (
+                <CarteCellier
+                  key={cellier.id_cellier}
+                  titre={cellier.nom}
+                  idCellier={cellier.id_cellier}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Modale pour creer un cellier */}
           {estModaleOuverte && (
