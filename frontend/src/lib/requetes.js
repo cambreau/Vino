@@ -209,6 +209,50 @@ export const connexionUtilisateur = async (datas, navigate) => {
   }
 };
 
+// *************************** Vin
+/**
+ * Récupère toutes les bouteilles (vins) disponibles via l'API backend.
+ * @param {Object} [filtres={}] - Paramètres optionnels ajoutés à la requête (ex.: recherche, pagination)
+ * @returns {Promise<{succes: boolean, donnees?: Array, total?: number, erreur?: string}>}
+ */
+export const recupererTousBouteilles = async (filtres = {}) => {
+  try {
+    const baseUrl = import.meta.env.VITE_BACKEND_BOUTEILLES_URL;
+    const params = new URLSearchParams();
+
+    Object.entries(filtres).forEach(([cle, valeur]) => {
+      if (valeur === undefined || valeur === null) return;
+      const valeurFormatee =
+        typeof valeur === "string" ? valeur.trim() : String(valeur);
+      if (valeurFormatee !== "") params.append(cle, valeurFormatee);
+    });
+
+    const url = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+    const reponse = await fetch(url);
+    const data = await reponse.json();
+
+    if (reponse.ok) {
+      const donnees = data?.donnees ?? data;
+      return {
+        succes: true,
+        donnees,
+        total: data?.total ?? (Array.isArray(donnees) ? donnees.length : 0),
+      };
+    }
+
+    return {
+      succes: false,
+      erreur: data?.message || "Erreur lors de la récupération des vins",
+    };
+  } catch (error) {
+    console.error("Erreur lors de la récupération des vins :", error);
+    return {
+      succes: false,
+      erreur: "Erreur de connexion au serveur",
+    };
+  }
+};
+
 // *************************** Bouteille Cellier
 // Fonction d'ajout d'une bouteille dans un cellier
 export const ajouterBouteilleCellier = async (idCellier, donnees) => {
