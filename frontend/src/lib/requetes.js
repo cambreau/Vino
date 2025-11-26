@@ -190,8 +190,8 @@ export const connexionUtilisateur = async (datas, navigate) => {
       // Charger les bouteilles une seule fois au moment de la connexion
       bouteillesStore.getState().chargerBouteilles();
 
-      // Rediriger vers page profil
-      navigate("/profil");
+      // Rediriger vers la page catalogue après connexion
+      navigate("/catalogue");
 
       return { succes: true, utilisateur: data.utilisateur };
     } else {

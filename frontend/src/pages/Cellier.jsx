@@ -43,7 +43,7 @@ function Cellier() {
           </h1>
 
           <article className="mt-(--rythme-base) p-(--rythme-serre) min-h-[200px]">
-            {cellier.bouteilles.length > 0 ? (
+            {/* {cellier.bouteilles.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {cellier.bouteilles.map((bouteille) => (
                   <CarteBouteille
@@ -72,7 +72,7 @@ function Cellier() {
                   }}
                 />
               </div>
-            )}
+            )} */}
           </article>
         </section>
       </main>
