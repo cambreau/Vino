@@ -270,7 +270,7 @@ export const recupererTousCellier = async (id_utilisateur) => {
 export const recupererCellier = async (id_cellier) => {
   try {
     const reponse = await fetch(
-      `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL}/${id_cellier}`
+      `${import.meta.env.VITE_BACKEND_CELLIER_URL}/${id_cellier}`
     );
 
     if (!reponse.ok) {
