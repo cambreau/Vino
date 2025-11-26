@@ -11,8 +11,8 @@ function CarteCellier({ titre, idCellier, onModifier, onSupprimer }) {
         max-w-[300px]
         rounded-(--arrondi-grand)
         border-2
-        border-[var(--color-principal-200)]
-        bg-[var(--color-fond-secondaire)]
+        border-principal-200
+        bg-fond-secondaire
         shadow-md
         p-(--rythme-espace)
         content-center
@@ -22,11 +22,11 @@ function CarteCellier({ titre, idCellier, onModifier, onSupprimer }) {
       <Link
         to={`/cellier/${idCellier}`}
         className="
-          text-[var(--color-texte-premier)]
+          text-texte-premier
           text-(length:--taille-normal)
           font-bold
           text-center
-          hover:text-[var(--color-principal-200)]
+          hover:text-principal-200
           hover:underline
           transition-colors
         "

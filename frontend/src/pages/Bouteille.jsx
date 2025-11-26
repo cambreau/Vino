@@ -69,44 +69,44 @@ function Bouteille() {
         </picture>
         <div className="flex flex-col flex-1 py-(--rythme-base) px-(--rythme-serre)">
           <header>
-            <h1 className="text-(--color-principal-300) text-(length:--taille-normal)">
+            <h1 className="text-principal-300 text-(length:--taille-normal)">
               <strong>{bouteille.nom}</strong>
             </h1>
             <hr className="my-(--rythme-serre)" />
           </header>
           <div className="flex flex-col gap-(--rythme-tres-serre)">
             <div className="flex flex-col gap-(--rythme-tres-serre)">
-              <h2 className="text-(--color-principal-300)">
+              <h2 className="text-principal-300">
                 <strong>Type:</strong>
               </h2>
               <p> {bouteille.type}</p>
             </div>
             <div className="flex flex-col gap-(--rythme-tres-serre)">
-              <h2 className="text-(--color-principal-300)">
+              <h2 className="text-principal-300">
                 <strong>Millésime :</strong>
               </h2>
               <p>{bouteille.millenisme}</p>
             </div>
             <div className="flex flex-col gap-(--rythme-tres-serre)">
-              <h2 className="text-(--color-principal-300)">
+              <h2 className="text-principal-300">
                 <strong>Region : </strong>
               </h2>
               <p>{bouteille.region}</p>
             </div>
             <div className="flex flex-col gap-(--rythme-tres-serre)">
-              <h2 className="text-(--color-principal-300)">
+              <h2 className="text-principal-300">
                 <strong>Degré d'alcool : </strong>
               </h2>
               <p> {bouteille.tauxAlcool} %</p>
             </div>
             <div className="flex flex-col gap-(--rythme-tres-serre)">
-              <h2 className="text-(--color-principal-300)">
+              <h2 className="text-principal-300">
                 <strong>Cepage : </strong>
               </h2>
               <p> {bouteille.cepage}</p>
             </div>
             <div className="flex flex-col gap-(--rythme-tres-serre)">
-              <h2 className="text-(--color-principal-300)">
+              <h2 className="text-principal-300">
                 <strong>Accords : </strong>
               </h2>
               <p>{bouteille.description}</p>
