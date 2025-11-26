@@ -28,7 +28,7 @@ function Catalogue() {
 
       if (ignore) return;
 
-      if (resultat?.succes) {
+      if (resultat?.donnees) {
         setEtatListe({
           donnees: resultat.donnees ?? [],
           chargement: false,
