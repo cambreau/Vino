@@ -6,14 +6,17 @@ import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
 import Bouton from "../components/components-partages/Boutons/Bouton";
 import Message from "../components/components-partages/Message/Message";
 import CarteBouteille from "../components/carte/CarteBouteille";
-import { recupererCellier } from "../lib/requetes.js";
+import {
+  recupererCellier,
+  recupererBouteillesCellier,
+} from "../lib/requetes.js";
 
 function Cellier() {
   const navigate = useNavigate();
   // Récupérer id du cellier dans l'URL
   const { idCellier } = useParams();
 
-  // Etat pour le cellier : nom + bouteilles
+  // Etat pour le cellier : nom
   const [cellier, setCellier] = useState({
     nom: "",
   });
@@ -23,11 +26,23 @@ function Cellier() {
       const donneesCellier = await recupererCellier(idCellier);
       setCellier({
         nom: donneesCellier.nom || "",
-        bouteilles: donneesCellier.bouteilles || [],
       });
     };
-
     chargerCellier();
+  }, [idCellier]);
+
+  // Etat pour les bouteilles : récupérer les bouteilles complètes du cellier
+  const [bouteillesCellier, setBouteillesCellier] = useState([]);
+  const [chargementBouteilles, setChargementBouteilles] = useState(false);
+
+  useEffect(() => {
+    const chargerBouteillesCellier = async () => {
+      setChargementBouteilles(true);
+      const datas = await recupererBouteillesCellier(idCellier);
+      setBouteillesCellier(datas || []);
+      setChargementBouteilles(false);
+    };
+    chargerBouteillesCellier();
   }, [idCellier]);
 
   return (
@@ -43,9 +58,14 @@ function Cellier() {
           </h1>
 
           <article className="mt-(--rythme-base) p-(--rythme-serre) min-h-[200px]">
-            {/* {cellier.bouteilles.length > 0 ? (
+            {chargementBouteilles ? (
+              <Message
+                type="information"
+                texte="Chargement des bouteilles du cellier..."
+              />
+            ) : bouteillesCellier.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {cellier.bouteilles.map((bouteille) => (
+                {bouteillesCellier.map((bouteille) => (
                   <CarteBouteille
                     key={bouteille.id}
                     bouteille={bouteille}
@@ -72,7 +92,7 @@ function Cellier() {
                   }}
                 />
               </div>
-            )} */}
+            )}
           </article>
         </section>
       </main>

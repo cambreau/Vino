@@ -6,7 +6,35 @@
 
 import modeleBouteilleCellier from "../models/modele.bouteilleCellier.js";
 
-export const afficherBouteilleDuCellier = async (req, res) => {};
+export const recupererBouteilleDuCellier = async (req, res) => {
+  try {
+    const { idCellier } = req.params;
+    const id = Number.parseInt(idCellier, 10);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({
+        message: "ID de cellier invalide",
+      });
+    }
+
+    const bouteilles = await modeleBouteilleCellier.recuperer(id);
+
+    return res.status(200).json({
+      message: "Bouteilles du cellier récupérées avec succès",
+      donnees: bouteilles,
+    });
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des bouteilles du cellier",
+      error
+    );
+    return res.status(500).json({
+      message:
+        "Erreur serveur lors de la récupération des bouteilles du cellier",
+      erreur: error.message,
+    });
+  }
+};
 
 export const modifierBouteilleDuCellier = async (req, res) => {};
 

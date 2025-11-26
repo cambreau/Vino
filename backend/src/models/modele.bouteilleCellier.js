@@ -2,9 +2,28 @@ import { connexion } from "../database/connexion.js";
 
 export default class modeleBouteilleCellier {
   // Requête pour récuperer les bouteilles dans un cellier
-  static async recuperer(idCellier) {}
+  static async recuperer(idCellier) {
+    // S'assure que l'ID du cellier est un entier valide
+    const id = Number.parseInt(idCellier, 10);
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new Error("ID de cellier invalide");
+    }
 
-  // Requête pour ajouter une bouteille dans un cellier} 
+    const sql = `
+      SELECT 
+        id_bouteille,
+        quantite
+      FROM bouteilleCellier
+      WHERE id_cellier = ?
+    `;
+
+    const [rows] = await connexion.query(sql, [id]);
+
+    // Retourne un tableau du type [{ id_bouteille, quantite }, ...]
+    return rows;
+  }
+
+  // Requête pour ajouter une bouteille dans un cellier}
   static async ajouter(idCellier, idBouteille, quantite = 1) {
     if (!idCellier || !idBouteille)
       throw new Error("Un cellier est une bouteille est nécessaire");
