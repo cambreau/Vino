@@ -533,8 +533,6 @@ export const recupererBouteilles = async () => {
   }
 };
 
-
-
 /** - Meriem
  * Vérifie si une bouteille existe déjà dans un cellier spécifique
  * @param {string|number} idCellier - L'identifiant du cellier
@@ -546,23 +544,22 @@ export const verifierBouteilleCellier = async (idCellier, idBouteille) => {
     const reponse = await fetch(
       `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL}/${idCellier}`
     );
-    
+
     if (reponse.ok) {
       const data = await reponse.json();
       const bouteilles = data?.donnees || data || [];
       const bouteilleExistante = bouteilles.find(
-        b => String(b.id_bouteille) === String(idBouteille)
+        (b) => String(b.id_bouteille) === String(idBouteille)
       );
-      
+
       if (bouteilleExistante) {
         return {
           existe: true,
-          quantite: bouteilleExistante.quantite || 0
+          quantite: bouteilleExistante.quantite || 0,
         };
       }
-      
     }
-    
+
     return { existe: false, quantite: 0 };
   } catch (error) {
     console.error("Erreur lors de la vérification:", error);

@@ -23,7 +23,36 @@ export default class modeleBouteilleCellier {
     return rows;
   }
 
-  // Requête pour ajouter une bouteille dans un cellier}
+  // Requête pour vérifier si une bouteille existe déjà dans le cellier
+  static async verifierExistence(idCellier, idBouteille) {
+    const sql = `
+      SELECT * FROM bouteilleCellier 
+      WHERE id_cellier = ? AND id_bouteille = ?
+    `;
+
+    const [rows] = await connexion.query(sql, [idCellier, idBouteille]);
+
+    // Retourne la première ligne si elle existe, sinon null
+    return rows.length > 0 ? rows[0] : null;
+  }
+
+  // Mettre a jour la quantite des bouteilles cellier
+  static async mettreAJourQuantite(idCellier, idBouteille, nouvelleQuantite) {
+    const sql = `
+      UPDATE bouteilleCellier 
+      SET quantite = ? 
+      WHERE id_cellier = ? AND id_bouteille = ?
+    `;
+
+    const [result] = await connexion.query(sql, [
+      nouvelleQuantite,
+      idCellier,
+      idBouteille,
+    ]);
+    return result.affectedRows > 0;
+  }
+
+  // Requête pour ajouter une bouteille dans un cellier
   static async ajouter(idCellier, idBouteille, quantite = 1) {
     if (!idCellier || !idBouteille)
       throw new Error("Un cellier est une bouteille est nécessaire");
