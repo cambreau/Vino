@@ -2,7 +2,16 @@ import { connexion } from "../database/connexion.js";
 
 export default class modeleBouteilleCellier {
   // Requête pour récuperer les bouteilles dans un cellier
-  static async recuperer(idCellier) {}
+static async recuperer(idCellier) {
+  const sql = `
+    SELECT * FROM bouteilleCellier
+    WHERE id_cellier = ?
+  `;
+
+  const [rows] = await connexion.query(sql, [idCellier]);
+  return rows;
+}
+
 
   // Requête pour ajouter une bouteille dans un cellier} 
   static async ajouter(idCellier, idBouteille, quantite = 1) {
@@ -37,4 +46,30 @@ export default class modeleBouteilleCellier {
     const [result] = await connexion.query(sql, [idCellier, idBouteille]);
     return result.affectedRows > 0;
   }
+
+  // Requête pour vérifier si une bouteille existe déjà dans le cellier
+  static async verifierExistence(idCellier, idBouteille) {
+    const sql = `
+      SELECT * FROM bouteilleCellier 
+      WHERE id_cellier = ? AND id_bouteille = ?
+    `;
+    
+    const [rows] = await connexion.query(sql, [idCellier, idBouteille]);
+    
+    // Retourne la première ligne si elle existe, sinon null
+    return rows.length > 0 ? rows[0] : null;
+  }
+
+  // Mettre a jour la quantite des bouteilles cellier 
+  static async mettreAJourQuantite(idCellier, idBouteille, nouvelleQuantite) {
+    const sql = `
+      UPDATE bouteilleCellier 
+      SET quantite = ? 
+      WHERE id_cellier = ? AND id_bouteille = ?
+    `;
+    
+    const [result] = await connexion.query(sql, [nouvelleQuantite, idCellier, idBouteille]);
+    return result.affectedRows > 0;
+  }
+
 }

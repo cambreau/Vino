@@ -216,7 +216,6 @@ export const ajouterBouteilleCellier = async (idCellier, donnees) => {
     const urlComplete = `${
       import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
     }/${idCellier}`;
-
     const reponse = await fetch(urlComplete, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -452,7 +451,7 @@ export const recupererBouteille = async (id) => {
   }
 };
 
-// *************************** Bouteilles (Catalogue)
+// *************************** Bouteilles (Catalogue) - Meriem
 /**
  * Récupère toutes les bouteilles disponibles dans le catalogue
  * @returns {Promise<Array|null>} Array des bouteilles ou null en cas d'erreur
@@ -476,7 +475,7 @@ export const recupererBouteilles = async () => {
 
 
 
-/**
+/** - Meriem
  * Vérifie si une bouteille existe déjà dans un cellier spécifique
  * @param {string|number} idCellier - L'identifiant du cellier
  * @param {string|number} idBouteille - L'identifiant de la bouteille
@@ -501,6 +500,7 @@ export const verifierBouteilleCellier = async (idCellier, idBouteille) => {
           quantite: bouteilleExistante.quantite || 0
         };
       }
+      
     }
     
     return { existe: false, quantite: 0 };
