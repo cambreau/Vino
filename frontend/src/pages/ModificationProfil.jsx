@@ -87,14 +87,13 @@ function ModificationProfil() {
   };
 
   return (
-    <>
-      <MenuEnHaut />
+    <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
+      <header>
+        <MenuEnHaut />
+      </header>
 
       <main
-        className="
-        px-(--rythme-serre) py-(--rythme-base) grid grid-rows-[1fr_5fr] items-end
-        bg-fond
-        "
+        className="flex flex-col bg-fond px-(--rythme-base) pt-(--rythme-espace) gap-(--rythme-espace) overflow-y-auto"
       >
         {echecModification && (
           <Message
@@ -200,7 +199,7 @@ function ModificationProfil() {
       </main>
 
       <MenuEnBas />
-    </>
+    </div>
   );
 }
 
