@@ -118,11 +118,9 @@ function SommaireCellier() {
       <header>
         <MenuEnHaut />
       </header>
-      
-      <main className="bg-fond overflow-y-auto relative">
-        <div className="absolute inset-0 bg-white/40 pointer-events-none"></div>
 
-        <section className="relative pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)">
+      <main className="bg-fond overflow-y-auto">
+        <section className="p-(--rythme-base)">
           <Bouton
             taille="moyen"
             texte="Ajouter un cellier"
@@ -133,7 +131,7 @@ function SommaireCellier() {
 
           {/* Message si aucun cellier */}
           {celliers.length === 0 && (
-            <div className="mt-(--rythme-base)">
+            <div className="mx-(--rythme-base)">
               <Message
                 type="information"
                 texte="Vous n'avez pas encore de celliers. Cliquez sur 'Ajouter un cellier' pour en créer un."
@@ -143,7 +141,7 @@ function SommaireCellier() {
 
           {/* Liste des celliers */}
           {celliers.length > 0 && (
-            <div className="flex flex-wrap mt-(--rythme-base) gap-(--rythme-base) max-w-6xl mx-auto">
+            <div className="flex flex-wrap my-(--rythme-espace) gap-(--rythme-base) max-w-6xl">
               {celliers.map((cellier) => (
                 <CarteCellier
                   key={cellier.id_cellier}
