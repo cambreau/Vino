@@ -267,6 +267,8 @@ export const recupererBouteillesCellier = async (idCellier) => {
     const data = await reponse.json();
     const bouteillesIds = data.donnees || []; // [{ id_bouteille, quantite }, ...]
 
+    console.log("Bouteilles IDs du cellier:", bouteillesIds);
+
     // 2. Récupérer les infos bouteilles du store
     const bouteillesCatalogue = bouteillesStore.getState().bouteilles;
 

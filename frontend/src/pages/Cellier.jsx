@@ -39,6 +39,7 @@ function Cellier() {
     const chargerBouteillesCellier = async () => {
       setChargementBouteilles(true);
       const datas = await recupererBouteillesCellier(idCellier);
+      console.log("Bouteilles récupérées pour le cellier:", datas);
       setBouteillesCellier(datas || []);
       setChargementBouteilles(false);
     };
