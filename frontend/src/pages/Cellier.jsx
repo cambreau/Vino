@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Bouton from "../components/components-partages/Boutons/Bouton";
 import Message from "../components/components-partages/Message/Message";
 
-function Cellier() {
+function Cellier({ nomCellier }) {
   const navigate = useNavigate();
   return (
     <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
@@ -16,7 +16,7 @@ function Cellier() {
         <section className="pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)">
           {/* Contenu du catalogue (celliers) à ajouter ici */}
           <h1 className="text-(length:--taille-moyen) text-center font-display font-semibold text-principal-300">
-            Cellier - NomDuCellier
+            Cellier - {nomCellier}
           </h1>
           <article className="mt-(--rythme-base) p-(--rythme-serre) min-h-[200px] flex flex-col items-center justify-center">
             {/* Contenu des bouteilles dans le cellier à ajouter ici */}
