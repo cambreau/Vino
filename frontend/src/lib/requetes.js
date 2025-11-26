@@ -1,5 +1,6 @@
 // Ce fichier regroupe toutes les fonctions permettant de communiquer avec le backend.
 import authentificationStore from "../stores/authentificationStore";
+import bouteillesStore from "../stores/bouteillesStore";
 
 // *************************** Utilisateur
 /**
@@ -186,8 +187,11 @@ export const connexionUtilisateur = async (datas, navigate) => {
       // Sauvegarder l'utilisateur dans le store
       authentificationStore.getState().connexion(datasUtilisateur);
 
-      // Rediriger vers page profil
-      navigate("/profil");
+      // Charger les bouteilles une seule fois au moment de la connexion
+      bouteillesStore.getState().chargerBouteilles();
+
+      // Rediriger vers la page catalogue après connexion
+      navigate("/catalogue");
 
       return { succes: true, utilisateur: data.utilisateur };
     } else {
@@ -210,6 +214,7 @@ export const connexionUtilisateur = async (datas, navigate) => {
 };
 
 // *************************** Bouteille Cellier
+
 // Fonction d'ajout d'une bouteille dans un cellier
 export const ajouterBouteilleCellier = async (idCellier, donnees) => {
   try {
@@ -238,6 +243,61 @@ export const ajouterBouteilleCellier = async (idCellier, donnees) => {
       succes: false,
       erreur: "Le serveur ne répond pas.",
     };
+  }
+};
+
+/**
+ * Récupère les bouteilles d'un cellier en récupérant les IDs depuis le backend
+ * et en complétant avec les données du store bouteillesStore
+ * @param {string|number} idCellier - L'id du cellier
+ * @returns {Promise<Array>} Array des bouteilles complètes avec quantités
+ */
+export const recupererBouteillesCellier = async (idCellier) => {
+  try {
+    // 1. Récupérer les IDs et quantités depuis le backend
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL}/${idCellier}`
+    );
+
+    if (!reponse.ok) {
+      throw new Error(`Erreur HTTP: ${reponse.status}`);
+    }
+
+    const data = await reponse.json();
+    const bouteillesIds = data.donnees || []; // [{ id_bouteille, quantite }, ...]
+
+    console.log("Bouteilles IDs du cellier:", bouteillesIds);
+
+    // 2. Récupérer les infos bouteilles du store
+    const bouteillesCatalogue = bouteillesStore.getState().bouteilles;
+
+    // 3. Fusionner toutes les datas - ne retourner que les bouteilles de ce cellier
+    const bouteillesCompletes = bouteillesIds
+      .map((item) => {
+        // item: { id_bouteille, quantite }
+        const bouteilleCatalogue = bouteillesCatalogue.find(
+          (b) => b.id === item.id_bouteille
+        );
+
+        // Ne retourner que si la bouteille existe dans le store
+        if (!bouteilleCatalogue) return null;
+
+        return {
+          ...bouteilleCatalogue, // Copie des infos du catalogue pour la bouteille
+          quantite: item.quantite, // + la quantite
+          idCellier: Number.parseInt(idCellier, 10), // Ajouter l'idCellier pour référence
+        };
+      })
+      .filter(Boolean); // Retire les null - garde que les bouteilles trouvées
+
+    // Retourner uniquement les bouteilles qui sont dans ce cellier
+    return bouteillesCompletes;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des bouteilles du cellier :",
+      error
+    );
+    return [];
   }
 };
 
@@ -473,8 +533,6 @@ export const recupererBouteilles = async () => {
   }
 };
 
-
-
 /** - Meriem
  * Vérifie si une bouteille existe déjà dans un cellier spécifique
  * @param {string|number} idCellier - L'identifiant du cellier
@@ -486,23 +544,22 @@ export const verifierBouteilleCellier = async (idCellier, idBouteille) => {
     const reponse = await fetch(
       `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL}/${idCellier}`
     );
-    
+
     if (reponse.ok) {
       const data = await reponse.json();
       const bouteilles = data?.donnees || data || [];
       const bouteilleExistante = bouteilles.find(
-        b => String(b.id_bouteille) === String(idBouteille)
+        (b) => String(b.id_bouteille) === String(idBouteille)
       );
-      
+
       if (bouteilleExistante) {
         return {
           existe: true,
-          quantite: bouteilleExistante.quantite || 0
+          quantite: bouteilleExistante.quantite || 0,
         };
       }
-      
     }
-    
+
     return { existe: false, quantite: 0 };
   } catch (error) {
     console.error("Erreur lors de la vérification:", error);
