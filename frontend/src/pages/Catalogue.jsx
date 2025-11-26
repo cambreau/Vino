@@ -54,11 +54,7 @@ function Catalogue() {
           )}
 
           {chargement ? (
-            <div className="text-center py-8">
-              <p className="text-texte-secondaire">
-                Chargement du catalogue...
-              </p>
-            </div>
+            <Message texte="Chargement du catalogue..." type="information" />
           ) : (
             <>
               {bouteilles.length > 0 ? (
@@ -72,11 +68,10 @@ function Catalogue() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <p className="text-texte-secondaire">
-                    Aucune bouteille disponible dans le catalogue
-                  </p>
-                </div>
+                <Message
+                  texte="Aucune bouteille disponible dans le catalogue"
+                  type="information"
+                />
               )}
             </>
           )}
