@@ -131,7 +131,7 @@ function SommaireCellier() {
 
           {/* Message si aucun cellier */}
           {celliers.length === 0 && (
-            <div className="mx-(--rythme-base)">
+            <div className="my-(--rythme-base)">
               <Message
                 type="information"
                 texte="Vous n'avez pas encore de celliers. Cliquez sur 'Ajouter un cellier' pour en créer un."
@@ -141,7 +141,7 @@ function SommaireCellier() {
 
           {/* Liste des celliers */}
           {celliers.length > 0 && (
-            <div className="flex flex-wrap my-(--rythme-espace) gap-(--rythme-base) max-w-6xl">
+            <div className="flex flex-wrap my-(--rythme-espace) gap-(--rythme-base)  max-w-6xl">
               {celliers.map((cellier) => (
                 <CarteCellier
                   key={cellier.id_cellier}
