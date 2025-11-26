@@ -5,7 +5,7 @@ const configuration = {
   host: process.env.DB_HOST || process.env.DB_HOTE || "localhost",
   port: Number(process.env.DB_PORT || 3306),
   user: process.env.DB_ROOT_USER || process.env.DB_UTILISATEUR || "root",
-  password: process.env.DB_PASSWORD || process.env.DB_MOT_DE_PASSE || "",
+  password: process.env.DB_PASSWORD || process.env.DB_MOT_DE_PASSE || "admin",
   database: process.env.DB_NAME || process.env.DB_BASE_DE_DONNEES || "vino_db",
   timezone: "Z",
 };
