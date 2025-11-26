@@ -83,7 +83,7 @@ export default class ModeleCellier {
   }
 
   // Requête pour suprimmer un cellier
-  static async supprimer(id_cellier, id_utilisateur) {
+  static async supprimer(id_utilisateur, id_cellier) {
     // S'assure que les ID sont des nombres valides
     const idUtilisateur = Number.parseInt(id_utilisateur, 10);
     const idCellier = Number.parseInt(id_cellier, 10);
@@ -105,7 +105,7 @@ export default class ModeleCellier {
 
       // Requête sql de suppression avec le résultat dans une variable.
       const sql = "DELETE FROM cellier WHERE id_utilisateur = ? AND id_cellier = ?";
-      const [result] = await connection.query(sql, [id_cellier, id_utilisateur]);
+      const [result] = await connection.query(sql, [id_utilisateur, id_cellier]);
 
       // Commit si tout est OK.
       await connection.commit();
