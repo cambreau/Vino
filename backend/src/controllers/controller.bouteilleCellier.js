@@ -6,6 +6,8 @@
 
 import modeleBouteilleCellier from "../models/modele.bouteilleCellier.js";
 
+import { connexion } from "../database/connexion.js";
+
 export const afficherBouteilleDuCellier = async (req, res) => {};
 
 export const modifierBouteilleDuCellier = async (req, res) => {};
@@ -16,9 +18,9 @@ export const ajouterBouteilleDuCellier = async (req, res) => {
     const { idCellier } = req.params;
     const identifiantCellier = Number.parseInt(idCellier, 10);
 
-    // Obtiens le idBouteille avec
-    const { idBouteille } = req.body;
-    const identifiantBouteille = Number.parseInt(idBouteille, 10);
+    // Obtiens le id_bouteille avec
+    const { id_bouteille } = req.body;
+    const identifiantBouteille = Number.parseInt(id_bouteille, 10);
 
     let { quantite = 1 } = req.body;
     quantite = Number.parseInt(quantite, 10);
