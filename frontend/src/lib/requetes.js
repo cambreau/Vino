@@ -444,3 +444,39 @@ export const recupererBouteilles = async () => {
     return null;
   }
 };
+
+
+
+/**
+ * Vérifie si une bouteille existe déjà dans un cellier spécifique
+ * @param {string|number} idCellier - L'identifiant du cellier
+ * @param {string|number} idBouteille - L'identifiant de la bouteille
+ * @returns {Promise<{existe: boolean, quantite: number}>} Objet indiquant si la bouteille existe et sa quantité
+ */
+export const verifierBouteilleCellier = async (idCellier, idBouteille) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL}/${idCellier}`
+    );
+    
+    if (reponse.ok) {
+      const data = await reponse.json();
+      const bouteilles = data?.donnees || data || [];
+      const bouteilleExistante = bouteilles.find(
+        b => String(b.id_bouteille) === String(idBouteille)
+      );
+      
+      if (bouteilleExistante) {
+        return {
+          existe: true,
+          quantite: bouteilleExistante.quantite || 0
+        };
+      }
+    }
+    
+    return { existe: false, quantite: 0 };
+  } catch (error) {
+    console.error("Erreur lors de la vérification:", error);
+    return { existe: false, quantite: 0 };
+  }
+};
