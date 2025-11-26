@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import Bouton from "../components-partages/Boutons/Bouton";
 
 function CarteCellier({ titre, idCellier, onModifier, onSupprimer }) {
@@ -6,12 +7,14 @@ function CarteCellier({ titre, idCellier, onModifier, onSupprimer }) {
     <div
       className="
         aspect-square
+        min-w-[150px]
+        max-w-[300px]
         rounded-(--arrondi-grand)
         border-2
         border-[var(--color-principal-200)]
         bg-[var(--color-fond-secondaire)]
         shadow-md
-        p-(--rythme-serre)
+        p-(--rythme-espace)
         content-center
         text-center
       "
@@ -20,10 +23,9 @@ function CarteCellier({ titre, idCellier, onModifier, onSupprimer }) {
         to={`/cellier/${idCellier}`}
         className="
           text-[var(--color-texte-premier)]
-          text-(length:--taille-moyen)
+          text-(length:--taille-normal)
           font-bold
           text-center
-          mb-(--rythme-serre)
           hover:text-[var(--color-principal-200)]
           hover:underline
           transition-colors
@@ -31,9 +33,9 @@ function CarteCellier({ titre, idCellier, onModifier, onSupprimer }) {
       >
         {titre}
       </Link>
-      <div className="flex flex-wrap gap-(--rythme-tres-serre) justify-center mt-(--rythme-serre)">
+      <div className="flex flex-wrap gap-(--rythme-base) justify-center my-(--rythme-serre)">
         <Bouton
-          texte="Modifier"
+          texte={<FaEdit />}
           type="secondaire"
           typeHtml="button"
           action={(e) => {
@@ -43,7 +45,7 @@ function CarteCellier({ titre, idCellier, onModifier, onSupprimer }) {
           }}
         />
         <Bouton
-          texte="Supprimer"
+          texte={<FaTrash />}
           type="primaire"
           typeHtml="button"
           action={(e) => {
