@@ -36,34 +36,16 @@ export const ajouterBouteilleDuCellier = async (req, res) => {
     const identifiantBouteille = Number.parseInt(id_bouteille, 10);
     const quantiteAjout = Number.parseInt(quantite, 10) || 1;
 
-    // Validation des ID
-    if (!identifiantCellier || !identifiantBouteille) {
-      return res
-        .status(400)
-        .json({ message: "ID cellier et ID bouteille requis" });
-    }
-
-   
-
     // Vérifie si la bouteille existe déjà dans le cellier (via le modèle)
     const bouteilleExistante = await modeleBouteilleCellier.verifierExistence(
       identifiantCellier,
       identifiantBouteille
     );
 
-    // Si la bouteille existe déjà, INCRÉMENTER la quantité
+    // Si la bouteille existe déjà, retourner un message
     if (bouteilleExistante) {
-      const nouvelleQuantite = bouteilleExistante.quantite + quantiteAjout;
-      
-      await modeleBouteilleCellier.mettreAJourQuantite(
-        identifiantCellier,
-        identifiantBouteille,
-        nouvelleQuantite
-      );
-      
       return res.status(200).json({ 
-        message: "Quantité mise à jour dans le cellier",
-        quantite: nouvelleQuantite
+        message: "La bouteille existe déjà dans le cellier"
       });
     }
 
