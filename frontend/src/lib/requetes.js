@@ -213,8 +213,9 @@ export const connexionUtilisateur = async (datas, navigate) => {
 // Fonction d'ajout d'une bouteille dans un cellier
 export const ajouterBouteilleCellier = async (idCellier, donnees) => {
   try {
-    const urlComplete = `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
-      }/${idCellier}`;
+    const urlComplete = `${
+      import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
+    }/${idCellier}`;
 
     const reponse = await fetch(urlComplete, {
       method: "POST",
@@ -250,7 +251,8 @@ export const ajouterBouteilleCellier = async (idCellier, donnees) => {
 export const recupererTousCellier = async (id_utilisateur) => {
   try {
     const reponse = await fetch(
-      `${import.meta.env.VITE_BACKEND_CELLIER_URL
+      `${
+        import.meta.env.VITE_BACKEND_CELLIER_URL
       }?id_utilisateur=${id_utilisateur}`
     );
     return reponse.json();
@@ -260,7 +262,27 @@ export const recupererTousCellier = async (id_utilisateur) => {
   }
 };
 
-export const recupererCellier = async (id_utilisateur, id_cellier) => { };
+/**
+ * Récupère les informations d'un cellier (nom + bouteilles)
+ * @param {string|number} id_cellier - Id du cellier
+ * @returns {Promise<Object|null>}
+ */
+export const recupererCellier = async (id_cellier) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL}/${id_cellier}`
+    );
+
+    if (!reponse.ok) {
+      throw new Error(`Erreur HTTP: ${reponse.status}`);
+    }
+
+    return await reponse.json();
+  } catch (error) {
+    console.error("Erreur lors de la récupération du cellier :", error);
+    return null;
+  }
+};
 
 /**
  * Creer un nouveau cellier pour un utilisateur.
@@ -321,7 +343,8 @@ export const modifierCellier = async (
 ) => {
   try {
     const reponse = await fetch(
-      `${import.meta.env.VITE_BACKEND_CELLIER_URL
+      `${
+        import.meta.env.VITE_BACKEND_CELLIER_URL
       }/${id_utilisateur}/${id_cellier}`,
       {
         method: "PUT",
@@ -362,16 +385,23 @@ export const modifierCellier = async (
  * @param {Function} navigate - Fonction de navigation de react-router-dom pour rediriger l'utilisateur
  * @returns {Promise<>} Un objet indiquant le succès de l'opération et l'erreur éventuelle
  */
-export const supprimerCellier = async (id_utilisateur, id_cellier, navigate) => {
-
+export const supprimerCellier = async (
+  id_utilisateur,
+  id_cellier,
+  navigate
+) => {
   try {
     console.log(
       "Requête DELETE vers:",
-      `${import.meta.env.VITE_BACKEND_CELLIER_URL}/${id_utilisateur}/${id_cellier}`
+      `${
+        import.meta.env.VITE_BACKEND_CELLIER_URL
+      }/${id_utilisateur}/${id_cellier}`
     );
 
     const reponse = await fetch(
-      `${import.meta.env.VITE_BACKEND_CELLIER_URL}/${id_utilisateur}/${id_cellier}`,
+      `${
+        import.meta.env.VITE_BACKEND_CELLIER_URL
+      }/${id_utilisateur}/${id_cellier}`,
       {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
@@ -382,8 +412,7 @@ export const supprimerCellier = async (id_utilisateur, id_cellier, navigate) => 
 
     if (reponse.ok) {
       navigate(`/sommaire-cellier?succes=true`);
-      return { succes: true }
-
+      return { succes: true };
     } else {
       // Gestion des erreurs HTTP
       const erreurData = await reponse.json().catch(() => ({}));

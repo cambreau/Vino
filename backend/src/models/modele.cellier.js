@@ -28,7 +28,19 @@ export default class ModeleCellier {
   }
 
   // Requête pour récupére un cellier d'un utilisateur
-  static async recuperer(id_utilisateur) { }
+  static async recuperer(id_cellier) {
+    // S'assure que l'ID du cellier est un nombre valide
+    const idCellier = Number.parseInt(id_cellier, 10);
+    if (!Number.isInteger(idCellier) || idCellier <= 0) {
+      throw new Error("ID cellier invalide");
+    }
+
+    const sql = `SELECT * FROM cellier WHERE id_cellier = ? LIMIT 1`;
+    const [rows] = await connexion.query(sql, [idCellier]);
+
+    // Retourne le cellier trouvé ou null si aucun résultat
+    return rows.length > 0 ? rows[0] : null;
+  }
 
   // Requête pour récupérer les celliers d'un utilisateur
   static async recupererTous(id_utilisateur) {
@@ -104,8 +116,12 @@ export default class ModeleCellier {
       await connection.beginTransaction();
 
       // Requête sql de suppression avec le résultat dans une variable.
-      const sql = "DELETE FROM cellier WHERE id_utilisateur = ? AND id_cellier = ?";
-      const [result] = await connection.query(sql, [id_utilisateur, id_cellier]);
+      const sql =
+        "DELETE FROM cellier WHERE id_utilisateur = ? AND id_cellier = ?";
+      const [result] = await connection.query(sql, [
+        id_utilisateur,
+        id_cellier,
+      ]);
 
       // Commit si tout est OK.
       await connection.commit();
@@ -117,7 +133,5 @@ export default class ModeleCellier {
     } finally {
       connection.release();
     }
-
   }
-
 }
