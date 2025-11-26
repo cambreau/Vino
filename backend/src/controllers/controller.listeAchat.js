@@ -1,4 +1,4 @@
-import modeleListeAchat from "../models/modele.utilisateur.js";
+import modeleListeAchat from "../models/modele.listeAchat.js";
 
 /**
  * Fonction asynchrone qui ajoute une bouteille a la liste achat.
