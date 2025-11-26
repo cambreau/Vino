@@ -7,32 +7,32 @@ import { supprimerUtilisateur } from "../lib/requetes.js";
 import Bouton from "../components/components-partages/Boutons/Bouton";
 import { FaUser } from "react-icons/fa";
 import authentificationStore from "../stores/authentificationStore";
-
+ 
 function Profil() {
   const navigate = useNavigate();
-
+ 
   // Récupérer les données du store
   const utilisateur = authentificationStore((state) => state.utilisateur);
   const estConnecte = authentificationStore((state) => state.estConnecte);
-
+ 
   // État pour gérer l'ouverture de la boîte modale de suppression
   const [estModaleSuppressionOuverte, setEstModaleSuppressionOuverte] =
     useState(false);
-
+ 
   useEffect(() => {
     if (!estConnecte || !utilisateur) {
       navigate("/connexion?deconnexionSucces=true");
       return;
     }
   }, [estConnecte, utilisateur, navigate]);
-
+ 
   /**
    * Ouvre la boîte modale de confirmation de suppression du profil
    */
   const gestionSuppressionProfil = () => {
     setEstModaleSuppressionOuverte(true);
   };
-
+ 
   /**
    * Fonction qui confirme et exécute la suppression du profil de l'utilisateur
    */
@@ -52,25 +52,27 @@ function Profil() {
       );
     }
   };
-
+ 
   /**
    * Ferme la boîte modale de suppression
    */
   const annulerSuppressionProfil = () => {
     setEstModaleSuppressionOuverte(false);
   };
-
+ 
   const modifierCompte = () => {
     if (utilisateur && utilisateur.id) {
       navigate(`/modifier-utilisateur/${utilisateur.id}`);
     }
   };
-
+ 
   return (
-    <div className="flex flex-col min-h-screen font-body max-w-[500px] mx-auto inset-x-0 relative">
-      <MenuEnHaut />
-
-      <main className="flex flex-col bg-fond px-(--rythme-base) pt-(--rythme-espace) gap-(--rythme-espace) grow">
+    <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
+      <header>
+        <MenuEnHaut />
+      </header>
+ 
+      <main className="flex flex-col bg-fond px-(--rythme-base) pt-(--rythme-espace) gap-(--rythme-espace) overflow-y-auto">
         {/* Boîte modale de confirmation de suppression  */}
         {estModaleSuppressionOuverte && (
           <BoiteModale
@@ -94,7 +96,7 @@ function Profil() {
             }
           />
         )}
-
+ 
         <div>
           <section className="flex items-center justify-between">
             <div>
@@ -107,7 +109,7 @@ function Profil() {
             </div>
             <FaUser size={32} color="#461243" />
           </section>
-
+ 
           <div className="flex flex-col mt-(--rythme-base) gap-(--rythme-serre)">
             <p>
               <span className="text-texte-premier font-bold mr-(--rythme-serre)">
@@ -129,7 +131,7 @@ function Profil() {
             </p>
           </div>
         </div>
-
+ 
         <div className="flex justify-between m-(--rythme-tres-serre) pb-(--rythme-espace) mb-(--rythme-espace)">
           <Bouton
             taille="moyen"
@@ -147,10 +149,12 @@ function Profil() {
           />
         </div>
       </main>
-
+ 
       <MenuEnBas />
     </div>
   );
 }
-
+ 
 export default Profil;
+ 
+ 

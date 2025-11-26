@@ -54,22 +54,22 @@ function Bouteille() {
   }, [id]);
 
   return (
-    <>
+    <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
       <header>
         {/* Menu haut fixe */}
-        <MenuEnHaut titre="Bouteille" />
+        <MenuEnHaut />
       </header>
-      <main className="flex gap-(--rythme-tres-serre) h-screen font-body max-w-[500px] mx-auto py-(--rythme-base) bg-fond">
-        <picture className="w-1/2 max-h-[800px]">
+      <main className="flex gap-(--rythme-tres-serre) font-body py-(--rythme-base) bg-fond overflow-y-auto">
+        <picture className="w-1/2">
           <img
             src={bouteille.image}
-            alt=""
-            className="w-full h-full object-cover"
+            alt={bouteille.nom}
+            className=" h-full object-cover"
           />
         </picture>
         <div className="flex flex-col flex-1 py-(--rythme-base) px-(--rythme-serre)">
           <header>
-            <h1 className="text-(--color-principal-300) text-(length:--taille-moyen)">
+            <h1 className="text-(--color-principal-300) text-(length:--taille-normal)">
               <strong>{bouteille.nom}</strong>
             </h1>
             <hr className="my-(--rythme-serre)" />
@@ -97,7 +97,7 @@ function Bouteille() {
               <h2 className="text-(--color-principal-300)">
                 <strong>Degré d'alcool : </strong>
               </h2>
-              <p> {bouteille.tauxAlcool}</p>
+              <p> {bouteille.tauxAlcool} %</p>
             </div>
             <div className="flex flex-col gap-(--rythme-tres-serre)">
               <h2 className="text-(--color-principal-300)">
@@ -111,26 +111,24 @@ function Bouteille() {
               </h2>
               <p>{bouteille.description}</p>
             </div>
-          </div>
-          {/* Bouton CTA vers l'ajout d'une bouteille (catalogue) */}
-          <div className="mt-auto">
-            <Bouton
-              taille="moyen"
-              texte="Ajouter cette bouteille"
-              type="primaire"
-              typeHtml="button"
-              action={() => {
-                navigate("/catalogue");
-              }}
-            />
+            {/* Bouton pour ajouter une bouteille dans le cellier */}
+            <div className="mb-(--rythme-base) pt-(--rythme-base)">
+              <Bouton
+                taille="moyen"
+                texte="Ajouter cette bouteille"
+                type="primaire"
+                typeHtml="button"
+                action={() => {
+                  navigate("/catalogue");
+                }}
+              />
+            </div>
           </div>
         </div>
       </main>
-      <footer>
-        {/* Menu bas fixe */}
-        <MenuEnBas />
-      </footer>
-    </>
+
+      <MenuEnBas />
+    </div>
   );
 }
 

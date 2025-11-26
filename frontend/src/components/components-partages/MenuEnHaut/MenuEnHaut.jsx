@@ -21,7 +21,7 @@ function MenuEnHaut({}) {
   };
 
   return (
-    <nav className="flex items-center justify-between max-w-[500px] mx-auto inset-x-0 p-(--rythme-base) bg-(--color-fond-secondaire)">
+    <nav className="flex items-center justify-between p-(--rythme-base) bg-(--color-fond-secondaire)">
       <div className="relative">
         {/* Bouton hamburger */}
         <button
