@@ -28,7 +28,7 @@ function Catalogue() {
 
       if (ignore) return;
 
-      if (resultat?.succes) {
+      if (resultat?.donnees) {
         setEtatListe({
           donnees: resultat.donnees ?? [],
           chargement: false,
@@ -39,7 +39,7 @@ function Catalogue() {
           donnees: [],
           chargement: false,
           message: {
-            texte: resultat?.erreur || "Impossible de charger le catalogue",
+            texte: "Impossible de charger le catalogue",
             type: "erreur",
           },
         });
