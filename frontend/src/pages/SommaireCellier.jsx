@@ -119,10 +119,8 @@ function SommaireCellier() {
         <MenuEnHaut />
       </header>
 
-      <main className="bg-fond overflow-y-auto relative">
-        <div className="absolute inset-0 bg-white/40 pointer-events-none"></div>
-
-        <section className="relative  p-(--rythme-base)">
+      <main className="bg-fond overflow-y-auto">
+        <section className="p-(--rythme-base)">
           <Bouton
             taille="moyen"
             texte="Ajouter un cellier"
