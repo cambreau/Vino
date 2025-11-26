@@ -6,10 +6,13 @@ import {
   modifierCellier,
   supprimerCellier,
   recupererTousCelliers,
+  recupererCellier,
 } from "../controllers/controller.cellier.js";
 
-// Récupérer tous les celliers d'un utilisateur ou un seul
+// Récupérer tous les celliers d'un utilisateur
 router.get("/", recupererTousCelliers); // tous les celliers (avec query param id_utilisateur)
+// Récupérer un cellier par son id
+router.get("/:id_cellier", recupererCellier);
 
 // Ajouter un cellier
 router.post("/:id_utilisateur", ajouterCellier);
