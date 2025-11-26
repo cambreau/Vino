@@ -9,6 +9,7 @@ function FormulaireSelect({
   value = "",
   onChange,
   classCouleur = "Dark", //Dark ou Clair
+  fullWidth = false,
 }) {
   const labelClair = "text-(--color-fond)";
   const labelDark = "text-color-texte-secondaire";
@@ -35,7 +36,7 @@ function FormulaireSelect({
       </label>
       <select
         className={`
-          max-w-[320px] px-(--rythme-serre) py-(--rythme-tres-serre)
+          ${fullWidth ? "max-w-full" : "max-w-[320px]"}  px-(--rythme-serre) py-(--rythme-tres-serre)
           text-(length:--taille-normal) font-font-body
            ${classCouleur === "Dark" ? selectDark : selectClair}
           border border-texte-secondaire rounded-(--arrondi-base) shadow-sm focus:outline-none focus:border-principal-200`}

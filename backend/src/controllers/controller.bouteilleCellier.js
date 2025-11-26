@@ -44,38 +44,29 @@ export const ajouterBouteilleDuCellier = async (req, res) => {
     const { idCellier } = req.params;
     const identifiantCellier = Number.parseInt(idCellier, 10);
 
-    // Obtiens le idBouteille avec
-    const { idBouteille } = req.body;
-    const identifiantBouteille = Number.parseInt(idBouteille, 10);
+    // Obtiens le id_bouteille avec req.body
+    const { id_bouteille, quantite } = req.body;
+    const identifiantBouteille = Number.parseInt(id_bouteille, 10);
+    const quantiteAjout = Number.parseInt(quantite, 10) || 1;
 
-    let { quantite = 1 } = req.body;
-    quantite = Number.parseInt(quantite, 10);
-
-    // Validation des ID
-    if (!identifiantCellier || !identifiantBouteille) {
-      return res
-        .status(400)
-        .json({ message: "ID cellier et ID bouteille requis" });
-    }
-
-    // Vérifie si la bouteille existe déjà dans le cellier
-    const [rows] = await connexion.query(
-      "SELECT * FROM bouteilleCellier WHERE id_cellier = ? AND id_bouteille = ?",
-      [identifiantCellier, identifiantBouteille]
+    // Vérifie si la bouteille existe déjà dans le cellier (via le modèle)
+    const bouteilleExistante = await modeleBouteilleCellier.verifierExistence(
+      identifiantCellier,
+      identifiantBouteille
     );
 
-    // Si on obtiens une rangée contenant la même bouteille, lance un message d'erreur
-    if (rows.length > 0) {
-      return res
-        .status(400)
-        .json({ message: "Cette bouteille est déjà dans le cellier" });
+    // Si la bouteille existe déjà, retourner un message
+    if (bouteilleExistante) {
+      return res.status(200).json({
+        message: "La bouteille existe déjà dans le cellier",
+      });
     }
 
-    // Requête pour ajouter avec informations
+    // Requête pour ajouter une nouvelle bouteille
     const action = await modeleBouteilleCellier.ajouter(
       identifiantCellier,
       identifiantBouteille,
-      quantite
+      quantiteAjout
     );
 
     res

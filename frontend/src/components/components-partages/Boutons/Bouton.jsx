@@ -4,6 +4,7 @@ function Bouton({
   taille = "", // Si, on ne met rien aucune taille donc grand, Taille 'moyen' = 320px
   action,
   typeHtml = "button",
+  disabled = false, 
 }) {
   // Classes de base pour les boutons
   const classesBase = `
@@ -38,9 +39,10 @@ function Bouton({
     <button
       type={typeHtml}
       className={`${classesBase} ${classesType} ${
-        taille === "moyen" ? "max-w-[320px]" : ""
-      }`}
-      onClick={action}
+        taille === "moyen" ? "max-w-[320px]" : ""} 
+        ${disabled ? "opacity-50 disabled:cursor-[not-allowed]  disabled:hover:bg-(--color-fond) disabled:hover:translate-y-0" : ""}`} 
+      onClick={!disabled ? action : undefined}  
+      disabled={disabled}  
     >
       {texte}
     </button>
