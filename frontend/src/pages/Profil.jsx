@@ -67,10 +67,12 @@ function Profil() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen font-body max-w-[500px] mx-auto inset-x-0 relative">
-      <MenuEnHaut />
+    <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
+      <header>
+        <MenuEnHaut />
+      </header>
 
-      <main className="flex flex-col bg-fond px-(--rythme-base) pt-(--rythme-espace) gap-(--rythme-espace) grow">
+      <main className="flex flex-col bg-fond px-(--rythme-base) pt-(--rythme-espace) gap-(--rythme-espace) overflow-y-auto">
         {/* Boîte modale de confirmation de suppression  */}
         {estModaleSuppressionOuverte && (
           <BoiteModale

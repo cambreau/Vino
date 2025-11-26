@@ -7,6 +7,7 @@ import {
   recupererTousCellier,
   creerCellier,
   modifierCellier,
+  supprimerCellier,
 } from "../lib/requetes.js";
 import Bouton from "../components/components-partages/Boutons/Bouton";
 import FormulaireInput from "../components/components-partages/Formulaire/FormulaireInput/FormulaireInput";
@@ -30,6 +31,11 @@ function SommaireCellier() {
     useState(false);
   const [cellierAModifier, setCellierAModifier] = useState(null);
   const [nomCellierModification, setNomCellierModification] = useState("");
+
+  //Information modale supprimer
+  const [estModaleSuppresionOuverte, setEstModaleSuppressionOuverte] =
+    useState(false);
+  const [cellierASupprimer, setCellierASupprimer] = useState(null);
 
   //**** Fonctions charger les celliers */
   // Fonction pour charger les celliers
@@ -109,22 +115,43 @@ function SommaireCellier() {
   };
 
   //**** Fonctions supprimer un cellier */
-
   // Fonction pour supprimer un cellier
-  const gererSupprimerCellier = (idCellier) => {};
+  const gererSupprimerCellier = (idCellier) => {
+    // Récupérer le cellier dans la liste des celliers obtenue précédemment.
+    const cellier = celliers.find((c) => c.id_cellier === idCellier);
+    if (cellier) {
+      setCellierASupprimer(cellier);
+      setEstModaleSuppressionOuverte(true);
+    }
+  };
+
+  // Fonction pour fermer la boite modale de suppression
+  const fermerModaleASupprimer = () => {
+    setEstModaleSuppressionOuverte(false);
+    setCellierASupprimer(null);
+  };
+
+  // Fonction pour supprimer le cellier
+  const suppressionCellier = async () => {
+    const resultat = await supprimerCellier(
+      idUtilisateur,
+      cellierASupprimer.id_cellier,
+      navigate
+    );
+    if (resultat.succes) {
+      await chargerCelliers();
+      fermerModaleASupprimer();
+    }
+  };
 
   return (
-    <>
+    <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
       <header>
-        <MenuEnHaut titre="Sommaire celliers" />
+        <MenuEnHaut />
       </header>
-      <main
-        className="min-h-screen font-body max-w-[500px] mx-auto inset-x-0 relative
-      bg-[linear-gradient(0deg,rgba(0,0,0,0.05)25%,rgba(0,0,0,0)),url('../assets/images/sommaireCellier.webp')] bg-cover bg-center bg-fond"
-      >
-        <div className="absolute inset-0 bg-white/40 pointer-events-none"></div>
 
-        <section className="relative pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)">
+      <main className="bg-fond overflow-y-auto">
+        <section className="p-(--rythme-base)">
           <Bouton
             taille="moyen"
             texte="Ajouter un cellier"
@@ -135,7 +162,7 @@ function SommaireCellier() {
 
           {/* Message si aucun cellier */}
           {celliers.length === 0 && (
-            <div className="mt-(--rythme-base)">
+            <div className="my-(--rythme-base)">
               <Message
                 type="information"
                 texte="Vous n'avez pas encore de celliers. Cliquez sur 'Ajouter un cellier' pour en créer un."
@@ -145,7 +172,7 @@ function SommaireCellier() {
 
           {/* Liste des celliers */}
           {celliers.length > 0 && (
-            <div className="mt-(--rythme-base) grid grid-cols-2 gap-(--rythme-base)">
+            <div className="flex flex-wrap my-(--rythme-espace) gap-(--rythme-base)  max-w-6xl">
               {celliers.map((cellier) => (
                 <CarteCellier
                   key={cellier.id_cellier}
@@ -231,12 +258,34 @@ function SommaireCellier() {
               }
             />
           )}
+
+          {/* Modale pour supprimer un cellier */}
+          {estModaleSuppresionOuverte && cellierASupprimer && (
+            <BoiteModale
+              texte={`Supprimer le cellier : ${cellierASupprimer.nom}`}
+              bouton={
+                <>
+                  <Bouton
+                    texte="Annuler"
+                    type="secondaire"
+                    typeHtml="button"
+                    action={fermerModaleASupprimer}
+                  />
+                  <Bouton
+                    texte="Supprimer"
+                    type="primaire"
+                    typeHtml="button"
+                    action={suppressionCellier}
+                  />
+                </>
+              }
+            />
+          )}
         </section>
       </main>
-      <footer>
-        <MenuEnBas />
-      </footer>
-    </>
+
+      <MenuEnBas />
+    </div>
   );
 }
 

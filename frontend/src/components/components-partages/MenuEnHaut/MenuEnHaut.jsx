@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Icon from "../Icon/Icon";
+import Bouton from "../Boutons/Bouton";
 import RasinLogo from "../../../assets/images/grape_logo.svg";
 import authentificationStore from "../../../stores/authentificationStore";
 
@@ -18,10 +19,11 @@ function MenuEnHaut({}) {
    */
   const gererDeconnexion = () => {
     authentificationStore.getState().deconnexion();
+    navigate("/connexion?deconnexionSucces=true");
   };
 
   return (
-    <nav className="flex items-center justify-between max-w-[500px] mx-auto inset-x-0 p-(--rythme-base) bg-(--color-fond-secondaire)">
+    <nav className="flex items-center justify-between p-(--rythme-base) bg-fond-secondaire">
       <div className="relative">
         {/* Bouton hamburger */}
         <button
@@ -46,13 +48,13 @@ function MenuEnHaut({}) {
 
         {/* Menu déroulant */}
         {estMenuOuvert && (
-          <div className="absolute -left-(--rythme-base) mt-(--rythme-tres-serre) p-(--rythme-base) h-screen  min-w-[300px] bg-(--color-fond-secondaire)">
+          <div className="absolute -left-(--rythme-base) mt-(--rythme-tres-serre) p-(--rythme-base) h-screen  min-w-[300px] bg-fond-secondaire">
             <div className="flex justify-between mb-(--rythme-espace)">
               <header>
-                <h2 className="text-(--color-texte-premier) text-(length:--taille-grand) font-display font-bold">
+                <h2 className="text-texte-premier text-(length:--taille-grand) font-display font-bold">
                   {estConnecte && utilisateur ? utilisateur.nom : ""}
                 </h2>
-                <small className="text-(--color-texte-premier) text-(length:--taille-moyen) font-display">
+                <small className="text-texte-premier text-(length:--taille-moyen) font-display">
                   {estConnecte && utilisateur
                     ? utilisateur.courriel
                     : "Courriel"}
@@ -110,7 +112,7 @@ function MenuEnHaut({}) {
 
       {/* Logo */}
       <Link to="/catalogue" className="flex items-center">
-        <h2 className="text-(--color-principal-300) text-(length:--taille-grand) font-display">
+        <h2 className="text-principal-300 text-(length:--taille-grand) font-display">
           Vin
         </h2>
         <img src={RasinLogo} alt="Logo raisin" width="43" height="35" />
@@ -118,13 +120,18 @@ function MenuEnHaut({}) {
 
       {/* Déconnexion */}
       {estConnecte && (
-        <button onClick={gererDeconnexion} aria-label="Déconnexion">
-          <Icon
-            nom="deconnection"
-            typeMenu="haut"
-            couleur="(--color-principal-300)"
-          />
-        </button>
+        <Bouton
+          texte={
+            <Icon
+              nom="deconnection"
+              typeMenu="haut"
+              couleur="(--color-principal-300)"
+            />
+          }
+          type="secondaire"
+          typeHtml="button"
+          action={gererDeconnexion}
+        />
       )}
     </nav>
   );

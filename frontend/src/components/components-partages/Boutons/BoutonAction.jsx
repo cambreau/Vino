@@ -1,8 +1,8 @@
-function BoutonAction({ 
+function BoutonAction({
   texte = "Action",
-  onClick, 
+  onClick,
   disabled = false,
-  type = "primaire" // "primaire" ou "secondaire"
+  type = "primaire", // "primaire" ou "secondaire"
 }) {
   // Classes de base
   const classesBase = `
@@ -17,9 +17,11 @@ function BoutonAction({
 
   // Classes selon le type
   const classesPrimaire = "bg-principal-300 hover:bg-principal-200 ";
-  const classesSecondaire = "bg-principal-100 hover:bg-principal-200 text-principal-200 hover:text-principal-100";
-  
-  const classesType = type === "secondaire" ? classesSecondaire : classesPrimaire;
+  const classesSecondaire =
+    "bg-principal-100 hover:bg-principal-200 text-principal-200 hover:text-principal-100";
+
+  const classesType =
+    type === "secondaire" ? classesSecondaire : classesPrimaire;
 
   return (
     <button

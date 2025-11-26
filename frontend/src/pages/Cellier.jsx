@@ -1,46 +1,85 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+
 import MenuEnHaut from "../components/components-partages/MenuEnHaut/MenuEnHaut";
 import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
-import { useNavigate } from "react-router-dom";
 import Bouton from "../components/components-partages/Boutons/Bouton";
 import Message from "../components/components-partages/Message/Message";
+import CarteBouteille from "../components/carte/CarteBouteille";
+import { recupererCellier } from "../lib/requetes.js";
 
 function Cellier() {
   const navigate = useNavigate();
-  return (
-    <>
-      <MenuEnHaut titre="Celliers" />
+  // Récupérer id du cellier dans l'URL
+  const { idCellier } = useParams();
 
-      <main className="min-h-screen font-body max-w-[500px] mx-auto inset-x-0 bg-fond">
+  // Etat pour le cellier : nom + bouteilles
+  const [cellier, setCellier] = useState({
+    nom: "",
+    bouteilles: [],
+  });
+
+  useEffect(() => {
+    const chargerCellier = async () => {
+      const donneesCellier = await recupererCellier(idCellier);
+      setCellier({
+        nom: donneesCellier.nom || "",
+        bouteilles: donneesCellier.bouteilles || [],
+      });
+    };
+
+    chargerCellier();
+  }, [idCellier]);
+
+  return (
+    <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
+      <header>
+        <MenuEnHaut />
+      </header>
+
+      <main className="bg-fond overflow-y-auto">
         <section className="pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)">
-          {/* Contenu du catalogue (celliers) à ajouter ici */}
           <h1 className="text-(length:--taille-moyen) text-center font-display font-semibold text-principal-300">
-            Cellier - NomDuCellier
+            Cellier - {cellier.nom}
           </h1>
-          <article className="mt-(--rythme-base) p-(--rythme-serre) min-h-[200px] flex flex-col items-center justify-center">
-            {/* Contenu des bouteilles dans le cellier à ajouter ici */}
-            {/* Message lorsque le cellier est vide */}
-            <div className="mb-(--rythme-base) w-full ">
-              <Message
-                type="erreur"
-                texte="Vous n'avez pas encore de bouteilles dans ce cellier."
-              />
-            </div>
-            {/* Bouton CTA vers l'ajout d'une bouteille (catalogue) */}
-            <Bouton
-              taille="moyen"
-              texte="Ajouter une bouteille"
-              type="primaire"
-              typeHtml="button"
-              action={() => {
-                navigate("/catalogue");
-              }}
-            />
+
+          <article className="mt-(--rythme-base) p-(--rythme-serre) min-h-[200px]">
+            {cellier.bouteilles.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {cellier.bouteilles.map((bouteille) => (
+                  <CarteBouteille
+                    key={bouteille.id}
+                    bouteille={bouteille}
+                    type="cellier"
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-(--rythme-base)">
+                <div className="mb-(--rythme-base) w-full">
+                  <Message
+                    type="information"
+                    texte="Vous n'avez pas encore de bouteilles dans ce cellier."
+                  />
+                </div>
+
+                <Bouton
+                  taille="moyen"
+                  texte="Ajouter une bouteille"
+                  type="primaire"
+                  typeHtml="button"
+                  action={() => {
+                    navigate("/catalogue");
+                  }}
+                />
+              </div>
+            )}
           </article>
         </section>
       </main>
 
       <MenuEnBas />
-    </>
+    </div>
   );
 }
 

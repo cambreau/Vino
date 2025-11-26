@@ -37,6 +37,34 @@ export const ajouterCellier = async (req, res) => {
   }
 };
 
+/**
+ * Récupère un cellier par son id.
+ */
+export const recupererCellier = async (req, res) => {
+  try {
+    const { id_cellier } = req.params;
+
+    if (!id_cellier) {
+      return res
+        .status(400)
+        .json({ message: "Id cellier requis pour récupérer le cellier" });
+    }
+
+    const cellier = await ModeleCellier.recuperer(id_cellier);
+
+    if (!cellier) {
+      return res.status(404).json({ message: "Cellier non trouvé" });
+    }
+
+    return res.status(200).json(cellier);
+  } catch (error) {
+    console.error("Erreur lors de la récupération du cellier :", error);
+    return res.status(500).json({
+      message: "Erreur serveur lors de la récupération du cellier.",
+    });
+  }
+};
+
 export const recupererTousCelliers = async (req, res) => {
   try {
     const { id_utilisateur } = req.query;
@@ -100,4 +128,35 @@ export const modifierCellier = async (req, res) => {
   }
 };
 
-export const supprimerCellier = async (req, res) => {};
+export const supprimerCellier = async (req, res) => {
+  try {
+    // Récupère les ID depuis les paramètres de l'URL
+    const { id_utilisateur, id_cellier } = req.params;
+
+    // Validation des entrées
+    if (!id_utilisateur || !id_cellier) {
+      return res.status(400).json({
+        message: "Identifiant de cellier invalide",
+      });
+    }
+
+    // Applique la requête SQL
+    const resultat = await ModeleCellier.supprimer(id_utilisateur, id_cellier);
+
+    // Si retourne faux, retourne un message d'erreur, sinon on envoie la requête
+    if (!resultat) {
+      return res.status(404).json({
+        message: "Cellier introuvable ou déjà supprimée",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Cellier supprimée avec succès",
+    });
+  } catch (error) {
+    console.error("Erreur lors de la suppression de ce cellier", error);
+    return res.status(500).json({
+      message: "Impossible de supprimer le cellier",
+    });
+  }
+};
