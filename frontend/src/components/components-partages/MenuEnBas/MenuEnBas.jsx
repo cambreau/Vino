@@ -6,20 +6,20 @@ function MenuEnBas({}) {
       <Link to="/catalogue">
         <Icon
           nom="catalogue"
-          couleur="(--color-principal-100)"
+          couleur="principal-100"
           typeMenu="bas"
         />
       </Link>
       {/* ATTENTION LIEN A FAIRE */}
       <Link to="/sommaire-cellier">
-        <Icon nom="cellier" couleur="(--color-principal-100)" typeMenu="bas" />
+        <Icon nom="cellier" couleur="principal-100" typeMenu="bas" />
       </Link>
       {/* ATTENTION LIEN A FAIRE */}
       <Link to="#">
-        <Icon nom="liste" couleur="(--color-principal-100)" typeMenu="bas" />
+        <Icon nom="liste" couleur="principal-100" typeMenu="bas" />
       </Link>
       <Link to="/profil">
-        <Icon nom="profil" couleur="(--color-principal-100)" typeMenu="bas" />
+        <Icon nom="profil" couleur="principal-100" typeMenu="bas" />
       </Link>
     </footer>
   );
