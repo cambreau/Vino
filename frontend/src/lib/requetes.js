@@ -1,5 +1,6 @@
 // Ce fichier regroupe toutes les fonctions permettant de communiquer avec le backend.
 import authentificationStore from "../stores/authentificationStore";
+import bouteillesStore from "../stores/bouteillesStore";
 
 // *************************** Utilisateur
 /**
@@ -185,6 +186,9 @@ export const connexionUtilisateur = async (datas, navigate) => {
 
       // Sauvegarder l'utilisateur dans le store
       authentificationStore.getState().connexion(datasUtilisateur);
+
+      // Charger les bouteilles une seule fois au moment de la connexion
+      bouteillesStore.getState().chargerBouteilles();
 
       // Rediriger vers page profil
       navigate("/profil");

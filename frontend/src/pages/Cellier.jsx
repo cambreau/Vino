@@ -16,7 +16,6 @@ function Cellier() {
   // Etat pour le cellier : nom + bouteilles
   const [cellier, setCellier] = useState({
     nom: "",
-    bouteilles: [],
   });
 
   useEffect(() => {
