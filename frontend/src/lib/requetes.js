@@ -209,8 +209,6 @@ export const connexionUtilisateur = async (datas, navigate) => {
   }
 };
 
-
-
 // *************************** Bouteille Cellier
 // Fonction d'ajout d'une bouteille dans un cellier
 export const ajouterBouteilleCellier = async (idCellier, donnees) => {
@@ -360,3 +358,43 @@ export const modifierCellier = async (
 };
 
 export const supprimerCellier = async (id_utilisateur, id_cellier) => {};
+
+// BOUTEILLE
+
+/**
+ * Récupère les informations d'une bouteille par son identifiant via l'API backend.
+ * @param {string|number} id - L'identifiant unique d'une bouteille à récupérer
+ * @returns {Promise<Object|null>} Les données de la bouteille ou null en cas d'erreur
+ */
+export const recupererBouteille = async (id) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_BOUTEILLES_URL}/${id}`
+    );
+    return reponse.json();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// *************************** Bouteilles (Catalogue)
+/**
+ * Récupère toutes les bouteilles disponibles dans le catalogue
+ * @returns {Promise<Array|null>} Array des bouteilles ou null en cas d'erreur
+ */
+export const recupererBouteilles = async () => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_BOUTEILLES_URL}`
+    );
+
+    if (!reponse.ok) {
+      throw new Error(`Erreur HTTP: ${reponse.status}`);
+    }
+
+    return await reponse.json();
+  } catch (error) {
+    console.error("Erreur lors de la récupération des bouteilles:", error);
+    return null;
+  }
+};
