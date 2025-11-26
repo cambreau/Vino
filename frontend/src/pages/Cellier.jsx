@@ -7,10 +7,12 @@ import Message from "../components/components-partages/Message/Message";
 function Cellier({ nomCellier }) {
   const navigate = useNavigate();
   return (
-    <>
-      <MenuEnHaut titre="Celliers" />
+    <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
+      <header>
+        <MenuEnHaut titre="Celliers" />
+      </header>
 
-      <main className="min-h-screen font-body max-w-[500px] mx-auto inset-x-0 bg-fond">
+      <main className="bg-fond overflow-y-auto">
         <section className="pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)">
           {/* Contenu du catalogue (celliers) à ajouter ici */}
           <h1 className="text-(length:--taille-moyen) text-center font-display font-semibold text-principal-300">
@@ -40,7 +42,7 @@ function Cellier({ nomCellier }) {
       </main>
 
       <MenuEnBas />
-    </>
+    </div>
   );
 }
 

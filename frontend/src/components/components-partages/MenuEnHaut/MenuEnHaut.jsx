@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Icon from "../Icon/Icon";
+import Bouton from "../Boutons/Bouton";
 import RasinLogo from "../../../assets/images/grape_logo.svg";
 import authentificationStore from "../../../stores/authentificationStore";
 
@@ -18,10 +19,11 @@ function MenuEnHaut({}) {
    */
   const gererDeconnexion = () => {
     authentificationStore.getState().deconnexion();
+    navigate("/connexion?deconnexionSucces=true");
   };
 
   return (
-    <nav className="flex items-center justify-between max-w-[500px] mx-auto inset-x-0 p-(--rythme-base) bg-(--color-fond-secondaire)">
+    <nav className="flex items-center justify-between p-(--rythme-base) bg-(--color-fond-secondaire)">
       <div className="relative">
         {/* Bouton hamburger */}
         <button
@@ -118,13 +120,18 @@ function MenuEnHaut({}) {
 
       {/* Déconnexion */}
       {estConnecte && (
-        <button onClick={gererDeconnexion} aria-label="Déconnexion">
-          <Icon
-            nom="deconnection"
-            typeMenu="haut"
-            couleur="(--color-principal-300)"
-          />
-        </button>
+        <Bouton
+          texte={
+            <Icon
+              nom="deconnection"
+              typeMenu="haut"
+              couleur="(--color-principal-300)"
+            />
+          }
+          type="secondaire"
+          typeHtml="button"
+          action={gererDeconnexion}
+        />
       )}
     </nav>
   );
