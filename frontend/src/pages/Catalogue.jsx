@@ -7,6 +7,8 @@ import bouteillesStore from "../stores/bouteillesStore";
 function Catalogue() {
   const { bouteilles, erreur, chargement } = bouteillesStore();
 
+  const enChargement = chargement || (!bouteilles.length && !erreur);
+
   return (
     <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
       <header>
@@ -21,7 +23,7 @@ function Catalogue() {
             </div>
           )}
 
-          {chargement ? (
+          {enChargement ? (
             <Message texte="Chargement du catalogue..." type="information" />
           ) : (
             <>
