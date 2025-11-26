@@ -11,29 +11,29 @@ function BoiteModale({ texte, contenu = null, bouton }) {
       <section
         className="
               max-w-[500px] w-full
-              mx-[var(--rythme-base)]
-              bg-[var(--color-fond-secondaire)]
-              border border-[var(--color-secondaire)]
-              rounded-[var(--arrondi-grand)]
+              mx-(--rythme-base)
+              bg-fond-secondaire
+              border border-(--color-secondaire)
+              rounded-(--arrondi-grand)
               shadow-lg
-              p-[var(--rythme-base)]
+              p-(--rythme-base)
             "
       >
         <h2
           className="
-                text-[var(--color-texte-premier)]
-                text-[length:var(--taille-moyen)]
+                text-texte-premier
+                text-(length:--taille-moyen)
                 font-display font-bold
-                mb-[var(--rythme-base)]
+                mb-(--rythme-base)
                 text-center
               "
         >
           {texte}
         </h2>
-        <div className="mt-[var(--rythme-espace)] flex justify-center">
+        <div className="mt-(--rythme-espace) flex justify-center">
           {contenu}
         </div>
-        <div className="mt-[var(--rythme-espace)] flex justify-center gap-[var(--rythme-base)]">
+        <div className="mt-(--rythme-espace) flex justify-center gap-(--rythme-base)">
           {bouton}
         </div>
       </section>

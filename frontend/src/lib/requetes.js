@@ -387,11 +387,11 @@ export const recupererBouteilles = async () => {
     const reponse = await fetch(
       `${import.meta.env.VITE_BACKEND_BOUTEILLES_URL}`
     );
-    
+
     if (!reponse.ok) {
       throw new Error(`Erreur HTTP: ${reponse.status}`);
     }
-    
+
     return await reponse.json();
   } catch (error) {
     console.error("Erreur lors de la récupération des bouteilles:", error);

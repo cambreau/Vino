@@ -1,16 +1,18 @@
-function BoutonQuantite({ 
+function BoutonQuantite({
   type = "augmenter", // "augmenter" ou "diminuer"
-  onClick, 
-  disabled = false 
+  onClick,
+  disabled = false,
 }) {
   const symbole = type === "augmenter" ? "+" : "-";
-  const label = type === "augmenter" ? "Augmenter la quantité" : "Diminuer la quantité";
+  const label =
+    type === "augmenter" ? "Augmenter la quantité" : "Diminuer la quantité";
 
- // Classes d’arrondi selon le type
+  // Classes d’arrondi selon le type
 
- const coins = type === "augmenter"
-    ? "rounded-tr-(--arrondi-tres-grand) rounded-br-(--arrondi-tres-grand)"
-    : "rounded-tl-(--arrondi-tres-grand) rounded-bl-(--arrondi-tres-grand)";
+  const coins =
+    type === "augmenter"
+      ? "rounded-tr-(--arrondi-tres-grand) rounded-br-(--arrondi-tres-grand)"
+      : "rounded-tl-(--arrondi-tres-grand) rounded-bl-(--arrondi-tres-grand)";
 
   return (
     <button

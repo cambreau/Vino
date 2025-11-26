@@ -32,7 +32,7 @@ function Icon({ nom, size = 24, couleur, typeMenu }) {
         <div className="flex flex-col items-center gap-(--rythme-tres-serre) w-full ">
           <IconComposant
             size={size}
-            className={`text-(--color-principal-100)`}
+            className={`text-principal-100`}
           />
           {typeMenu === "bas" ? (
             <p className={`text-${couleur}`}>{formatMajDebut(nom)}</p>
