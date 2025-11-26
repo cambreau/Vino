@@ -96,6 +96,8 @@ function Catalogue() {
     chargerBouteilles();
   }, []);
 
+  const { donnees, chargement, message } = etatListe;
+
   // FONCTION: Ouvrir la modale quand on clique sur "Ajouter au cellier"
   const ouvrirModale = (bouteille) => {
     setBouteilleSelectionnee(bouteille);

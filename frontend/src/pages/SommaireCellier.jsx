@@ -7,6 +7,7 @@ import {
   recupererTousCellier,
   creerCellier,
   modifierCellier,
+  supprimerCellier,
 } from "../lib/requetes.js";
 import Bouton from "../components/components-partages/Boutons/Bouton";
 import FormulaireInput from "../components/components-partages/Formulaire/FormulaireInput/FormulaireInput";
@@ -30,6 +31,11 @@ function SommaireCellier() {
     useState(false);
   const [cellierAModifier, setCellierAModifier] = useState(null);
   const [nomCellierModification, setNomCellierModification] = useState("");
+
+  //Information modale supprimer
+  const [estModaleSuppresionOuverte, setEstModaleSuppressionOuverte] =
+    useState(false);
+  const [cellierASupprimer, setCellierASupprimer] = useState(null);
 
   //**** Fonctions charger les celliers */
   // Fonction pour charger les celliers
@@ -109,9 +115,34 @@ function SommaireCellier() {
   };
 
   //**** Fonctions supprimer un cellier */
-
   // Fonction pour supprimer un cellier
-  const gererSupprimerCellier = (idCellier) => {};
+  const gererSupprimerCellier = (idCellier) => {
+    // Récupérer le cellier dans la liste des celliers obtenue précédemment.
+    const cellier = celliers.find((c) => c.id_cellier === idCellier);
+    if (cellier) {
+      setCellierASupprimer(cellier);
+      setEstModaleSuppressionOuverte(true);
+    }
+  };
+
+  // Fonction pour fermer la boite modale de suppression
+  const fermerModaleASupprimer = () => {
+    setEstModaleSuppressionOuverte(false);
+    setCellierASupprimer(null);
+  };
+
+  // Fonction pour supprimer le cellier
+  const suppressionCellier = async () => {
+    const resultat = await supprimerCellier(
+      idUtilisateur,
+      cellierASupprimer.id_cellier,
+      navigate
+    );
+    if (resultat.succes) {
+      await chargerCelliers();
+      fermerModaleASupprimer();
+    }
+  };
 
   return (
     <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
@@ -222,6 +253,29 @@ function SommaireCellier() {
                     type="primaire"
                     typeHtml="button"
                     action={modifierCellierAvecNom}
+                  />
+                </>
+              }
+            />
+          )}
+
+          {/* Modale pour supprimer un cellier */}
+          {estModaleSuppresionOuverte && cellierASupprimer && (
+            <BoiteModale
+              texte={`Supprimer le cellier : ${cellierASupprimer.nom}`}
+              bouton={
+                <>
+                  <Bouton
+                    texte="Annuler"
+                    type="secondaire"
+                    typeHtml="button"
+                    action={fermerModaleASupprimer}
+                  />
+                  <Bouton
+                    texte="Supprimer"
+                    type="primaire"
+                    typeHtml="button"
+                    action={suppressionCellier}
                   />
                 </>
               }
