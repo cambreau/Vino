@@ -3,7 +3,7 @@ import MenuEnHaut from "../components/components-partages/MenuEnHaut/MenuEnHaut"
 import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
 import CarteBouteille from "../components/carte/CarteBouteille";
 import Message from "../components/components-partages/Message/Message";
-import { recupererTousBouteilles } from "../lib/requetes";
+import { recupererBouteilles } from "../lib/requetes";
 
 const etatInitialListe = {
   donnees: [],
@@ -24,7 +24,7 @@ function Catalogue() {
         message: { texte: "", type: "" },
       }));
 
-      const resultat = await recupererTousBouteilles();
+      const resultat = await recupererBouteilles();
 
       if (ignore) return;
 
