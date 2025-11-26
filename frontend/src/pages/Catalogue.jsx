@@ -22,9 +22,6 @@ function Catalogue() {
           setMessage({
             texte: "Impossible de charger le catalogue",
             type: "erreur",
-          setMessage({
-            texte: "Impossible de charger le catalogue",
-            type: "erreur",
           });
           setChargement(false);
           return;
@@ -33,9 +30,6 @@ function Catalogue() {
         setChargement(false);
       } catch (erreur) {
         console.error("Erreur:", erreur);
-        setMessage({
-          texte: "Impossible de charger le catalogue",
-          type: "erreur",
         setMessage({
           texte: "Impossible de charger le catalogue",
           type: "erreur",
@@ -68,9 +62,7 @@ function Catalogue() {
 
   return (
     <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
-    <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
       <header>
-        <MenuEnHaut />
         <MenuEnHaut />
       </header>
       <main className="font-body bg-fond overflow-y-auto">
@@ -82,12 +74,10 @@ function Catalogue() {
           )}
           {chargement ? (
             <Message texte="Chargement du catalogue..." type="information" />
-            <Message texte="Chargement du catalogue..." type="information" />
           ) : (
             <>
               {bouteilles.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {bouteilles.map((bouteille) => (
                   {bouteilles.map((bouteille) => (
                     <CarteBouteille
                       key={bouteille.id}
@@ -101,17 +91,12 @@ function Catalogue() {
                   texte="Aucune bouteille disponible dans le catalogue"
                   type="information"
                 />
-                <Message
-                  texte="Aucune bouteille disponible dans le catalogue"
-                  type="information"
-                />
               )}
             </>
           )}
         </section>
       </main>
       <MenuEnBas />
-    </div>
     </div>
   );
 }
