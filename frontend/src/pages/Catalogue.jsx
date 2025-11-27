@@ -1,22 +1,22 @@
 import { useState, useEffect, useCallback } from "react";
-import MenuEnHaut from "../components/components-partages/MenuEnHaut/MenuEnHaut";
-import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
-import CarteBouteille from "../components/carte/CarteBouteille";
-import Message from "../components/components-partages/Message/Message";
-import BoiteModale from "../components/components-partages/BoiteModale/BoiteModale";
+import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
+import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
+import CarteBouteille from "@components/carte/CarteBouteille";
+import Message from "@components/components-partages/Message/Message";
+import BoiteModale from "@components/components-partages/BoiteModale/BoiteModale";
 
-import Bouton from "../components/components-partages/Boutons/Bouton";
-import BoutonQuantite from "../components/components-partages/Boutons/BoutonQuantite";
-import FormulaireSelect from "../components/components-partages/Formulaire/FormulaireSelect/FormulaireSelect";
+import Bouton from "@components/components-partages/Boutons/Bouton";
+import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuantite";
+import FormulaireSelect from "@components/components-partages/Formulaire/FormulaireSelect/FormulaireSelect";
 
 import {
   recupererBouteilles,
   ajouterBouteilleCellier,
   recupererTousCellier,
   verifierBouteilleCellier,
-} from "../lib/requetes";
+} from "@lib/requetes";
 
-import authentificationStore from "../stores/authentificationStore";
+import authentificationStore from "@store/authentificationStore";
 
 function Catalogue() {
   // Récupération de l'utilisateur connecté

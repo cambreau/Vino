@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
-import MenuEnHaut from "../components/components-partages/MenuEnHaut/MenuEnHaut";
-import BoiteModale from "../components/components-partages/BoiteModale/BoiteModale";
-import { supprimerUtilisateur } from "../lib/requetes.js";
-import Bouton from "../components/components-partages/Boutons/Bouton";
+import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
+import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
+import BoiteModale from "@components/components-partages/BoiteModale/BoiteModale";
+import { supprimerUtilisateur } from "@lib/requetes.js";
+import Bouton from "@components/components-partages/Boutons/Bouton";
 import { FaUser } from "react-icons/fa";
-import authentificationStore from "../stores/authentificationStore";
+import authentificationStore from "@store/authentificationStore";
 
 function Profil() {
   const navigate = useNavigate();

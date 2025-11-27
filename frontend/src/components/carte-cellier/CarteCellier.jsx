@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import Bouton from "../components-partages/Boutons/Bouton";
+import Bouton from "@components/components-partages/Boutons/Bouton";
 
 function CarteCellier({ titre, idCellier, onModifier, onSupprimer }) {
   return (

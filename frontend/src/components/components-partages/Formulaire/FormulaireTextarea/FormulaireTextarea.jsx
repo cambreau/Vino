@@ -1,5 +1,5 @@
 // Utils
-import { formatString } from "../../../../lib/utils";
+import { formatString } from "@lib/utils";
 
 function FormulaireTextarea({
   nom,
