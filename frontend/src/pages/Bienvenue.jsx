@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import Bouton from "../components/components-partages/Boutons/Bouton";
+import Bouton from "@components/components-partages/Boutons/Bouton";
 
 function Bienvenue() {
   const navigate = useNavigate();
@@ -9,7 +9,7 @@ function Bienvenue() {
       className="
       flex items-end justify-center min-h-screen py-(--rythme-espace) px-(--rythme-base)
       font-body
-       bg-[linear-gradient(0deg,rgba(0,0,0,0.7)25%,rgba(0,0,0,0)),url('../assets/images/heroBienvenue.webp')] bg-cover bg-center
+       bg-[linear-gradient(0deg,rgba(0,0,0,0.7)25%,rgba(0,0,0,0)),url('@assets/images/heroBienvenue.webp')] bg-cover bg-center
       "
     >
       <section className="w-full max-w-md">

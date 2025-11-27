@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import Icon from "../Icon/Icon";
-import Bouton from "../Boutons/Bouton";
-import RasinLogo from "../../../assets/images/grape_logo.svg";
-import authentificationStore from "../../../stores/authentificationStore";
+import Icon from "@components/components-partages/Icon/Icon";
+import Bouton from "@components/components-partages/Boutons/Bouton";
+import RasinLogo from "@assets/images/grape_logo.svg";
+import authentificationStore from "@store/authentificationStore";
 
 function MenuEnHaut({}) {
   const navigate = useNavigate();

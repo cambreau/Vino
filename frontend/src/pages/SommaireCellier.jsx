@@ -1,6 +1,6 @@
-import MenuEnHaut from "../components/components-partages/MenuEnHaut/MenuEnHaut";
-import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
-import authentificationStore from "../stores/authentificationStore.js";
+import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
+import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
+import authentificationStore from "@store/authentificationStore.js";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -8,12 +8,12 @@ import {
   creerCellier,
   modifierCellier,
   supprimerCellier,
-} from "../lib/requetes.js";
-import Bouton from "../components/components-partages/Boutons/Bouton";
-import FormulaireInput from "../components/components-partages/Formulaire/FormulaireInput/FormulaireInput";
-import BoiteModale from "../components/components-partages/BoiteModale/BoiteModale";
-import Message from "../components/components-partages/Message/Message";
-import CarteCellier from "../components/carte-cellier/CarteCellier";
+} from "@lib/requetes.js";
+import Bouton from "@components/components-partages/Boutons/Bouton";
+import FormulaireInput from "@components/components-partages/Formulaire/FormulaireInput/FormulaireInput";
+import BoiteModale from "@components/components-partages/BoiteModale/BoiteModale";
+import Message from "@components/components-partages/Message/Message";
+import CarteCellier from "@components/carte-cellier/CarteCellier";
 
 function SommaireCellier() {
   const navigate = useNavigate();

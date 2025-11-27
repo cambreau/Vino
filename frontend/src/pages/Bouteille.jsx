@@ -1,9 +1,9 @@
-import MenuEnHaut from "../components/components-partages/MenuEnHaut/MenuEnHaut";
-import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
-import Bouton from "../components/components-partages/Boutons/Bouton";
+import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
+import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
+import Bouton from "@components/components-partages/Boutons/Bouton";
 
-import { formatDetailsBouteille } from "../lib/utils.js";
-import { recupererBouteille } from "../lib/requetes.js";
+import { formatDetailsBouteille } from "@lib/utils.js";
+import { recupererBouteille } from "@lib/requetes.js";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 function Bouteille() {
