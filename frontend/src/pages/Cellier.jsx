@@ -71,6 +71,7 @@ function Cellier() {
                     key={bouteille.id}
                     bouteille={bouteille}
                     type="cellier"
+                    navigate={navigate}
                   />
                 ))}
               </div>
