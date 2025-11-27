@@ -1,14 +1,10 @@
-import Icon from "../Icon/Icon";
+import Icon from "@components/components-partages/Icon/Icon";
 import { Link } from "react-router-dom";
 function MenuEnBas({}) {
   return (
     <footer className="grid grid-cols-4 mt-auto p-(--rythme-base) bg-principal-300">
       <Link to="/catalogue">
-        <Icon
-          nom="catalogue"
-          couleur="principal-100"
-          typeMenu="bas"
-        />
+        <Icon nom="catalogue" couleur="principal-100" typeMenu="bas" />
       </Link>
       {/* ATTENTION LIEN A FAIRE */}
       <Link to="/sommaire-cellier">

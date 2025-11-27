@@ -1,10 +1,10 @@
-import Formulaire from "../components/components-partages/Formulaire/Formulaire";
-import FormulaireInput from "../components/components-partages/Formulaire/FormulaireInput/FormulaireInput";
-import BoutonRetour from "../components/components-partages/Boutons/BoutonRetour";
-import Bouton from "../components/components-partages/Boutons/Bouton";
-import Message from "../components/components-partages/Message/Message";
-import { regex, validationChamp } from "../lib/validationFormulaire.js";
-import { creerUtilisateur } from "../lib/requetes.js";
+import Formulaire from "@components/components-partages/Formulaire/Formulaire";
+import FormulaireInput from "@components/components-partages/Formulaire/FormulaireInput/FormulaireInput";
+import BoutonRetour from "@components/components-partages/Boutons/BoutonRetour";
+import Bouton from "@components/components-partages/Boutons/Bouton";
+import Message from "@components/components-partages/Message/Message";
+import { regex, validationChamp } from "@lib/validationFormulaire.js";
+import { creerUtilisateur } from "@lib/requetes.js";
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
@@ -95,7 +95,7 @@ function Inscription() {
     <section
       className="
       min-h-screen px-(--rythme-serre) pb-(--rythme-espace) grid grid-rows-[1fr_5fr] items-end
-      bg-[linear-gradient(0deg,rgba(0,0,0,0.8)30%,rgba(0,0,0,0)),url('../assets/images/inscriptionCellier.webp')] bg-cover bg-center bg-no-repeat bg-[#e0e0e0]
+      bg-[linear-gradient(0deg,rgba(0,0,0,0.8)30%,rgba(0,0,0,0)),url('@assets/images/inscriptionCellier.webp')] bg-cover bg-center bg-no-repeat bg-[#e0e0e0]
       "
     >
       <header className="px-(--rythme-base)">

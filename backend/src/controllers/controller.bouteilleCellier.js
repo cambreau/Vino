@@ -6,24 +6,83 @@
 
 import modeleBouteilleCellier from "../models/modele.bouteilleCellier.js";
 
-export const afficherBouteilleDuCellier = async (req, res) => {
+export const recupererBouteilleDuCellier = async (req, res) => {
   try {
     const { idCellier } = req.params;
+    const id = Number.parseInt(idCellier, 10);
 
-    const bouteilles = await modeleBouteilleCellier.recuperer(idCellier);
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({
+        message: "ID de cellier invalide",
+      });
+    }
+
+    const bouteilles = await modeleBouteilleCellier.recuperer(id);
 
     return res.status(200).json({
-      donnees: bouteilles
+      message: "Bouteilles du cellier récupérées avec succès",
+      donnees: bouteilles,
     });
-
   } catch (error) {
-    console.error("Erreur lors de la récupération :", error);
-    res.status(500).json({ message: "Erreur serveur" });
+    console.error(
+      "Erreur lors de la récupération des bouteilles du cellier",
+      error
+    );
+    return res.status(500).json({
+      message:
+        "Erreur serveur lors de la récupération des bouteilles du cellier",
+      erreur: error.message,
+    });
   }
 };
 
+export const modifierBouteilleDuCellier = async (req, res) => {
+  try {
+    // Obtiens le idCellier avec l'url grâce à la route en utilisant req.params
+    const { idCellier } = req.params;
+    const identifiantCellier = Number.parseInt(idCellier, 10);
 
-export const modifierBouteilleDuCellier = async (req, res) => {};
+    // Obtiens le idBouteille avec l'url grâce à la route en utilisant req.params
+    const { idBouteille } = req.params;
+    const identifiantBouteille = Number.parseInt(idBouteille, 10);
+
+    // Obtiens le id_bouteille avec req.body
+    const { nouvelleQuantite } = req.body;
+
+    // Vérifie si la bouteille existe déjà dans le cellier (via le modèle)
+    const bouteilleExistante = await modeleBouteilleCellier.verifierExistence(
+      identifiantBouteille, identifiantCellier
+    );
+
+    // Si la bouteille existe déjà
+    if (bouteilleExistante) {
+      // Appel du modèle pour modifier le bouteillecellier
+      const action = await modeleBouteilleCellier.mettreAJourQuantite(
+        identifiantCellier,
+        identifiantBouteille,
+        nouvelleQuantite,
+      );
+
+      if (action) {
+        return res.status(200).json({
+          message: "La quantite a ete mise a jour",
+        });
+      } else {
+        res
+          .status(404)
+          .json({ message: "Erreur serveur lors de la modification" });
+      }
+    } else {
+      res
+        .status(404)
+        .json({ message: "Bouteille non trouvée dans le cellier" });
+    }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erreur serveur lors de la modification" });
+  }
+};
 
 export const ajouterBouteilleDuCellier = async (req, res) => {
   try {
@@ -44,8 +103,8 @@ export const ajouterBouteilleDuCellier = async (req, res) => {
 
     // Si la bouteille existe déjà, retourner un message
     if (bouteilleExistante) {
-      return res.status(200).json({ 
-        message: "La bouteille existe déjà dans le cellier"
+      return res.status(200).json({
+        message: "La bouteille existe déjà dans le cellier",
       });
     }
 
@@ -88,4 +147,3 @@ export const supprimerBouteilleDuCellier = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur lors de la suppression" });
   }
 };
-

@@ -1,11 +1,11 @@
-import MenuEnHaut from "../components/components-partages/MenuEnHaut/MenuEnHaut";
-import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
-import Formulaire from "../components/components-partages/Formulaire/Formulaire";
-import FormulaireInput from "../components/components-partages/Formulaire/FormulaireInput/FormulaireInput";
-import Bouton from "../components/components-partages/Boutons/Bouton";
-import Message from "../components/components-partages/Message/Message";
-import { regex, validationChamp } from "../lib/validationFormulaire.js";
-import { recupererUtilisateur, modifierUtilisateur } from "../lib/requetes.js";
+import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
+import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
+import Formulaire from "@components/components-partages/Formulaire/Formulaire";
+import FormulaireInput from "@components/components-partages/Formulaire/FormulaireInput/FormulaireInput";
+import Bouton from "@components/components-partages/Boutons/Bouton";
+import Message from "@components/components-partages/Message/Message";
+import { regex, validationChamp } from "@lib/validationFormulaire.js";
+import { recupererUtilisateur, modifierUtilisateur } from "@lib/requetes.js";
 import { useState, useEffect } from "react";
 import { useSearchParams, useParams, useNavigate } from "react-router-dom";
 
@@ -92,9 +92,7 @@ function ModificationProfil() {
         <MenuEnHaut />
       </header>
 
-      <main
-        className="flex flex-col bg-fond px-(--rythme-base) pt-(--rythme-espace) gap-(--rythme-espace) overflow-y-auto"
-      >
+      <main className="flex flex-col bg-fond px-(--rythme-base) pt-(--rythme-espace) gap-(--rythme-espace) overflow-y-auto">
         {echecModification && (
           <Message
             texte="Une erreur est survenue lors de la modification. Veuillez réessayer."
