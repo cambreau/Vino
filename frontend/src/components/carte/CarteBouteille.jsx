@@ -1,11 +1,36 @@
 import BoutonQuantite from "../components-partages/Boutons/BoutonQuantite";
 import BoutonAction from "../components-partages/Boutons/BoutonAction";
 
+import { modifierBouteilleCellier } from "../../lib/requetes.js";
+
 const CarteBouteille = ({
+  navigate,
   bouteille,
   type = "catalogue",
-  onAugmenter = () => {},
-  onDiminuer = () => {},
+  onAugmenter = () => {
+    const nouvelleQuantite = ++bouteille.quantite;
+    const idBouteille = bouteille.id;
+    const idCellier = bouteille.idCellier;
+
+    modifierBouteilleCellier(
+      idCellier,
+      idBouteille,
+      nouvelleQuantite,
+      navigate
+    );
+  },
+  onDiminuer = () => {
+    const nouvelleQuantite = --bouteille.quantite;
+    const idBouteille = bouteille.id;
+    const idCellier = bouteille.idCellier;
+
+    modifierBouteilleCellier(
+      idCellier,
+      idBouteille,
+      nouvelleQuantite,
+      navigate
+    );
+  },
   onAjouter = () => {},
   disabled = false, //désactiver le bouton
 }) => {

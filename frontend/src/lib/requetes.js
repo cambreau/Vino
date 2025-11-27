@@ -218,9 +218,8 @@ export const connexionUtilisateur = async (datas, navigate) => {
 // Fonction d'ajout d'une bouteille dans un cellier
 export const ajouterBouteilleCellier = async (idCellier, donnees) => {
   try {
-    const urlComplete = `${
-      import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
-    }/${idCellier}`;
+    const urlComplete = `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
+      }/${idCellier}`;
     const reponse = await fetch(urlComplete, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -266,8 +265,6 @@ export const recupererBouteillesCellier = async (idCellier) => {
     const data = await reponse.json();
     const bouteillesIds = data.donnees || []; // [{ id_bouteille, quantite }, ...]
 
-    console.log("Bouteilles IDs du cellier:", bouteillesIds);
-
     // 2. Récupérer les infos bouteilles du store
     const bouteillesCatalogue = bouteillesStore.getState().bouteilles;
 
@@ -310,8 +307,7 @@ export const recupererBouteillesCellier = async (idCellier) => {
 export const recupererTousCellier = async (id_utilisateur) => {
   try {
     const reponse = await fetch(
-      `${
-        import.meta.env.VITE_BACKEND_CELLIER_URL
+      `${import.meta.env.VITE_BACKEND_CELLIER_URL
       }?id_utilisateur=${id_utilisateur}`
     );
     return reponse.json();
@@ -402,8 +398,7 @@ export const modifierCellier = async (
 ) => {
   try {
     const reponse = await fetch(
-      `${
-        import.meta.env.VITE_BACKEND_CELLIER_URL
+      `${import.meta.env.VITE_BACKEND_CELLIER_URL
       }/${id_utilisateur}/${id_cellier}`,
       {
         method: "PUT",
@@ -452,14 +447,12 @@ export const supprimerCellier = async (
   try {
     console.log(
       "Requête DELETE vers:",
-      `${
-        import.meta.env.VITE_BACKEND_CELLIER_URL
+      `${import.meta.env.VITE_BACKEND_CELLIER_URL
       }/${id_utilisateur}/${id_cellier}`
     );
 
     const reponse = await fetch(
-      `${
-        import.meta.env.VITE_BACKEND_CELLIER_URL
+      `${import.meta.env.VITE_BACKEND_CELLIER_URL
       }/${id_utilisateur}/${id_cellier}`,
       {
         method: "DELETE",
@@ -511,7 +504,7 @@ export const recupererBouteille = async (id) => {
   }
 };
 
-// *************************** Bouteilles (Catalogue) - Meriem
+// *************************** Bouteilles (Catalogue) 
 /**
  * Récupère toutes les bouteilles disponibles dans le catalogue
  * @returns {Promise<Array|null>} Array des bouteilles ou null en cas d'erreur
@@ -533,7 +526,7 @@ export const recupererBouteilles = async () => {
   }
 };
 
-/** - Meriem
+/** 
  * Vérifie si une bouteille existe déjà dans un cellier spécifique
  * @param {string|number} idCellier - L'identifiant du cellier
  * @param {string|number} idBouteille - L'identifiant de la bouteille
@@ -564,5 +557,88 @@ export const verifierBouteilleCellier = async (idCellier, idBouteille) => {
   } catch (error) {
     console.error("Erreur lors de la vérification:", error);
     return { existe: false, quantite: 0 };
+  }
+};
+
+
+// -----------------BOUTEILLE_CELLIER
+
+/**
+ * Modifie les informations d'un cellier existant dans la base de données.
+ * Redirige vers la page de sommaire celliers.
+ * @param {string|number} id_bouteille - Id bouteille
+ * @param {string|number} id_cellier - Id du cellier à modifier
+ * @param {string|number} nouvelleQuantite - quantite e bouteille a modifier
+ * @param {Function} navigate - Fonction de navigation de react-router-dom pour rediriger l'utilisateur
+ * @returns {Promise<>} Un objet indiquant le succès de l'opération et l'erreur éventuelle
+ */
+export const modifierBouteilleCellier = async (
+  id_cellier,
+  id_bouteille,
+  nouvelleQuantite,
+  navigate
+) => {
+  try {
+    // Si la quantite est egale a zero, on supprime la bouteille de la base de donnes
+    if (nouvelleQuantite === 0) {
+      console.log(
+        "Requête DELETE vers:",
+        `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
+        }/${id_bouteille}/${id_cellier}`
+      );
+      const reponse = await fetch(
+        `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
+        }/${id_cellier}/${id_bouteille}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (reponse.ok) {
+        window.location.href = `/cellier/${id_cellier}`; // Force un vrai rechargement
+        return { succes: true };
+      } else {
+        // Gestion des erreurs HTTP
+        const erreurData = await reponse.json().catch(() => ({}));
+        console.error(
+          "Erreur HTTP lors de la suppression:",
+          reponse.status,
+          erreurData
+        );
+
+      }
+    }
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
+      }/${id_bouteille}/${id_cellier}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nouvelleQuantite }),
+      }
+    );
+
+    if (reponse.ok) {
+      navigate(`/cellier/${id_cellier}`);
+      return { succes: true };
+    }
+
+    // Gestion des erreurs HTTP (400, 500, etc.)
+    const erreurData = await reponse.json().catch(() => ({}));
+    console.error("Erreur HTTP:", reponse.status, erreurData);
+
+    // navigate(`/sommaire-cellier?echec=true`);
+
+    return {
+      succes: false,
+      erreur:
+        erreurData?.message || "Erreur lors de la modification de la bouteille dans le cellier",
+    };
+  } catch (error) {
+    // Gestion des erreurs réseau (exemple: pas de connexion)
+    console.error("Erreur lors de la modification de la bouteille dans le cellier :", error);
+    // navigate(`/sommaire-cellier?echec=true`);
+    return { succes: false, erreur: error.message };
   }
 };

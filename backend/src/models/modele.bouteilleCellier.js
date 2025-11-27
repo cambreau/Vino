@@ -46,8 +46,8 @@ export default class modeleBouteilleCellier {
 
     const [result] = await connexion.query(sql, [
       nouvelleQuantite,
-      idCellier,
       idBouteille,
+      idCellier,
     ]);
     return result.affectedRows > 0;
   }
@@ -76,7 +76,7 @@ export default class modeleBouteilleCellier {
   }
 
   // Requête pour Modifier quantité, notes, etc.
-  static async modifier(idCellier, idBouteilles, quantite, notes) {}
+  static async modifier(idCellier, idBouteilles, quantite, notes) { }
 
   // Requête pour supprimer une bouteille d'un cellier
   static async supprimer(idCellier, idBouteille) {
