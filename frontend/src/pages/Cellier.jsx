@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import MenuEnHaut from "../components/components-partages/MenuEnHaut/MenuEnHaut";
-import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
-import Bouton from "../components/components-partages/Boutons/Bouton";
-import Message from "../components/components-partages/Message/Message";
-import CarteBouteille from "../components/carte/CarteBouteille";
-import {
-  recupererCellier,
-  recupererBouteillesCellier,
-} from "../lib/requetes.js";
+import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
+import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
+import Bouton from "@components/components-partages/Boutons/Bouton";
+import Message from "@components/components-partages/Message/Message";
+import CarteBouteille from "@components/carte/CarteBouteille";
+import { recupererCellier, recupererBouteillesCellier } from "@lib/requetes.js";
 
 function Cellier() {
   const navigate = useNavigate();

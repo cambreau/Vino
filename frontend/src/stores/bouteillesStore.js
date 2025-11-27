@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { recupererBouteilles } from "../lib/requetes.js";
+import { recupererBouteilles } from "@lib/requetes.js";
 
 /**
  * Store Zustand pour gérer les bouteilles (catalogue)

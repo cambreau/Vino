@@ -1,5 +1,5 @@
 // Utils
-import { formatString, formatMajDebut } from "../../../../lib/utils";
+import { formatString, formatMajDebut } from "@lib/utils";
 
 function FormulaireInput({
   type,

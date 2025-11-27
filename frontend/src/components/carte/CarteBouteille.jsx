@@ -1,7 +1,7 @@
-import BoutonQuantite from "../components-partages/Boutons/BoutonQuantite";
-import BoutonAction from "../components-partages/Boutons/BoutonAction";
+import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuantite";
+import BoutonAction from "@components/components-partages/Boutons/BoutonAction";
 
-import { modifierBouteilleCellier } from "../../lib/requetes.js";
+import { modifierBouteilleCellier } from "@lib/requetes.js";
 
 const CarteBouteille = ({
   navigate,
