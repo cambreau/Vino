@@ -273,9 +273,7 @@ function Catalogue() {
               <>
                 {bouteilles.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {/* {bouteilles.map((b) => ( */}
-                    
-                    {bouteilles.slice(0, 10).map((b) => (
+                    {bouteilles.map((b) => (       
                       <CarteBouteille
                         key={b.id}
                         bouteille={b}
