@@ -52,7 +52,7 @@ function FormulaireSelect({
           -- Choisir {genre} {nom} --
         </option>
         {arrayOptions.map((option) => (
-          <option key={option} value={formatString(option)}>
+          <option key={option} value={option}>
             {option}
           </option>
         ))}

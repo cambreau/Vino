@@ -2,38 +2,50 @@ import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuanti
 import BoutonAction from "@components/components-partages/Boutons/BoutonAction";
 
 import { modifierBouteilleCellier } from "@lib/requetes.js";
-
+import { useNavigate } from "react-router-dom";
 const CarteBouteille = ({
-  navigate,
   bouteille,
   type = "catalogue",
-  onAugmenter = () => {
-    const nouvelleQuantite = ++bouteille.quantite;
-    const idBouteille = bouteille.id;
-    const idCellier = bouteille.idCellier;
-
-    modifierBouteilleCellier(
-      idCellier,
-      idBouteille,
-      nouvelleQuantite,
-      navigate
-    );
-  },
-  onDiminuer = () => {
-    const nouvelleQuantite = --bouteille.quantite;
-    const idBouteille = bouteille.id;
-    const idCellier = bouteille.idCellier;
-
-    modifierBouteilleCellier(
-      idCellier,
-      idBouteille,
-      nouvelleQuantite,
-      navigate
-    );
-  },
+  onMiseAJour,
   onAjouter = () => {},
   disabled = false, //désactiver le bouton
+
 }) => {
+const navigate = useNavigate();
+/// ----------------- 
+  const  onAugmenter = async () => {
+    const nouvelleQuantite = bouteille.quantite + 1;
+    const idBouteille = bouteille.id;
+    const idCellier = bouteille.idCellier;
+
+    const resultat = await modifierBouteilleCellier(
+      idCellier,
+      idBouteille,
+      nouvelleQuantite,
+    );
+
+      if (resultat.succes && onMiseAJour) { 
+       onMiseAJour();
+    }
+
+  };
+
+  const  onDiminuer = async () => {
+    const nouvelleQuantite = bouteille.quantite - 1;
+    const idBouteille = bouteille.id;
+    const idCellier = bouteille.idCellier;
+
+     const resultat = await modifierBouteilleCellier( 
+      idCellier,
+      idBouteille,
+      nouvelleQuantite,
+    );
+     if (resultat.succes && onMiseAJour) { 
+      onMiseAJour();
+    }
+  };
+
+
   /**
    * Génère les contrôles (boutons) selon le type :
    * - catalogue : bouton "Ajouter au cellier"
@@ -97,6 +109,7 @@ const CarteBouteille = ({
     >
       {/* Section IMAGE de la bouteille */}
       <div
+      onClick={() => navigate(`/bouteilles/${bouteille.id}`)}
         className="
         flex items-center justify-center bg-fond-secondaire 
         rounded-(--arrondi-grand) mb-(--rythme-tres-serre)"

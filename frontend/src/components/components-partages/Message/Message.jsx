@@ -7,7 +7,7 @@ function Message({
 }) {
   // Classes de base pour les messages
   const classesBase = `
-    w-full px-(--rythme-base) py-(--rythme-serre)
+    w-full px-(--rythme-base) py-(--rythme-serre) mb-(--rythme-base)
     font-body font-light text-(length:--taille-petit) text-(--color-fond)
     rounded-(--arrondi-grand) shadow-md
     transition-all duration-300
