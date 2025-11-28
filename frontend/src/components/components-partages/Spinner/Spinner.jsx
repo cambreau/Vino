@@ -1,5 +1,13 @@
-import Lottie from "lottie-react";
+import LottieImport from "lottie-react";
 import animationData from "./Zen Loading Trails.json";
+
+// Normalise l'export par défaut pour fonctionner n'importe où.
+const LottieComponent =
+	typeof LottieImport === "function"
+		? LottieImport
+		: typeof LottieImport?.default === "function"
+		? LottieImport.default
+		: null;
 
 function Spinner({ size = 160, ariaLabel = "Chargement", className = "" }) {
 	const wrapperStyle = {
@@ -14,19 +22,21 @@ function Spinner({ size = 160, ariaLabel = "Chargement", className = "" }) {
 	};
 
 	return (
-		<div
-			role="status"
-			aria-live="polite"
-			aria-label={ariaLabel}
-			className={className}
-			style={wrapperStyle}>
-			<Lottie
-				animationData={animationData}
-				loop
-				autoplay
-				style={animationStyle}
-			/>
-		</div>
+		LottieComponent && (
+			<div
+				role="status"
+				aria-live="polite"
+				aria-label={ariaLabel}
+				className={className}
+				style={wrapperStyle}>
+				<LottieComponent
+					animationData={animationData}
+					loop
+					autoplay
+					style={animationStyle}
+				/>
+			</div>
+		)
 	);
 }
 
