@@ -580,7 +580,6 @@ export const modifierBouteilleCellier = async (
   id_cellier,
   id_bouteille,
   nouvelleQuantite,
-  navigate
 ) => {
   try {
     // Si la quantite est egale a zero, on supprime la bouteille de la base de donnes
@@ -589,7 +588,7 @@ export const modifierBouteilleCellier = async (
         "Requête DELETE vers:",
         `${
           import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
-        }/${id_bouteille}/${id_cellier}`
+        }/${id_cellier}/${id_bouteille}`
       );
       const reponse = await fetch(
         `${
@@ -602,7 +601,8 @@ export const modifierBouteilleCellier = async (
       );
 
       if (reponse.ok) {
-        window.location.href = `/cellier/${id_cellier}`; // Force un vrai rechargement
+        // window.location.href = `/cellier/${id_cellier}`; // Force un vrai rechargement
+        //navigate(`/cellier/${id_cellier}`);
         return { succes: true };
       } else {
         // Gestion des erreurs HTTP
@@ -626,7 +626,7 @@ export const modifierBouteilleCellier = async (
     );
 
     if (reponse.ok) {
-      navigate(`/cellier/${id_cellier}`);
+      //navigate(`/cellier/${id_cellier}`);
       return { succes: true };
     }
 

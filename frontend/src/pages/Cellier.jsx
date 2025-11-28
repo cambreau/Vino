@@ -32,14 +32,16 @@ function Cellier() {
   const [bouteillesCellier, setBouteillesCellier] = useState([]);
   const [chargementBouteilles, setChargementBouteilles] = useState(false);
 
+  // 
+  const chargerBouteillesCellier = async () => {
+    setChargementBouteilles(true);
+    const datas = await recupererBouteillesCellier(idCellier);
+    console.log("Bouteilles récupérées pour le cellier:", datas);
+    setBouteillesCellier(datas || []);
+    setChargementBouteilles(false);
+  };
+
   useEffect(() => {
-    const chargerBouteillesCellier = async () => {
-      setChargementBouteilles(true);
-      const datas = await recupererBouteillesCellier(idCellier);
-      console.log("Bouteilles récupérées pour le cellier:", datas);
-      setBouteillesCellier(datas || []);
-      setChargementBouteilles(false);
-    };
     chargerBouteillesCellier();
   }, [idCellier]);
 
@@ -68,7 +70,7 @@ function Cellier() {
                     key={bouteille.id}
                     bouteille={bouteille}
                     type="cellier"
-                    navigate={navigate}
+                    onMiseAJour={chargerBouteillesCellier} 
                   />
                 ))}
               </div>
