@@ -9,6 +9,12 @@ export const creerUtilisateur = async (req, res) => {
 	try {
 		const { nom, courriel, mot_de_passe, nom_premier_cellier } = req.body;
 
+		if (!nom || !courriel || !mot_de_passe) {
+			return res.status(400).json({
+				message: "Nom, courriel et mot de passe sont requis.",
+			});
+		}
+
 		// Vérifier si l'utilisateur existe déjà
 		const existant = await modeleUtilisateur.trouverParCourriel(courriel);
 		if (existant) {
@@ -26,7 +32,11 @@ export const creerUtilisateur = async (req, res) => {
 			motDePasseHache,
 		);
 
-		const nomPremierCellier = nom_premier_cellier?.trim();
+		const nomPremierCellier =
+			typeof nom_premier_cellier === "string" &&
+			nom_premier_cellier.trim().length > 0
+				? nom_premier_cellier.trim()
+				: "Mon cellier";
 
 		try {
 			const id_cellier = await ModeleCellier.ajouter(
@@ -36,11 +46,11 @@ export const creerUtilisateur = async (req, res) => {
 			return res.status(201).json({
 				message: "Utilisateur créé avec succès.",
 				utilisateur: {
-          id_utilisateur,
-          id_cellier,
-				  nom,
-          courriel,
-        },
+					id_utilisateur,
+					id_cellier,
+					nom,
+					courriel,
+				},
 			});
 		} catch (cellierErr) {
 			console.error(
@@ -52,25 +62,6 @@ export const creerUtilisateur = async (req, res) => {
 				error: "Impossible de créer le premier cellier. Veuillez réessayer votre inscription.",
 			});
 		}
-	} catch (err) {
-		console.error("Erreur lors de la création de l'utilisateur :", err);
-		return res.status(500).json({
-			error: "Erreur serveur lors de la création de l'utilisateur.",
-		});
-	}
-		const id_utilisateur = await modeleUtilisateur.creer(
-			nom,
-			courriel,
-			motDePasseHache,
-		);
-		return res.status(201).json({
-			message: "Utilisateur créé avec succès.",
-			utilisateur: {
-				id_utilisateur,
-				nom,
-				courriel,
-			},
-		});
 	} catch (err) {
 		console.error("Erreur lors de la création de l'utilisateur :", err);
 		return res.status(500).json({
@@ -91,7 +82,8 @@ export const recupererUtilisateur = async (req, res) => {
 			return res.status(404).json({ message: "Utilisateur non trouvé." });
 		}
 
-		return res.status(200).json(utilisateur);
+		const { mot_de_passe, ...donneesUtilisateur } = utilisateur;
+		return res.status(200).json(donneesUtilisateur);
 	} catch (err) {
 		console.error("Erreur lors de la récupération de l'utilisateur :", err);
 		return res.status(500).json({
@@ -103,7 +95,33 @@ export const recupererUtilisateur = async (req, res) => {
 /**
  * Fonction asynchrone qui recherche un utilisateur par son courriel.
  */
-export const recupererUtilisateurParCourriel = async (req, res) => {};
+export const recupererUtilisateurParCourriel = async (req, res) => {
+	try {
+		const { email } = req.params;
+		if (!email) {
+			return res.status(400).json({
+				message: "Courriel requis pour la recherche.",
+			});
+		}
+
+		const utilisateur = await modeleUtilisateur.trouverParCourriel(email);
+
+		if (!utilisateur) {
+			return res.status(404).json({ message: "Utilisateur non trouvé." });
+		}
+
+		const { mot_de_passe, ...donneesUtilisateur } = utilisateur;
+		return res.status(200).json(donneesUtilisateur);
+	} catch (err) {
+		console.error(
+			"Erreur lors de la récupération de l'utilisateur par courriel :",
+			err,
+		);
+		return res.status(500).json({
+			error: "Erreur serveur lors de la récupération de l'utilisateur par courriel.",
+		});
+	}
+};
 
 /**
  * Fonction asynchrone qui modifie les informations d'un utilisateur.
