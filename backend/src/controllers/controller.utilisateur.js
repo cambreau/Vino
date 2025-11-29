@@ -26,7 +26,11 @@ export const creerUtilisateur = async (req, res) => {
 		);
 		return res.status(201).json({
 			message: "Utilisateur créé avec succès.",
-			id_utilisateur: id_utilisateur,
+			utilisateur: {
+				id_utilisateur,
+				nom,
+				courriel,
+			},
 		});
 	} catch (err) {
 		console.error("Erreur lors de la création de l'utilisateur :", err);
