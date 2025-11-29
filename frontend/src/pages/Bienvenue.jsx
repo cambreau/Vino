@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import ConnexionForm from "@components/connexion/ConnexionForm";
+import { useDocumentTitle } from "@lib/utils.js";
 
 function Bienvenue() {
+	useDocumentTitle("Bienvenue");
 	return (
 		<main
 			className="

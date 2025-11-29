@@ -11,6 +11,7 @@ import {
 	recupererBouteillesCellier,
 	modifierBouteilleCellier,
 } from "@lib/requetes.js";
+import { useDocumentTitle } from "@lib/utils.js";
 
 function Cellier() {
 	const navigate = useNavigate();
@@ -21,6 +22,7 @@ function Cellier() {
 	const [cellier, setCellier] = useState({
 		nom: "",
 	});
+	useDocumentTitle(cellier.nom ? `Cellier - ${cellier.nom}` : "Cellier");
 
 	useEffect(() => {
 		const chargerCellier = async () => {
