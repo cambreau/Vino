@@ -1,4 +1,5 @@
 import modeleUtilisateur from "../models/modele.utilisateur.js";
+import ModeleCellier from "../models/modele.cellier.js";
 import bcrypt from "bcrypt";
 
 /**
@@ -6,7 +7,7 @@ import bcrypt from "bcrypt";
  */
 export const creerUtilisateur = async (req, res) => {
   try {
-    const { nom, courriel, mot_de_passe } = req.body;
+    const { nom, courriel, mot_de_passe, nom_premier_cellier } = req.body;
 
     // Vérifier si l'utilisateur existe déjà
     const existant = await modeleUtilisateur.trouverParCourriel(courriel);
@@ -24,10 +25,30 @@ export const creerUtilisateur = async (req, res) => {
       courriel,
       motDePasseHache
     );
-    return res.status(201).json({
-      message: "Utilisateur créé avec succès.",
-      id_utilisateur: id_utilisateur,
-    });
+
+    const nomPremierCellier = nom_premier_cellier?.trim();
+
+    try {
+      const id_cellier = await ModeleCellier.ajouter(
+        nomPremierCellier,
+        id_utilisateur
+      );
+      return res.status(201).json({
+        message: "Utilisateur créé avec succès.",
+        id_utilisateur: id_utilisateur,
+        id_cellier,
+      });
+    } catch (cellierErr) {
+      console.error(
+        "Erreur lors de la création du premier cellier :",
+        cellierErr
+      );
+      await modeleUtilisateur.supprimer(id_utilisateur);
+      return res.status(500).json({
+        error:
+          "Impossible de créer le premier cellier. Veuillez réessayer votre inscription.",
+      });
+    }
   } catch (err) {
     console.error("Erreur lors de la création de l'utilisateur :", err);
     return res.status(500).json({

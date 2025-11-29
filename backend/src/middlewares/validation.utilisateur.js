@@ -41,9 +41,25 @@ function validerMotDePasse(mot_de_passe, verifierLongueur = true) {
   return { valide: true };
 }
 
+function validerNomCellier(nomCellier) {
+  if (!nomCellier || nomCellier.trim() === "") {
+    return { valide: false, message: "Le nom du cellier est requis." };
+  }
+
+  const valeur = nomCellier.trim();
+  if (valeur.length < 2 || valeur.length > 50) {
+    return {
+      valide: false,
+      message: "Le nom du cellier doit contenir entre 2 et 50 caractères.",
+    };
+  }
+
+  return { valide: true };
+}
+
 // Middleware pour la CRÉATION d'utilisateur
 export function validerDonneesUtilisateur(req, res, next) {
-  const { nom, courriel, mot_de_passe } = req.body;
+  const { nom, courriel, mot_de_passe, nom_premier_cellier } = req.body;
   // Valider le nom
   const validationNom = validerNom(nom);
   if (!validationNom.valide) {
@@ -60,6 +76,12 @@ export function validerDonneesUtilisateur(req, res, next) {
   const validationMotDePasse = validerMotDePasse(mot_de_passe);
   if (!validationMotDePasse.valide) {
     return res.status(400).json({ message: validationMotDePasse.message });
+  }
+
+  // Valider le nom du premier cellier
+  const validationNomCellier = validerNomCellier(nom_premier_cellier);
+  if (!validationNomCellier.valide) {
+    return res.status(400).json({ message: validationNomCellier.message });
   }
 
   //Si tout est valide
