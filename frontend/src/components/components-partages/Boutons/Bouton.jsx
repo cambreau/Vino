@@ -40,7 +40,7 @@ function Bouton({
 			type={typeHtml}
 			className={`${classesBase} ${classesType} ${
 				taille === "moyen" ? "max-w-[320px]" : ""
-			} 
+			}
         ${
 			disabled
 				? "opacity-50 disabled:cursor-not-allowed  disabled:hover:bg-fond disabled:hover:translate-y-0"
