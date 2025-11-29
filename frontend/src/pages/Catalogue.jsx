@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
 import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
 import CarteBouteille from "@components/carte/CarteBouteille";
@@ -21,6 +21,12 @@ import authentificationStore from "@store/authentificationStore";
 function Catalogue() {
   // Récupération de l'utilisateur connecté
   const utilisateur = authentificationStore((state) => state.utilisateur);
+  // Référence vers le conteneur principal pour le scroll infini
+  const mainRef = useRef(null);
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [scrollLoading, setScrollLoading] = useState(false);
 
   // État global du composant regroupé dans un seul useState
   const [etat, setEtat] = useState({
@@ -46,15 +52,16 @@ function Catalogue() {
     const charger = async () => {
       try {
         // Chargement parallèle des données
-        const [dataBouteilles, dataCelliers] = await Promise.all([
-          recupererBouteilles(),
-          recupererTousCellier(utilisateur.id),
-        ]);
+        // Récupération des bouteilles (page 1, 10 par page)
+        const dataBouteilles = await recupererBouteilles(1, 10);
+        const dataCelliers = await recupererTousCellier(utilisateur.id);
 
         if (ignore) return;
 
         const bouteilles = dataBouteilles?.donnees ?? [];
         const celliers = dataCelliers?.donnees ?? dataCelliers ?? [];
+
+        setHasMore(dataBouteilles?.meta?.hasMore ?? false);
 
         // Sélectionne automatiquement le premier cellier
         const premierCellier =
@@ -93,6 +100,48 @@ function Catalogue() {
       ignore = true;
     };
   }, [utilisateur?.id]);
+
+  // Scroll infini pour charger les bouteilles 10 à la fois
+  const chargerPlus = async () => {
+    if (scrollLoading) return; // on ne charge pas si déjà en cours
+    setScrollLoading(true);
+
+    const prochainePage = page + 1;
+    const res = await recupererBouteilles(prochainePage, 10);
+    console.log("➡️ Réponse API:", res);
+
+    const nouvelles = res?.donnees ?? [];
+
+    if (nouvelles.length > 0) {
+      // Ajoute les nouvelles bouteilles à celles déjà chargées
+      setEtat((e) => ({
+        ...e,
+        bouteilles: [...e.bouteilles, ...nouvelles],
+      }));
+      setPage(prochainePage); // mise à jour de la page actuelle
+    }
+
+    setHasMore(res?.meta?.hasMore ?? false); // vérifie s’il y a encore des pages
+    setScrollLoading(false);
+  };
+
+  // Gestion du scroll infini
+  useEffect(() => {
+    const el = mainRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const nearBottom =
+        el.scrollTop + el.clientHeight >= el.scrollHeight - 200;
+
+      // Si proche du bas, qu’il reste plus de bouteilles et qu’on ne charge pas déjà
+      if (nearBottom && hasMore && !scrollLoading) {
+        chargerPlus();
+      }
+    };
+
+    el.addEventListener("scroll", onScroll);
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [page, hasMore, scrollLoading]);
 
   /*============================================================================ */
   // Ouvre la modale pour une bouteille sélectionnée
@@ -241,7 +290,7 @@ function Catalogue() {
         <header>
           <MenuEnHaut />
         </header>
-        <main className="bg-fond overflow-y-auto">
+        <main ref={mainRef} className="bg-fond overflow-y-auto">
           <section className="pt-(--rythme-espace) px-(--rythme-serre)">
             <Message
               texte="Vous devez être connecté pour accéder au catalogue"
@@ -261,7 +310,7 @@ function Catalogue() {
           <MenuEnHaut />
         </header>
 
-        <main className="bg-fond overflow-y-auto">
+        <main ref={mainRef} className="bg-fond overflow-y-auto">
           <section className="pt-(--rythme-espace) px-(--rythme-serre)">
             {message.texte && (
               <Message texte={message.texte} type={message.type} />
@@ -281,6 +330,14 @@ function Catalogue() {
                         onAjouter={ouvrirModale}
                       />
                     ))}
+                    {scrollLoading && (
+                      <div className="flex justify-center mt-4">
+                        <Message
+                          texte="Chargement de plus de bouteilles..."
+                          type="information"
+                        />
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <Message

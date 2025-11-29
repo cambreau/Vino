@@ -514,10 +514,13 @@ export const recupererBouteille = async (id) => {
  * Récupère toutes les bouteilles disponibles dans le catalogue
  * @returns {Promise<Array|null>} Array des bouteilles ou null en cas d'erreur
  */
-export const recupererBouteilles = async () => {
+// Récupère les bouteilles avec pagination 10 par page
+export const recupererBouteilles = async (page = 1, limit = 10) => {
   try {
     const reponse = await fetch(
-      `${import.meta.env.VITE_BACKEND_BOUTEILLES_URL}`
+      `${
+        import.meta.env.VITE_BACKEND_BOUTEILLES_URL
+      }?page=${page}&limit=${limit}`
     );
 
     if (!reponse.ok) {
