@@ -245,7 +245,10 @@ function Inscription() {
 								const valeurTrim = valeur.trim();
 								if (
 									!valeurTrim ||
-									!validationChamp(regex.regNomCellier, valeurTrim)
+									!validationChamp(
+										regex.regNomCellier,
+										valeurTrim,
+									)
 								) {
 									const erreur =
 										"Le nom du cellier doit contenir entre 2 et 50 caractères (lettres, chiffres, espaces, apostrophes ou tirets).";
