@@ -1,0 +1,25 @@
+{
+	"files.exclude": {
+		"**/.git": true,
+		"**/.svn": true,
+		"**/.hg": true,
+		"**/.DS_Store": true,
+		"**/Thumbs.db": true,
+		".vscode": true,
+		"conventions.md": true,
+		"package-lock.json": true,
+		"README.md": true,
+		"serverdistant.md": true,
+		"test": true,
+		"img": true
+	},
+	"hide-files.files": [
+		".vscode",
+		"conventions.md",
+		"package-lock.json",
+		"README.md",
+		"serverdistant.md",
+		"test",
+		"img"
+	]
+}
