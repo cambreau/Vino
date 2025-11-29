@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback, useRef, useReducer, useMemo } from "react";
 import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
 import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
 import CarteBouteille from "@components/carte/CarteBouteille";
@@ -19,8 +19,23 @@ import {
 
 import authentificationStore from "@store/authentificationStore";
 
+/*
+ * Constante: nombre d'éléments à charger par page lors de la pagination.
+ */
 const LIMITE_BOUTEILLES = 10;
 
+/*
+ * Crée l'état initial du catalogue. Propriété par propriété :
+ *  - chargementInitial: indique si l'écran affiche un chargement initial.
+ *  - scrollLoading: indique si un chargement lors du scroll est en cours.
+ *  - bouteilles: liste des bouteilles chargées pour l'affichage.
+ *  - celliers: liste des celliers de l'utilisateur.
+ *  - cellierSelectionne: id du cellier sélectionné par défaut pour l'ajout.
+ *  - page: numéro de page actuellement chargé (utilisé pour la pagination).
+ *  - hasMore: indique si la ressource a d'autres pages disponibles.
+ *  - message: objet contenant un message global à afficher (texte, type).
+ *  - modale: état de la modale d'ajout (ouverte, bouteille, quantité, existe si déjà là).
+ */
 const creerEtatInitial = () => ({
 	chargementInitial: true,
 	scrollLoading: false,
@@ -38,11 +53,159 @@ const creerEtatInitial = () => ({
 	},
 });
 
+/*
+ * Actions pour le reducer — utilisation pour manipuler l'état local du catalogue.
+ */
+const ACTIONS = {
+	RESET: "reset",
+	INIT_SUCCESS: "init_success",
+	INIT_ERROR: "init_error",
+	LOAD_MORE_START: "load_more_start",
+	LOAD_MORE_SUCCESS: "load_more_success",
+	LOAD_MORE_ERROR: "load_more_error",
+	OPEN_MODAL: "open_modal",
+	CLOSE_MODAL: "close_modal",
+	MODALE_EXISTE: "modale_existe",
+	MODIFIER_QUANTITE: "modifier_quantite",
+	CHANGER_CELLIER: "changer_cellier",
+	SET_MESSAGE: "set_message",
+};
+
+/*
+ * Reducer central de la page Catalogue :
+ * - Permet d'appliquer des mutations immuables à l'état en fonction d'actions.
+ */
+const catalogueReducer = (state, action) => {
+	switch (action.type) {
+		case ACTIONS.RESET:
+			// Réinitialise tout l'état (comme si l'utilisateur venait d'ouvrir la page).
+			return creerEtatInitial();
+		case ACTIONS.INIT_SUCCESS:
+			// Chargement initial réussi : on enregistre les bouteilles et les celliers reçus.
+			return {
+				...state,
+				chargementInitial: false,
+				scrollLoading: false,
+				bouteilles: action.payload.bouteilles,
+				celliers: action.payload.celliers,
+				cellierSelectionne: action.payload.cellierSelectionne,
+				page: 1,
+				hasMore: action.payload.hasMore,
+				message: action.payload.message ?? { texte: "", type: "" },
+			};
+		case ACTIONS.INIT_ERROR:
+			// Échec du chargement initial : on affiche un message d'erreur.
+			return {
+				...state,
+				chargementInitial: false,
+				scrollLoading: false,
+				message: action.payload,
+			};
+		case ACTIONS.LOAD_MORE_START:
+			// Début d'un chargement additionnel (pagination par scroll)
+			return { ...state, scrollLoading: true };
+		case ACTIONS.LOAD_MORE_SUCCESS: {
+			// Succès d'un chargement additionnel : on concatène les nouvelles bouteilles.
+			const nouvelles = action.payload.bouteilles ?? [];
+			if (!nouvelles.length) {
+				return { ...state, scrollLoading: false, hasMore: false };
+			}
+			return {
+				...state,
+				bouteilles: [...state.bouteilles, ...nouvelles],
+				page: action.payload.page,
+				hasMore: action.payload.hasMore,
+				scrollLoading: false,
+			};
+		}
+		case ACTIONS.LOAD_MORE_ERROR:
+			// Erreur lors du chargement additionnel : on stoppe l'indicateur.
+			return {
+				...state,
+				scrollLoading: false,
+				message: action.payload,
+			};
+		case ACTIONS.OPEN_MODAL:
+			// Ouvre la modale et place la bouteille sélectionnée dans l'état local de la modale.
+			return {
+				...state,
+				modale: {
+					ouverte: true,
+					bouteille: action.payload,
+					quantite: 1,
+					existe: false,
+				},
+			};
+		case ACTIONS.CLOSE_MODAL:
+			// Ferme la modale et réinitialise ses propriétés.
+			return {
+				...state,
+				modale: {
+					ouverte: false,
+					bouteille: null,
+					quantite: 1,
+					existe: false,
+				},
+			};
+		case ACTIONS.MODALE_EXISTE:
+			// Indique qu'une bouteille existe déjà dans le cellier choisi (ex.: pour afficher la quantité actuelle).
+			return {
+				...state,
+				modale: {
+					...state.modale,
+					existe: true,
+					quantite: action.payload,
+				},
+			};
+		case ACTIONS.MODIFIER_QUANTITE:
+			// Met à jour la quantité voulue dans la modale.
+			return {
+				...state,
+				modale: {
+					...state.modale,
+					quantite: action.payload,
+				},
+			};
+		case ACTIONS.CHANGER_CELLIER:
+			// Change le cellier ciblé dans la modale et réinitialise le marqueur d'existence
+			return {
+				...state,
+				cellierSelectionne: action.payload,
+				modale: {
+					...state.modale,
+					existe: false,
+					quantite: 1,
+				},
+			};
+		case ACTIONS.SET_MESSAGE:
+			// Permet d'afficher un message global à l'utilisateur (succès / erreur / info).
+			return { ...state, message: action.payload };
+		default:
+			return state;
+	}
+};
+
 function Catalogue() {
 	const utilisateur = authentificationStore((state) => state.utilisateur);
+	// Référence vers le conteneur scrollable principal (utilisé pour l'observer et le fallback).
 	const mainRef = useRef(null);
+	const sentinelRef = useRef(null);
 	const scrollStateRef = useRef({ hasMore: true, scrollLoading: false });
-	const [etat, setEtat] = useState(() => creerEtatInitial());
+	const [etat, dispatch] = useReducer(
+		catalogueReducer,
+		undefined,
+		creerEtatInitial,
+	);
+	const etatRef = useRef(etat);
+	// Référence de contrôle pour éviter les réponses asynchrones obsolètes lors des vérifications
+	// (incrémentée à chaque requête pour s'assurer que la réponse correspond à la dernière requête).
+	const verificationRef = useRef(0);
+
+	// Effet principal: charge les bouteilles et les celliers de l'utilisateur au montage
+	// et à chaque changement d'id d'utilisateur.
+	useEffect(() => {
+		etatRef.current = etat;
+	}, [etat]);
 
 	useEffect(() => {
 		scrollStateRef.current = {
@@ -53,17 +216,15 @@ function Catalogue() {
 
 	useEffect(() => {
 		if (!utilisateur?.id) {
-			setEtat(() => creerEtatInitial());
+			dispatch({ type: ACTIONS.RESET });
 			return;
 		}
 
 		let ignore = false;
 
+		// Fonction asynchrone interne qui effectue toutes les requêtes initiales.
 		const charger = async () => {
-			setEtat((prev) => ({
-				...creerEtatInitial(),
-				message: { texte: "", type: "" },
-			}));
+			dispatch({ type: ACTIONS.RESET });
 
 			try {
 				const [dataBouteilles, dataCelliers] = await Promise.all([
@@ -73,209 +234,223 @@ function Catalogue() {
 
 				if (ignore) return;
 
+				// `dataBouteilles` et `dataCelliers` proviennent des endpoints API :
+				// - `donnees` contient la liste des éléments si le format de la réponse est normalisé.
 				const bouteilles = dataBouteilles?.donnees ?? [];
 				const celliers = dataCelliers?.donnees ?? dataCelliers ?? [];
 				const hasMore = dataBouteilles?.meta?.hasMore ?? false;
+				// Par défaut, on sélectionne le premier cellier disponible (si présent).
 				const premierCellier =
 					celliers.length > 0 ? String(celliers[0].id_cellier) : "";
+				const message =
+					celliers.length === 0
+						? {
+								texte: "Vous devez d'abord créer un cellier",
+								type: "information",
+						  }
+						: { texte: "", type: "" };
 
-				setEtat((prev) => ({
-					...prev,
-					chargementInitial: false,
-					scrollLoading: false,
-					bouteilles,
-					celliers,
-					cellierSelectionne: premierCellier,
-					page: 1,
-					hasMore,
-					message:
-						celliers.length === 0
-							? {
-									texte: "Vous devez d'abord créer un cellier",
-									type: "information",
-							  }
-							: { texte: "", type: "" },
-				}));
+				dispatch({
+					type: ACTIONS.INIT_SUCCESS,
+					payload: {
+						bouteilles,
+						celliers,
+						cellierSelectionne: premierCellier,
+						hasMore,
+						message,
+					},
+				});
 			} catch (error) {
 				console.error(error);
 				if (ignore) return;
 
-				setEtat((prev) => ({
-					...prev,
-					chargementInitial: false,
-					scrollLoading: false,
-					message: {
+				dispatch({
+					type: ACTIONS.INIT_ERROR,
+					payload: {
 						texte: "Erreur lors du chargement",
 						type: "erreur",
 					},
-				}));
+				});
 			}
 		};
 
+		// Lance le chargement initial de la page.
 		charger();
 		return () => {
 			ignore = true;
 		};
 	}, [utilisateur?.id]);
 
+	// Paginer — charger la page suivante de bouteilles.
+	// Appelée par l'IntersectionObserver ou par le fallback du scroll.
 	const chargerPlus = useCallback(async () => {
-		let pageToLoad = 0;
+		const { scrollLoading, hasMore, page } = etatRef.current;
+		if (scrollLoading || !hasMore) return;
 
-		setEtat((prev) => {
-			if (prev.scrollLoading || !prev.hasMore) {
-				return prev;
-			}
-
-			pageToLoad = prev.page + 1;
-			return { ...prev, scrollLoading: true };
-		});
-
-		if (!pageToLoad) return;
+		dispatch({ type: ACTIONS.LOAD_MORE_START });
+		scrollStateRef.current = { hasMore, scrollLoading: true };
+		const pageToLoad = page + 1;
 
 		try {
 			const res = await recupererBouteilles(
 				pageToLoad,
 				LIMITE_BOUTEILLES,
 			);
-			setEtat((prev) => {
-				const nouvelles = Array.isArray(res?.donnees)
-					? res.donnees
-					: [];
-				const metaHasMore = res?.meta?.hasMore;
-				const aEncoreDesPages =
-					typeof metaHasMore === "boolean"
-						? metaHasMore
-						: nouvelles.length === LIMITE_BOUTEILLES;
+			const nouvelles = Array.isArray(res?.donnees) ? res.donnees : [];
+			const metaHasMore = res?.meta?.hasMore;
+			const aEncoreDesPages =
+				typeof metaHasMore === "boolean"
+					? metaHasMore
+					: nouvelles.length === LIMITE_BOUTEILLES;
 
-				if (!nouvelles.length) {
-					return {
-						...prev,
-						hasMore: false,
-						scrollLoading: false,
-					};
-				}
+			scrollStateRef.current = {
+				hasMore: nouvelles.length ? aEncoreDesPages : false,
+				scrollLoading: false,
+			};
 
-				return {
-					...prev,
-					bouteilles: [...prev.bouteilles, ...nouvelles],
+			dispatch({
+				type: ACTIONS.LOAD_MORE_SUCCESS,
+				payload: {
+					bouteilles: nouvelles,
 					page: pageToLoad,
 					hasMore: aEncoreDesPages,
-					scrollLoading: false,
-				};
+				},
 			});
 		} catch (error) {
 			console.error(error);
-			setEtat((prev) => ({
-				...prev,
+			scrollStateRef.current = {
+				hasMore: scrollStateRef.current.hasMore,
 				scrollLoading: false,
-				message: {
+			};
+			dispatch({
+				type: ACTIONS.LOAD_MORE_ERROR,
+				payload: {
 					texte: "Erreur lors du chargement de nouvelles bouteilles",
 					type: "erreur",
 				},
-			}));
+			});
 		}
 	}, []);
 
-	useEffect(() => {
-		const element = mainRef.current;
-		if (!element) return;
+	// Fallback pour les environnements où l'IntersectionObserver manque le sentinel
+	const verifierScrollEtCharger = useCallback(() => {
+		const node = mainRef.current;
+		if (!node) return;
 
-		const onScroll = () => {
-			const { hasMore, scrollLoading } = scrollStateRef.current;
-			if (!hasMore || scrollLoading) return;
-
-			const nearBottom =
-				element.scrollTop + element.clientHeight >=
-				element.scrollHeight - 200;
-
-			if (nearBottom) {
-				chargerPlus();
-			}
-		};
-
-		element.addEventListener("scroll", onScroll);
-		return () => element.removeEventListener("scroll", onScroll);
+		const { scrollTop, clientHeight, scrollHeight } = node;
+		const distanceRestante = scrollHeight - (scrollTop + clientHeight);
+		const { hasMore, scrollLoading } = scrollStateRef.current;
+		if (distanceRestante <= 200 && hasMore && !scrollLoading) {
+			chargerPlus();
+		}
 	}, [chargerPlus]);
 
+	// Effet de mise en place d'un IntersectionObserver pour détecter quand le sentinel
+	// (élément placé en bas de la liste) devient visible, déclenchant alors le chargement
+	// additionnel (pagination).
+	useEffect(() => {
+		if (etat.chargementInitial) return;
+
+		const root = mainRef.current;
+		const sentinel = sentinelRef.current;
+		if (!root || !sentinel) return;
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				const [entry] = entries;
+				if (!entry?.isIntersecting) return;
+
+				const { hasMore, scrollLoading } = scrollStateRef.current;
+				if (!hasMore || scrollLoading) return;
+
+				chargerPlus();
+			},
+			{ root, rootMargin: "0px 0px 200px 0px", threshold: 0.1 },
+		);
+
+		observer.observe(sentinel);
+		return () => observer.disconnect();
+	}, [chargerPlus, etat.bouteilles.length, etat.chargementInitial]);
+
+	// Effet qui installe le fallback du scroll sur le conteneur principal pour
+	// déclencher `verifierScrollEtCharger` quand l'utilisateur scroll.
+	useEffect(() => {
+		if (etat.chargementInitial) return;
+
+		const node = mainRef.current;
+		if (!node) return;
+
+		node.addEventListener("scroll", verifierScrollEtCharger, {
+			passive: true,
+		});
+		verifierScrollEtCharger();
+		return () => {
+			node.removeEventListener("scroll", verifierScrollEtCharger);
+		};
+	}, [verifierScrollEtCharger, etat.chargementInitial]);
+
+	// Ouvre la modale d'ajout d'une bouteille pour permettre la sélection du cellier
+	// et l'ajout d'une quantité. Vérifie si la bouteille existe déjà dans le cellier.
 	const ouvrirModale = useCallback(
 		(bouteille) => {
-			setEtat((prev) => ({
-				...prev,
-				modale: {
-					ouverte: true,
-					bouteille,
-					quantite: 1,
-					existe: false,
-				},
-			}));
+			dispatch({ type: ACTIONS.OPEN_MODAL, payload: bouteille });
 
 			if (!etat.cellierSelectionne) return;
 
+			const verificationId = ++verificationRef.current;
 			verifierBouteilleCellier(
 				etat.cellierSelectionne,
 				bouteille.id,
 			).then((res) => {
+				if (verificationRef.current !== verificationId) return;
 				if (res?.existe) {
-					setEtat((prev) => ({
-						...prev,
-						modale: {
-							...prev.modale,
-							existe: true,
-							quantite: res.quantite,
-						},
-					}));
+					dispatch({
+						type: ACTIONS.MODALE_EXISTE,
+						payload: res.quantite,
+					});
 				}
 			});
 		},
 		[etat.cellierSelectionne],
 	);
 
+	// Ferme la modale et réinitialise les informations associées.
 	const fermerModale = useCallback(() => {
-		setEtat((prev) => ({
-			...prev,
-			modale: {
-				ouverte: false,
-				bouteille: null,
-				quantite: 1,
-				existe: false,
-			},
-		}));
+		dispatch({ type: ACTIONS.CLOSE_MODAL });
 	}, []);
 
-	const modifierQuantite = useCallback((action) => {
-		setEtat((prev) => ({
-			...prev,
-			modale: {
-				...prev.modale,
-				quantite:
-					action === "augmenter"
-						? prev.modale.quantite + 1
-						: Math.max(1, prev.modale.quantite - 1),
-			},
-		}));
-	}, []);
+	// Incrémente ou décrémente la quantité affichée dans la modale.
+	const modifierQuantite = useCallback(
+		(action) => {
+			const quantiteActuelle = etat.modale.quantite;
+			const nouvelleQuantite =
+				action === "augmenter"
+					? quantiteActuelle + 1
+					: Math.max(1, quantiteActuelle - 1);
+			dispatch({
+				type: ACTIONS.MODIFIER_QUANTITE,
+				payload: nouvelleQuantite,
+			});
+		},
+		[etat.modale.quantite],
+	);
 
+	// Change le cellier sélectionné dans la modale et vérifie si la bouteille y existe.
 	const changerCellier = useCallback(
 		(idCellier) => {
-			setEtat((prev) => ({
-				...prev,
-				cellierSelectionne: idCellier,
-				modale: { ...prev.modale, existe: false, quantite: 1 },
-			}));
+			dispatch({ type: ACTIONS.CHANGER_CELLIER, payload: idCellier });
 
 			if (!etat.modale.bouteille) return;
 
+			const verificationId = ++verificationRef.current;
 			verifierBouteilleCellier(idCellier, etat.modale.bouteille.id).then(
 				(res) => {
+					if (verificationRef.current !== verificationId) return;
 					if (res?.existe) {
-						setEtat((prev) => ({
-							...prev,
-							modale: {
-								...prev.modale,
-								existe: true,
-								quantite: res.quantite,
-							},
-						}));
+						dispatch({
+							type: ACTIONS.MODALE_EXISTE,
+							payload: res.quantite,
+						});
 					}
 				},
 			);
@@ -283,19 +458,21 @@ function Catalogue() {
 		[etat.modale.bouteille],
 	);
 
+	// Effectue l'appel API pour ajouter la bouteille au cellier sélectionné.
+	// Met à jour le message global et ferme la modale en cas de succès.
 	const confirmerAjout = useCallback(async () => {
 		const cellierSelectionne = etat.cellierSelectionne;
 		const bouteilleCourante = etat.modale.bouteille;
 		const quantiteCourante = etat.modale.quantite;
 
 		if (!cellierSelectionne || !bouteilleCourante) {
-			setEtat((prev) => ({
-				...prev,
-				message: {
+			dispatch({
+				type: ACTIONS.SET_MESSAGE,
+				payload: {
 					texte: "Veuillez sélectionner un cellier",
 					type: "erreur",
 				},
-			}));
+			});
 			return;
 		}
 
@@ -305,6 +482,7 @@ function Catalogue() {
 				quantite: quantiteCourante,
 			};
 
+			// Appel au service qui ajoute la bouteille dans le cellier ciblé.
 			const resultat = await ajouterBouteilleCellier(
 				cellierSelectionne,
 				donnees,
@@ -317,30 +495,31 @@ function Catalogue() {
 							String(c.id_cellier) === String(cellierSelectionne),
 					)?.nom ?? "";
 
-				setEtat((prev) => ({
-					...prev,
-					message: {
+				dispatch({
+					type: ACTIONS.SET_MESSAGE,
+					payload: {
+						// Message succès affiché à l'utilisateur.
 						texte: `${bouteilleCourante.nom} a été ajouté au cellier ${cellier}`,
 						type: "succes",
 					},
-				}));
+				});
 
 				fermerModale();
 			} else {
-				setEtat((prev) => ({
-					...prev,
-					message: {
+				dispatch({
+					type: ACTIONS.SET_MESSAGE,
+					payload: {
 						texte: "Erreur lors de l'ajout",
 						type: "erreur",
 					},
-				}));
+				});
 			}
 		} catch (error) {
 			console.error(error);
-			setEtat((prev) => ({
-				...prev,
-				message: { texte: "Erreur lors de l'ajout", type: "erreur" },
-			}));
+			dispatch({
+				type: ACTIONS.SET_MESSAGE,
+				payload: { texte: "Erreur lors de l'ajout", type: "erreur" },
+			});
 		}
 	}, [etat.cellierSelectionne, etat.celliers, etat.modale, fermerModale]);
 
@@ -353,6 +532,17 @@ function Catalogue() {
 		cellierSelectionne,
 		scrollLoading,
 	} = etat;
+
+	const optionsCelliers = useMemo(
+		() => celliers.map((c) => c.nom),
+		[celliers],
+	);
+	const cellierCourant = useMemo(
+		() =>
+			celliers.find((c) => String(c.id_cellier) === cellierSelectionne) ??
+			null,
+		[celliers, cellierSelectionne],
+	);
 
 	if (!utilisateur?.id) {
 		return (
@@ -427,6 +617,12 @@ function Catalogue() {
 								type="information"
 							/>
 						)}
+
+						<div
+							ref={sentinelRef}
+							className="h-1 w-full"
+							aria-hidden="true"
+						/>
 					</section>
 				</main>
 
@@ -447,14 +643,8 @@ function Catalogue() {
 									nom="Cellier"
 									genre="un"
 									estObligatoire={true}
-									arrayOptions={celliers.map((c) => c.nom)}
-									value={
-										celliers.find(
-											(c) =>
-												String(c.id_cellier) ===
-												cellierSelectionne,
-										)?.nom || ""
-									}
+									arrayOptions={optionsCelliers}
+									value={cellierCourant?.nom || ""}
 									onChange={(e) => {
 										const cellierCible = celliers.find(
 											(x) => x.nom === e.target.value,
