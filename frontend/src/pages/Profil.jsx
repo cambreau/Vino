@@ -9,150 +9,162 @@ import { FaUser } from "react-icons/fa";
 import authentificationStore from "@store/authentificationStore";
 
 function Profil() {
-  const navigate = useNavigate();
+	const navigate = useNavigate();
 
-  // Récupérer les données du store
-  const utilisateur = authentificationStore((state) => state.utilisateur);
-  const estConnecte = authentificationStore((state) => state.estConnecte);
+	// Récupérer les données du store
+	const utilisateur = authentificationStore((state) => state.utilisateur);
+	const estConnecte = authentificationStore((state) => state.estConnecte);
 
-  // État pour gérer l'ouverture de la boîte modale de suppression
-  const [estModaleSuppressionOuverte, setEstModaleSuppressionOuverte] =
-    useState(false);
+	// État pour gérer l'ouverture de la boîte modale de suppression
+	const [estModaleSuppressionOuverte, setEstModaleSuppressionOuverte] =
+		useState(false);
 
-  useEffect(() => {
-    if (!estConnecte || !utilisateur) {
-      navigate("/connexion?deconnexionSucces=true");
-      return;
-    }
-  }, [estConnecte, utilisateur, navigate]);
+	useEffect(() => {
+		if (!estConnecte || !utilisateur) {
+			navigate("/?deconnexionSucces=true");
+			return;
+		}
+	}, [estConnecte, utilisateur, navigate]);
 
-  /**
-   * Ouvre la boîte modale de confirmation de suppression du profil
-   */
-  const gestionSuppressionProfil = () => {
-    setEstModaleSuppressionOuverte(true);
-  };
+	/**
+	 * Ouvre la boîte modale de confirmation de suppression du profil
+	 */
+	const gestionSuppressionProfil = () => {
+		setEstModaleSuppressionOuverte(true);
+	};
 
-  /**
-   * Fonction qui confirme et exécute la suppression du profil de l'utilisateur
-   */
-  const confirmerSuppressionProfil = async () => {
-    setEstModaleSuppressionOuverte(false);
-    if (utilisateur && utilisateur.id) {
-      console.log("Tentative de suppression du profil, ID:", utilisateur.id);
-      const resultat = await supprimerUtilisateur(utilisateur.id, navigate);
-      if (!resultat || !resultat.succes) {
-        console.error("Erreur lors de la suppression:", resultat?.erreur);
-        // Optionnel: afficher un message d'erreur à l'utilisateur
-      }
-    } else {
-      console.error(
-        "Impossible de supprimer: utilisateur ou ID manquant",
-        utilisateur
-      );
-    }
-  };
+	/**
+	 * Fonction qui confirme et exécute la suppression du profil de l'utilisateur
+	 */
+	const confirmerSuppressionProfil = async () => {
+		setEstModaleSuppressionOuverte(false);
+		if (utilisateur && utilisateur.id) {
+			console.log(
+				"Tentative de suppression du profil, ID:",
+				utilisateur.id,
+			);
+			const resultat = await supprimerUtilisateur(
+				utilisateur.id,
+				navigate,
+			);
+			if (!resultat || !resultat.succes) {
+				console.error(
+					"Erreur lors de la suppression:",
+					resultat?.erreur,
+				);
+				// Optionnel: afficher un message d'erreur à l'utilisateur
+			}
+		} else {
+			console.error(
+				"Impossible de supprimer: utilisateur ou ID manquant",
+				utilisateur,
+			);
+		}
+	};
 
-  /**
-   * Ferme la boîte modale de suppression
-   */
-  const annulerSuppressionProfil = () => {
-    setEstModaleSuppressionOuverte(false);
-  };
+	/**
+	 * Ferme la boîte modale de suppression
+	 */
+	const annulerSuppressionProfil = () => {
+		setEstModaleSuppressionOuverte(false);
+	};
 
-  const modifierCompte = () => {
-    if (utilisateur && utilisateur.id) {
-      navigate(`/modifier-utilisateur/${utilisateur.id}`);
-    }
-  };
+	const modifierCompte = () => {
+		if (utilisateur && utilisateur.id) {
+			navigate(`/modifier-utilisateur/${utilisateur.id}`);
+		}
+	};
 
-  return (
-    <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
-      <header>
-        <MenuEnHaut />
-      </header>
+	return (
+		<div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
+			<header>
+				<MenuEnHaut />
+			</header>
 
-      <main className="flex flex-col bg-fond px-(--rythme-base) pt-(--rythme-espace) gap-(--rythme-espace) overflow-y-auto">
-        {/* Boîte modale de confirmation de suppression  */}
-        {estModaleSuppressionOuverte && (
-          <BoiteModale
-            texte="Êtes-vous certain de vouloir supprimer votre profil ?"
-            onClose={annulerSuppressionProfil}
-            bouton={
-              <div className="flex flex-wrap gap-(--rythme-base) justify-center">
-                <Bouton
-                  texte="Non"
-                  type="secondaire"
-                  typeHtml="button"
-                  action={annulerSuppressionProfil}
-                />
-                <Bouton
-                  texte="Oui"
-                  type="primaire"
-                  typeHtml="button"
-                  action={confirmerSuppressionProfil}
-                />
-              </div>
-            }
-          />
-        )}
+			<main className="flex flex-col bg-fond px-(--rythme-base) pt-(--rythme-espace) gap-(--rythme-espace) overflow-y-auto">
+				{/* Boîte modale de confirmation de suppression  */}
+				{estModaleSuppressionOuverte && (
+					<BoiteModale
+						texte="Êtes-vous certain de vouloir supprimer votre profil ?"
+						onClose={annulerSuppressionProfil}
+						bouton={
+							<div className="flex flex-wrap gap-(--rythme-base) justify-center">
+								<Bouton
+									texte="Non"
+									type="secondaire"
+									typeHtml="button"
+									action={annulerSuppressionProfil}
+								/>
+								<Bouton
+									texte="Oui"
+									type="primaire"
+									typeHtml="button"
+									action={confirmerSuppressionProfil}
+								/>
+							</div>
+						}
+					/>
+				)}
 
-        <div>
-          <section className="flex items-center justify-between">
-            <div>
-              <h1 className="text-(length:--taille-moyen) font-display font-bold text-texte-premier">
-                {utilisateur?.nom}
-              </h1>
-              <p className="text-(length:--taille-tres-petit)">
-                {utilisateur?.courriel}
-              </p>
-            </div>
-            <FaUser size={32} color="#461243" />
-          </section>
+				<div>
+					<section className="flex items-center justify-between">
+						<div>
+							<h1 className="text-(length:--taille-moyen) font-display font-bold text-texte-premier">
+								{utilisateur?.nom}
+							</h1>
+							<p className="text-(length:--taille-tres-petit)">
+								{utilisateur?.courriel}
+							</p>
+						</div>
+						<FaUser
+							size={32}
+							color="#461243"
+						/>
+					</section>
 
-          <div className="flex flex-col mt-(--rythme-base) gap-(--rythme-serre)">
-            <p>
-              <span className="text-texte-premier font-bold mr-(--rythme-serre)">
-                Nom :
-              </span>
-              {utilisateur?.nom}
-            </p>
-            <p>
-              <span className="text-texte-premier font-bold mr-(--rythme-serre)">
-                Courriel :
-              </span>
-              {utilisateur?.courriel}
-            </p>
-            <p>
-              <span className="text-texte-premier font-bold mr-(--rythme-serre)">
-                Mot de passe :
-              </span>
-              xxxxxxxxxx
-            </p>
-          </div>
-        </div>
+					<div className="flex flex-col mt-(--rythme-base) gap-(--rythme-serre)">
+						<p>
+							<span className="text-texte-premier font-bold mr-(--rythme-serre)">
+								Nom :
+							</span>
+							{utilisateur?.nom}
+						</p>
+						<p>
+							<span className="text-texte-premier font-bold mr-(--rythme-serre)">
+								Courriel :
+							</span>
+							{utilisateur?.courriel}
+						</p>
+						<p>
+							<span className="text-texte-premier font-bold mr-(--rythme-serre)">
+								Mot de passe :
+							</span>
+							xxxxxxxxxx
+						</p>
+					</div>
+				</div>
 
-        <div className="flex justify-between m-(--rythme-tres-serre) pb-(--rythme-espace) mb-(--rythme-espace)">
-          <Bouton
-            taille="moyen"
-            texte="Supprimer"
-            type="secondaire"
-            typeHtml="button"
-            action={gestionSuppressionProfil}
-          />
-          <Bouton
-            taille="moyen"
-            texte="Mettre à jour"
-            type="primaire"
-            typeHtml="button"
-            action={modifierCompte}
-          />
-        </div>
-      </main>
+				<div className="flex justify-between m-(--rythme-tres-serre) pb-(--rythme-espace) mb-(--rythme-espace)">
+					<Bouton
+						taille="moyen"
+						texte="Supprimer"
+						type="secondaire"
+						typeHtml="button"
+						action={gestionSuppressionProfil}
+					/>
+					<Bouton
+						taille="moyen"
+						texte="Mettre à jour"
+						type="primaire"
+						typeHtml="button"
+						action={modifierCompte}
+					/>
+				</div>
+			</main>
 
-      <MenuEnBas />
-    </div>
-  );
+			<MenuEnBas />
+		</div>
+	);
 }
 
 export default Profil;
