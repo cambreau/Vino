@@ -9,19 +9,45 @@ import modeleBouteille from "../models/modele.bouteille.js";
 
 export const listerBouteilles = async (req, res) => {
   try {
-    const bouteilles = await modeleBouteille.trouverTout();
+    // 1) Lire les paramètres depuis l’URL ?page=1&limit=10
+    const page = Number.parseInt(req.query.page, 10) || 1;
+    const limit = Number.parseInt(req.query.limit, 10) || 10;
+
+    // 2) Valider qu'ils sont corrects
+    if (
+      !Number.isInteger(page) ||
+      page <= 0 ||
+      !Number.isInteger(limit) ||
+      limit <= 0
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Paramètres page/limit invalides" });
+    }
+
+    // 3) Calculer à partir d’où récupérer dans la liste
+    const offset = (page - 1) * limit;
+
+    // 4) Récupérer toutes les bouteilles, mais découper seulement une portion
+    const toutes = await modeleBouteille.trouverTout();
+    const portion = toutes.slice(offset, offset + limit);
+
+    // 5) Dire au frontend s’il en reste d'autres
+    const hasMore = offset + portion.length < toutes.length;
 
     return res.status(200).json({
-      message: "Liste des bouteilles",
-      total: bouteilles.length,
-      donnees: bouteilles,
+      success: true,
+      donnees: portion,
+      meta: {
+        page,
+        limit,
+        total: toutes.length,
+        hasMore,
+      },
     });
   } catch (error) {
     console.error("Erreur lors de la récupération des bouteilles", error);
-    return res.status(500).json({
-      message: "Impossible de récupérer les bouteilles",
-      erreur: error.message,
-    });
+    return res.status(500).json({ success: false, message: "Erreur serveur" });
   }
 };
 
