@@ -113,7 +113,7 @@ export const supprimerCellier = async (req, res) => {
     }
 
     // Applique la requête SQL
-    const resultat = await ModeleCellier.supprimer( id_utilisateur, id_cellier);
+    const resultat = await ModeleCellier.supprimer(id_utilisateur, id_cellier);
 
     // Si retourne faux, retourne un message d'erreur, sinon on envoie la requête
     if (!resultat) {
