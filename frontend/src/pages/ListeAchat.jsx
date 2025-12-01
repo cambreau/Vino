@@ -6,7 +6,7 @@ import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
 import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import Message from "@components/components-partages/Message/Message";
-import CarteBouteille from "@components/carte/CarteBouteille";
+import CarteListeAchat from "@components/carte-liste-achat/CarteListeAchat";
 import {
   recupererCellier,
   recupererBouteillesCellier,
@@ -146,7 +146,7 @@ function ListeAchat() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {bouteillesCellier.map((bouteille) => (
                 <Link key={bouteille.id} to={`/bouteilles/${bouteille.id}`}>
-                  <CarteBouteille
+                  <CarteListeAchat
                     key={bouteille.id}
                     bouteille={bouteille}
                     type="cellier"
