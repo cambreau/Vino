@@ -45,3 +45,78 @@ export const formatDetailsBouteille = (texte) => {
 
   return texteFormate;
 };
+
+const normaliserTexte = (valeur) => {
+  if (valeur === undefined || valeur === null) return "";
+  return valeur
+    .toString()
+    .normalize("NFD")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .toLowerCase();
+};
+
+/**
+ * Filtre une liste de bouteilles selon différents critères optionnels.
+ * @param {Array<Object>} bouteilles - Liste complete des bouteilles.
+ * @param {Object} filtres - Combination des filtres actifs.
+ * @param {string} [filtres.type] - Couleur/type à filtrer (doit correspondre au select de couleurs).
+ * @param {string} [filtres.pays] - Pays tapé librement par l'utilisateur.
+ * @param {string} [filtres.region] - Région tapée librement par l'utilisateur.
+ * @param {string|number} [filtres.annee] - Année choisie dans le select.
+ * @returns {Array<Object>} Bouteilles respectant les filtres actifs.
+ */
+export const filtrerBouteilles = (bouteilles = [], filtres = {}) => {
+  if (!Array.isArray(bouteilles) || bouteilles.length === 0) {
+    return [];
+  }
+
+  const typeFiltre = normaliserTexte(filtres.type);
+  const paysFiltre = normaliserTexte(filtres.pays);
+  const regionFiltre = normaliserTexte(filtres.region);
+  const anneeFiltre = filtres.annee ? Number(filtres.annee) : null;
+
+  const typeActif = typeFiltre && typeFiltre !== "tous";
+
+  return bouteilles.filter((bouteille) => {
+    if (!bouteille) return false;
+
+    if (typeActif) {
+      const typeBouteille = normaliserTexte(
+        bouteille.type || bouteille.couleur
+      );
+      if (!typeBouteille || typeBouteille !== typeFiltre) {
+        return false;
+      }
+    }
+
+    if (paysFiltre) {
+      const paysBouteille = normaliserTexte(
+        bouteille.pays || bouteille.country || bouteille.origine
+      );
+      if (!paysBouteille || !paysBouteille.includes(paysFiltre)) {
+        return false;
+      }
+    }
+
+    if (regionFiltre) {
+      const regionBouteille = normaliserTexte(
+        bouteille.region || bouteille.appellation
+      );
+      if (!regionBouteille || !regionBouteille.includes(regionFiltre)) {
+        return false;
+      }
+    }
+
+    if (anneeFiltre) {
+      const anneeBouteille = Number(
+        bouteille.annee || bouteille.millesime || bouteille.vintage
+      );
+      if (!anneeBouteille || anneeBouteille !== anneeFiltre) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+};
