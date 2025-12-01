@@ -21,6 +21,7 @@ function Inscription() {
 		nom: "",
 		courriel: "",
 		mot_de_passe: "",
+		nom_premier_cellier: "",
 	});
 
 	// Confirmation du mot de passe (non envoyée au backend)
@@ -32,6 +33,7 @@ function Inscription() {
 		courriel: "",
 		confirmation: "",
 		motDePasse: "",
+		premierCellier: "",
 	});
 
 	/**
@@ -42,6 +44,7 @@ function Inscription() {
 		e.preventDefault();
 		// Valider tous les champs avant de soumettre
 		const nouvellesErreurs = { ...erreurs };
+		const nomPremierCellier = utilisateur.nom_premier_cellier.trim();
 		// Valider le nom
 		if (!validationChamp(regex.regNom, utilisateur.nom)) {
 			nouvellesErreurs.nom =
@@ -72,6 +75,17 @@ function Inscription() {
 		} else {
 			nouvellesErreurs.confirmation = "";
 		}
+		// Valider le nom du premier cellier
+		if (
+			!nomPremierCellier ||
+			!validationChamp(regex.regNomCellier, nomPremierCellier)
+		) {
+			nouvellesErreurs.premierCellier =
+				"Le nom du cellier doit contenir entre 2 et 50 caractères (lettres, chiffres, espaces, apostrophes ou tirets).";
+		} else {
+			nouvellesErreurs.premierCellier = "";
+		}
+
 		setErreurs(nouvellesErreurs);
 		// Vérifier s'il y a des erreurs
 		const aDesErreurs = Object.values(nouvellesErreurs).some(
@@ -81,7 +95,13 @@ function Inscription() {
 			return; // Ne pas soumettre si il y a des erreurs
 		} else {
 			// Envoyer les données utilisateur
-			await creerUtilisateur(utilisateur, navigate);
+			await creerUtilisateur(
+				{
+					...utilisateur,
+					nom_premier_cellier: nomPremierCellier,
+				},
+				navigate,
+			);
 		}
 	};
 
@@ -203,6 +223,50 @@ function Inscription() {
 						{erreurs.courriel && (
 							<Message
 								texte={erreurs.courriel}
+								type="erreur"
+							/>
+						)}
+
+						<FormulaireInput
+							type="text"
+							nom="nom du premier cellier"
+							genre="un"
+							classCouleurLabel="Clair"
+							estObligatoire={true}
+							value={utilisateur.nom_premier_cellier}
+							onChange={(e) => {
+								setUtilisateur((prev) => ({
+									...prev,
+									nom_premier_cellier: e.target.value,
+								}));
+							}}
+							onBlur={(e) => {
+								const valeur = e.target.value;
+								const valeurTrim = valeur.trim();
+								if (
+									!valeurTrim ||
+									!validationChamp(
+										regex.regNomCellier,
+										valeurTrim,
+									)
+								) {
+									const erreur =
+										"Le nom du cellier doit contenir entre 2 et 50 caractères (lettres, chiffres, espaces, apostrophes ou tirets).";
+									setErreurs((prev) => ({
+										...prev,
+										premierCellier: erreur,
+									}));
+								} else {
+									setErreurs((prev) => ({
+										...prev,
+										premierCellier: "",
+									}));
+								}
+							}}
+						/>
+						{erreurs.premierCellier && (
+							<Message
+								texte={erreurs.premierCellier}
 								type="erreur"
 							/>
 						)}
