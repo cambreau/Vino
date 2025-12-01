@@ -18,6 +18,7 @@ import {
 } from "@lib/requetes";
 
 import authentificationStore from "@store/authentificationStore";
+import { useDocumentTitle } from "@lib/utils.js";
 
 /*
  * Constante: nombre d'éléments à charger par page lors de la pagination.
@@ -186,6 +187,7 @@ const catalogueReducer = (state, action) => {
 };
 
 function Catalogue() {
+	useDocumentTitle("Catalogue");
 	const utilisateur = authentificationStore((state) => state.utilisateur);
 	// Référence vers le conteneur scrollable principal (utilisé pour l'observer et le fallback).
 	const mainRef = useRef(null);

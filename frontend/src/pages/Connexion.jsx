@@ -1,7 +1,9 @@
 import BoutonRetour from "@components/components-partages/Boutons/BoutonRetour";
 import ConnexionForm from "@components/connexion/ConnexionForm";
+import { useDocumentTitle } from "@lib/utils.js";
 
 function Connexion() {
+	useDocumentTitle("Connexion");
 	return (
 		<main
 			className="
