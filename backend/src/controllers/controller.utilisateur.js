@@ -1,185 +1,272 @@
 import modeleUtilisateur from "../models/modele.utilisateur.js";
+import ModeleCellier from "../models/modele.cellier.js";
 import bcrypt from "bcrypt";
 
 /**
  * Fonction asynchrone qui creer un utilisateur.
  */
 export const creerUtilisateur = async (req, res) => {
-  try {
-    const { nom, courriel, mot_de_passe } = req.body;
+	try {
+		const { nom, courriel, mot_de_passe, nom_premier_cellier } = req.body;
 
-    // Vérifier si l'utilisateur existe déjà
-    const existant = await modeleUtilisateur.trouverParCourriel(courriel);
-    if (existant) {
-      return res
-        .status(409)
-        .json({ message: "Cette adresse courriel est déjà utilisée." });
-    }
+		if (!nom || !courriel || !mot_de_passe) {
+			return res.status(400).json({
+				message: "Nom, courriel et mot de passe sont requis.",
+			});
+		}
 
-    // Hasher le mot de passe
-    const motDePasseHache = await bcrypt.hash(mot_de_passe, 10);
+		// Vérifier si l'utilisateur existe déjà
+		const existant = await modeleUtilisateur.trouverParCourriel(courriel);
+		if (existant) {
+			return res
+				.status(409)
+				.json({ message: "Cette adresse courriel est déjà utilisée." });
+		}
 
-    const id_utilisateur = await modeleUtilisateur.creer(
-      nom,
-      courriel,
-      motDePasseHache
-    );
-    return res.status(201).json({
-      message: "Utilisateur créé avec succès.",
-      id_utilisateur: id_utilisateur,
-    });
-  } catch (err) {
-    console.error("Erreur lors de la création de l'utilisateur :", err);
-    return res.status(500).json({
-      error: "Erreur serveur lors de la création de l'utilisateur.",
-    });
-  }
+		// Hasher le mot de passe
+		const motDePasseHache = await bcrypt.hash(mot_de_passe, 10);
+
+		const id_utilisateur = await modeleUtilisateur.creer(
+			nom,
+			courriel,
+			motDePasseHache,
+		);
+
+		const nomPremierCellier =
+			typeof nom_premier_cellier === "string" &&
+			nom_premier_cellier.trim().length > 0
+				? nom_premier_cellier.trim()
+				: "Mon cellier";
+
+		try {
+			const id_cellier = await ModeleCellier.ajouter(
+				nomPremierCellier,
+				id_utilisateur,
+			);
+			return res.status(201).json({
+				message: "Utilisateur créé avec succès.",
+				utilisateur: {
+					id_utilisateur,
+					id_cellier,
+					nom,
+					courriel,
+				},
+			});
+		} catch (cellierErr) {
+			console.error(
+				"Erreur lors de la création du premier cellier :",
+				cellierErr,
+			);
+			await modeleUtilisateur.supprimer(id_utilisateur);
+			return res.status(500).json({
+				error: "Impossible de créer le premier cellier. Veuillez réessayer votre inscription.",
+			});
+		}
+	} catch (err) {
+		console.error("Erreur lors de la création de l'utilisateur :", err);
+		return res.status(500).json({
+			error: "Erreur serveur lors de la création de l'utilisateur.",
+		});
+	}
 };
 
 /**
  * Fonction asynchrone qui recupere un utilisateur.
  */
 export const recupererUtilisateur = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const utilisateur = await modeleUtilisateur.trouverParId(id);
+	try {
+		const { id } = req.params;
+		const utilisateur = await modeleUtilisateur.trouverParId(id);
 
-    if (!utilisateur) {
-      return res.status(404).json({ message: "Utilisateur non trouvé." });
-    }
+		if (!utilisateur) {
+			return res.status(404).json({ message: "Utilisateur non trouvé." });
+		}
 
-    return res.status(200).json(utilisateur);
-  } catch (err) {
-    console.error("Erreur lors de la récupération de l'utilisateur :", err);
-    return res.status(500).json({
-      error: "Erreur serveur lors de la récupération de l'utilisateur.",
-    });
-  }
+		const { mot_de_passe, ...donneesUtilisateur } = utilisateur;
+		return res.status(200).json(donneesUtilisateur);
+	} catch (err) {
+		console.error("Erreur lors de la récupération de l'utilisateur :", err);
+		return res.status(500).json({
+			error: "Erreur serveur lors de la récupération de l'utilisateur.",
+		});
+	}
 };
 
 /**
  * Fonction asynchrone qui recherche un utilisateur par son courriel.
  */
-export const recupererUtilisateurParCourriel = async (req, res) => { };
+export const recupererUtilisateurParCourriel = async (req, res) => {
+	try {
+		const { email } = req.params;
+		if (!email) {
+			return res.status(400).json({
+				message: "Courriel requis pour la recherche.",
+			});
+		}
+
+		const utilisateur = await modeleUtilisateur.trouverParCourriel(email);
+
+		if (!utilisateur) {
+			return res.status(404).json({ message: "Utilisateur non trouvé." });
+		}
+
+		const { mot_de_passe, ...donneesUtilisateur } = utilisateur;
+		return res.status(200).json(donneesUtilisateur);
+	} catch (err) {
+		console.error(
+			"Erreur lors de la récupération de l'utilisateur par courriel :",
+			err,
+		);
+		return res.status(500).json({
+			error: "Erreur serveur lors de la récupération de l'utilisateur par courriel.",
+		});
+	}
+};
 
 /**
  * Fonction asynchrone qui modifie les informations d'un utilisateur.
  */
 export const modifierUtilisateur = async (req, res) => {
-  try {
-    const { nom, courriel } = req.body;
-    const { id } = req.params;
+	try {
+		const { nom, courriel } = req.body;
+		const { id } = req.params;
 
-    // Avoir les informations dans la basse de donnees si l'utilisateur existe
-    const donneesUtilisateur = await modeleUtilisateur.trouverParId(id);
+		// Avoir les informations dans la basse de donnees si l'utilisateur existe
+		const donneesUtilisateur = await modeleUtilisateur.trouverParId(id);
 
-    if (!donneesUtilisateur) {
-      return res.status(404).json({
-        message: "Utilisateur non trouvé.",
-      });
-    }
+		if (!donneesUtilisateur) {
+			return res.status(404).json({
+				message: "Utilisateur non trouvé.",
+			});
+		}
 
-    // Si le courriel enovoye est different de celui dans la base de donnees
-    if (courriel !== donneesUtilisateur.courriel) {
-      const existant = await modeleUtilisateur.trouverParCourriel(courriel);
-      if (existant) {
-        return res.status(409).json({
-          message: "Vous ne pouvez pas utiliser ce courriel.",
-        });
-      }
-    }
+		// Si le courriel enovoye est different de celui dans la base de donnees
+		if (courriel !== donneesUtilisateur.courriel) {
+			const existant = await modeleUtilisateur.trouverParCourriel(
+				courriel,
+			);
+			if (existant) {
+				return res.status(409).json({
+					message: "Vous ne pouvez pas utiliser ce courriel.",
+				});
+			}
+		}
 
-    // Mettre à jour l'utilisateur
-    const succes = await modeleUtilisateur.modifier(
-      id,
-      nom,
-      courriel,
-    );
+		// Mettre à jour l'utilisateur
+		const succes = await modeleUtilisateur.modifier(id, nom, courriel);
 
-    if (!succes) {
-      return res.status(500).json({
-        message: "Échec de la modification de l'utilisateur.",
-      });
-    }
+		if (!succes) {
+			return res.status(500).json({
+				message: "Échec de la modification de l'utilisateur.",
+			});
+		}
 
-    return res.status(200).json({
-      message: "Utilisateur modifié avec succès.",
-    });
-  } catch (err) {
-    console.error("Erreur lors de la modification de l'utilisateur :", err);
-    return res.status(500).json({
-      error: "Erreur lors de la modification de l'utilisateur.",
-    });
-  }
+		return res.status(200).json({
+			message: "Utilisateur modifié avec succès.",
+		});
+	} catch (err) {
+		console.error("Erreur lors de la modification de l'utilisateur :", err);
+		return res.status(500).json({
+			error: "Erreur lors de la modification de l'utilisateur.",
+		});
+	}
 };
 
 /**
  * Fonction asynchrone qui supprimme un utilisateur.
  */
 export const supprimerUtilisateur = async (req, res) => {
-  const { id } = req.params;
-  
-  try {
-    const supprimer = await modeleUtilisateur.supprimer(id);
-    return res.status(201).json({
-      message: "Utilisateur supprimeé avec succès.",
-    });
-  } catch (error) {
-    console.error("Erreur lors de la suppretion de l'utilisateur :", err);
-    return res.status(500).json({
-      error: "Erreur serveur lors de la suppretion de l'utilisateur.",
-    });
-  }
+	try {
+		const { id } = req.params;
 
+		if (!id) {
+			return res.status(400).json({
+				message:
+					"Identifiant d'utilisateur requis pour la suppression.",
+			});
+		}
+
+		const utilisateur = await modeleUtilisateur.trouverParId(id);
+
+		if (!utilisateur) {
+			return res.status(404).json({
+				message: "Utilisateur non trouvé.",
+			});
+		}
+
+		const supprime = await modeleUtilisateur.supprimer(id);
+
+		if (!supprime) {
+			return res.status(404).json({
+				message: "Utilisateur non trouvé.",
+			});
+		}
+
+		return res.status(200).json({
+			message: "Utilisateur supprimé avec succès.",
+		});
+	} catch (error) {
+		console.error(
+			"Erreur lors de la suppression de l'utilisateur :",
+			error,
+		);
+		return res.status(500).json({
+			error: "Erreur serveur lors de la suppression de l'utilisateur.",
+		});
+	}
 };
 
 /*
  * Fonction asynchrone qui connecte un utilisateur.
  */
 export const connexionUtilisateur = async (req, res) => {
-  try {
-    const { courriel, mot_de_passe } = req.body;
+	try {
+		const { courriel, mot_de_passe } = req.body;
 
-    // Vérifier que tous les champs sont présents
-    if (!courriel || !mot_de_passe) {
-      return res.status(400).json({ message: "Champs requis manquants." });
-    }
+		// Vérifier que tous les champs sont présents
+		if (!courriel || !mot_de_passe) {
+			return res
+				.status(400)
+				.json({ message: "Champs requis manquants." });
+		}
 
-    // Rechercher l'utilisateur dans la base de données via le modèle
-    const utilisateur = await modeleUtilisateur.connexionUtilisateur(courriel);
+		// Rechercher l'utilisateur dans la base de données via le modèle
+		const utilisateur = await modeleUtilisateur.connexionUtilisateur(
+			courriel,
+		);
 
-    if (!utilisateur) {
-      return res
-        .status(401)
-        .json({ message: "Courriel ou mot de passe incorrect." });
-    }
+		if (!utilisateur) {
+			return res
+				.status(401)
+				.json({ message: "Courriel ou mot de passe incorrect." });
+		}
 
-    // Comparer le mot de passe fourni avec le mot de passe hashé
-    const motDePasseValide = await bcrypt.compare(
-      mot_de_passe,
-      utilisateur.mot_de_passe
-    );
+		// Comparer le mot de passe fourni avec le mot de passe hashé
+		const motDePasseValide = await bcrypt.compare(
+			mot_de_passe,
+			utilisateur.mot_de_passe,
+		);
 
-    if (!motDePasseValide) {
-      return res
-        .status(401)
-        .json({ message: "Courriel ou mot de passe incorrect." });
-    }
+		if (!motDePasseValide) {
+			return res
+				.status(401)
+				.json({ message: "Courriel ou mot de passe incorrect." });
+		}
 
-    // Connexion réussie - ne pas renvoyer le mot de passe
-    return res.status(200).json({
-      message: "Connexion réussie.",
-      utilisateur: {
-        id_utilisateur: utilisateur.id_utilisateur,
-        nom: utilisateur.nom,
-        courriel: utilisateur.courriel,
-      },
-    });
-  } catch (err) {
-    // Gestion des erreurs serveur
-    console.error("Erreur lors de la connexion de l'utilisateur :", err);
-    return res.status(500).json({
-      error: "Erreur serveur lors de la connexion de l'utilisateur.",
-    });
-  }
+		// Connexion réussie - ne pas renvoyer le mot de passe
+		return res.status(200).json({
+			message: "Connexion réussie.",
+			utilisateur: {
+				id_utilisateur: utilisateur.id_utilisateur,
+				nom: utilisateur.nom,
+				courriel: utilisateur.courriel,
+			},
+		});
+	} catch (err) {
+		// Gestion des erreurs serveur
+		console.error("Erreur lors de la connexion de l'utilisateur :", err);
+		return res.status(500).json({
+			error: "Erreur serveur lors de la connexion de l'utilisateur.",
+		});
+	}
 };

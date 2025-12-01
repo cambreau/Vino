@@ -6,7 +6,7 @@ import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
 import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import Message from "@components/components-partages/Message/Message";
-import CarteBouteille from "@components/carte/CarteBouteille";
+import CarteListeAchat from "@components/carte-liste-achat/CarteListeAchat";
 import {
   recupererCellier,
   recupererBouteillesCellier,
@@ -14,10 +14,10 @@ import {
 } from "@lib/requetes.js";
 import { useDocumentTitle } from "@lib/utils.js";
 
-function Cellier() {
+function ListeAchat() {
   const navigate = useNavigate();
   // Récupérer id du cellier dans l'URL
-  const { idCellier } = useParams();
+  const idCellier = 12;
 
   // Etat pour le cellier : nom
   const [cellier, setCellier] = useState({
@@ -125,62 +125,59 @@ function Cellier() {
       </header>
 
       <main className="bg-fond overflow-y-auto">
-        <section className="pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)">
+        <header className="pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)">
           <h1 className="text-(length:--taille-moyen) text-center font-display font-semibold text-principal-300">
-            Cellier - {cellier.nom}
+            Votre Liste d'achat
           </h1>
+        </header>
 
-          <article className="mt-(--rythme-base) p-(--rythme-serre) min-h-[200px]">
-            {messageAction.texte && (
-              <div className="mb-(--rythme-base)">
-                <Message
-                  type={messageAction.type}
-                  texte={messageAction.texte}
-                />
-              </div>
-            )}
-            {chargementBouteilles ? (
-              <Message
-                type="information"
-                texte="Chargement des bouteilles du cellier..."
-              />
-            ) : bouteillesCellier.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {bouteillesCellier.map((bouteille) => (
-                  <Link key={bouteille.id} to={`/bouteilles/${bouteille.id}`}>
-                    <CarteBouteille
-                      key={bouteille.id}
-                      bouteille={bouteille}
-                      type="cellier"
-                      onAugmenter={handleAugmenter}
-                      onDiminuer={handleDiminuer}
-                      disabled={bouteillesEnTraitement.has(bouteille.id)}
-                    />
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center gap-(--rythme-base)">
-                <div className="mb-(--rythme-base) w-full">
-                  <Message
-                    type="information"
-                    texte="Vous n'avez pas encore de bouteilles dans ce cellier."
+        <article className="mt-(--rythme-base) p-(--rythme-serre) min-h-[200px]">
+          {messageAction.texte && (
+            <div className="mb-(--rythme-base)">
+              <Message type={messageAction.type} texte={messageAction.texte} />
+            </div>
+          )}
+          {chargementBouteilles ? (
+            <Message
+              type="information"
+              texte="Chargement des bouteilles de la liste..."
+            />
+          ) : bouteillesCellier.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {bouteillesCellier.map((bouteille) => (
+                <Link key={bouteille.id} to={`/bouteilles/${bouteille.id}`}>
+                  <CarteListeAchat
+                    key={bouteille.id}
+                    bouteille={bouteille}
+                    type="cellier"
+                    onAugmenter={handleAugmenter}
+                    onDiminuer={handleDiminuer}
+                    disabled={bouteillesEnTraitement.has(bouteille.id)}
                   />
-                </div>
-
-                <Bouton
-                  taille="moyen"
-                  texte="Ajouter une bouteille"
-                  type="primaire"
-                  typeHtml="button"
-                  action={() => {
-                    navigate("/catalogue");
-                  }}
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-(--rythme-base)">
+              <div className="mb-(--rythme-base) w-full">
+                <Message
+                  type="information"
+                  texte="Vous n'avez pas encore de bouteilles dans la liste."
                 />
               </div>
-            )}
-          </article>
-        </section>
+
+              <Bouton
+                taille="moyen"
+                texte="Ajouter une bouteille"
+                type="primaire"
+                typeHtml="button"
+                action={() => {
+                  navigate("/catalogue");
+                }}
+              />
+            </div>
+          )}
+        </article>
       </main>
 
       <MenuEnBas />
@@ -188,4 +185,4 @@ function Cellier() {
   );
 }
 
-export default Cellier;
+export default ListeAchat;

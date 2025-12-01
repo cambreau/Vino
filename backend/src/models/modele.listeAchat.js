@@ -92,8 +92,15 @@ export default class modeleListeAchat {
   }
 
   //Modifier une quantite bouteille a la liste d'achat
-  static async supprimerBouteilleListe(id_utilisateur, id_bouteille) {}
-
-  //Supprimer une bouteille a la liste d'achat
   static async modifierBouteilleListe(id_utilisateur, id_bouteille) {}
-}
+  
+  //Supprimer une bouteille a la liste d'achat
+  static async supprimerBouteilleListe(id_utilisateur, id_bouteille) {
+    const sql = `
+      DELETE FROM listeAchat 
+      WHERE id_utilisateur = ? AND id_bouteille = ?
+    `;
+    const [resultat] = await connexion.execute(sql, [id_utilisateur, id_bouteille]);
+    return resultat.affectedRows > 0;
+  }
+  }
