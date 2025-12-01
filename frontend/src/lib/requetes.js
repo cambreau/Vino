@@ -689,7 +689,7 @@ export const modifierBouteilleCellier = async (
 export const recupererListeAchat = async (id_utilisateur) => {
   try {
     const reponse = await fetch(
-      `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL}/${id_utilisateur}`
+      `${import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL}/${id_utilisateur}`
     );
     
     if (!reponse.ok) {
