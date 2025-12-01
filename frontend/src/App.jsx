@@ -10,7 +10,6 @@ import Bouteille from "@pages/Bouteille";
 import SommaireCellier from "@pages/SommaireCellier";
 import ListeAchat from "@pages/ListeAchat";
 
-
 function App() {
   return (
     <Routes>
