@@ -53,7 +53,34 @@ export const ajoutBouteilleListe = async (req, res) => {
 /**
  * Fonction asynchrone qui recupere la liste d'achat.
  */
-export const recupererListe = async (req, res) => {};
+export const recupererListe = async (req, res) => {
+	try {
+		const { id_utilisateur } = req.params;
+		const idUtilisateurNombre = parseInt(id_utilisateur, 10);
+
+		if (!Number.isInteger(idUtilisateurNombre) || idUtilisateurNombre <= 0) {
+			return res.status(400).json({
+				message: "Identifiant utilisateur invalide",
+			});
+		}
+
+		const liste = await modeleListeAchat.recupererListe(
+			idUtilisateurNombre
+		);
+
+		return res.status(200).json({
+			message: "Liste d'achat récupérée",
+			total: liste.length,
+			data: liste,
+		});
+	} catch (error) {
+		console.error(
+			"Erreur lors de la récupération de la liste d'achat",
+			error
+		);
+		return res.status(500).json({ message: "Erreur serveur" });
+	}
+};
 
 /**
  * Fonction asynchrone qui modifie la quantite d'une bouteille de la liste achat.
