@@ -11,6 +11,12 @@ export const ajoutBouteilleListe = async (req, res) => {};
 export const recupererListe = async (req, res) => {};
 
 /**
+ * Fonction asynchrone qui modifie la quantite d'une bouteille de la liste achat.
+ */
+export const modifierBouteilleListe = async (req, res) => {};
+
+
+/**
  * Fonction asynchrone qui supprime une bouteille a la liste achat.
  */
 export const supprimerBouteilleListe = async (req, res) => {
@@ -44,9 +50,3 @@ export const supprimerBouteilleListe = async (req, res) => {
     });
   }
 };
-
-
-/**
- * Fonction asynchrone qui modifie la quantite d'une bouteille de la liste achat.
- */
-export const modifierBouteilleListe = async (req, res) => {};
