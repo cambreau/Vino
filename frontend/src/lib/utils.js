@@ -47,7 +47,9 @@ export const formatDetailsBouteille = (texte) => {
 	texteFormate = texteFormateFinal.replace(/\s+/g, " ").trim();
 
 	return texteFormate;
-};  
+};
+
+
 const normaliserTexte = (valeur) => {
   if (valeur === undefined || valeur === null) return "";
   return valeur
