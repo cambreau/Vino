@@ -580,78 +580,74 @@ export const verifierBouteilleCellier = async (idCellier, idBouteille) => {
  * @returns {Promise<>} Un objet indiquant le succès de l'opération et l'erreur éventuelle
  */
 export const modifierBouteilleCellier = async (
-  id_cellier,
-  id_bouteille,
-  nouvelleQuantite,
-  navigate
+	id_cellier,
+	id_bouteille,
+	nouvelleQuantite,
 ) => {
-  try {
-    // Si la quantite est egale a zero, on supprime la bouteille de la base de donnes
-    if (nouvelleQuantite === 0) {
-      console.log(
-        "Requête DELETE vers:",
-        `${
-          import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
-        }/${id_bouteille}/${id_cellier}`
-      );
-      const reponse = await fetch(
-        `${
-          import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
-        }/${id_cellier}/${id_bouteille}`,
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+	try {
+		const quantiteCible = Math.max(
+			0,
+			Number.parseInt(nouvelleQuantite, 10) || 0,
+		);
 
-      if (reponse.ok) {
-        window.location.href = `/cellier/${id_cellier}`; // Force un vrai rechargement
-        return { succes: true };
-      } else {
-        // Gestion des erreurs HTTP
-        const erreurData = await reponse.json().catch(() => ({}));
-        console.error(
-          "Erreur HTTP lors de la suppression:",
-          reponse.status,
-          erreurData
-        );
-      }
-    }
-    const reponse = await fetch(
-      `${
-        import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
-      }/${id_bouteille}/${id_cellier}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nouvelleQuantite }),
-      }
-    );
+		if (quantiteCible === 0) {
+			const reponse = await fetch(
+				`${
+					import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
+				}/${id_cellier}/${id_bouteille}`,
+				{
+					method: "DELETE",
+					headers: { "Content-Type": "application/json" },
+				},
+			);
 
-    if (reponse.ok) {
-      navigate(`/cellier/${id_cellier}`);
-      return { succes: true };
-    }
+			if (reponse.ok) {
+				return { succes: true, supprime: true };
+			}
 
-    // Gestion des erreurs HTTP (400, 500, etc.)
-    const erreurData = await reponse.json().catch(() => ({}));
-    console.error("Erreur HTTP:", reponse.status, erreurData);
+			const erreurData = await reponse.json().catch(() => ({}));
+			console.error(
+				"Erreur HTTP lors de la suppression:",
+				reponse.status,
+				erreurData,
+			);
+			return {
+				succes: false,
+				erreur:
+					erreurData?.message ||
+					"Erreur lors de la suppression de la bouteille du cellier",
+			};
+		}
 
-    // navigate(`/sommaire-cellier?echec=true`);
+		const reponse = await fetch(
+			`${
+				import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
+			}/${id_cellier}/${id_bouteille}`,
+			{
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ nouvelleQuantite: quantiteCible }),
+			},
+		);
 
-    return {
-      succes: false,
-      erreur:
-        erreurData?.message ||
-        "Erreur lors de la modification de la bouteille dans le cellier",
-    };
-  } catch (error) {
-    // Gestion des erreurs réseau (exemple: pas de connexion)
-    console.error(
-      "Erreur lors de la modification de la bouteille dans le cellier :",
-      error
-    );
-    // navigate(`/sommaire-cellier?echec=true`);
-    return { succes: false, erreur: error.message };
-  }
+		if (reponse.ok) {
+			return { succes: true, supprime: false, quantite: quantiteCible };
+		}
+
+		const erreurData = await reponse.json().catch(() => ({}));
+		console.error("Erreur HTTP:", reponse.status, erreurData);
+
+		return {
+			succes: false,
+			erreur:
+				erreurData?.message ||
+				"Erreur lors de la modification de la bouteille dans le cellier",
+		};
+	} catch (error) {
+		console.error(
+			"Erreur lors de la modification de la bouteille dans le cellier :",
+			error,
+		);
+		return { succes: false, erreur: error.message };
+	}
 };
