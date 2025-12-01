@@ -47,7 +47,7 @@ export const formatDetailsBouteille = (texte) => {
 	return texteFormate;
 };
 
-const normaliserTexte = (valeur) => {
+export const normaliserTexte = (valeur) => {
   if (valeur === undefined || valeur === null) return "";
   return valeur
     .toString()
@@ -84,7 +84,7 @@ export const filtrerBouteilles = (bouteilles = [], filtres = {}) => {
 
     if (typeActif) {
       const typeBouteille = normaliserTexte(
-        bouteille.type || bouteille.couleur
+        bouteille.type ?? bouteille.couleur,
       );
       if (!typeBouteille || typeBouteille !== typeFiltre) {
         return false;
@@ -93,7 +93,7 @@ export const filtrerBouteilles = (bouteilles = [], filtres = {}) => {
 
     if (paysFiltre) {
       const paysBouteille = normaliserTexte(
-        bouteille.pays || bouteille.country || bouteille.origine
+        bouteille.pays ?? bouteille.country ?? bouteille.origine,
       );
       if (!paysBouteille || !paysBouteille.includes(paysFiltre)) {
         return false;
@@ -102,7 +102,7 @@ export const filtrerBouteilles = (bouteilles = [], filtres = {}) => {
 
     if (regionFiltre) {
       const regionBouteille = normaliserTexte(
-        bouteille.region || bouteille.appellation
+        bouteille.region ?? bouteille.appellation,
       );
       if (!regionBouteille || !regionBouteille.includes(regionFiltre)) {
         return false;
@@ -110,9 +110,12 @@ export const filtrerBouteilles = (bouteilles = [], filtres = {}) => {
     }
 
     if (anneeFiltre) {
-      const anneeBouteille = Number(
-        bouteille.annee || bouteille.millesime || bouteille.vintage
-      );
+      const anneeSource =
+        bouteille.annee ??
+        bouteille.millesime ??
+        bouteille.millenisme ??
+        bouteille.vintage;
+      const anneeBouteille = Number(anneeSource);
       if (!anneeBouteille || anneeBouteille !== anneeFiltre) {
         return false;
       }
@@ -136,7 +139,7 @@ export function useDocumentTitle(titre, suffixe = "Vino") {
 				document.title = `${titre} - ${suffixe}`;
 			}
 		} catch (e) {
-			// ignore si document n'est pas disponible (ex.: SSR)
+      // ignore
 		}
 	}, [titre, suffixe]);
 }
