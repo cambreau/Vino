@@ -49,8 +49,6 @@ export const formatDetailsBouteille = (texte) => {
 	return texteFormate;
 };
 
-  return texteFormate;
-};
 
 const normaliserTexte = (valeur) => {
   if (valeur === undefined || valeur === null) return "";
