@@ -696,7 +696,7 @@ export const recupererListeAchat = async (id_utilisateur) => {
       throw new Error("Erreur lors de la récupération de la liste");
     }
     
-    const donnees = reponse.json();
+    const donnees = await reponse.json();
     return donnees;
   } catch (erreur) {
     console.error("Erreur recupererListeAchat:", erreur);
