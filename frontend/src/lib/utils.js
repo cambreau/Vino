@@ -37,12 +37,14 @@ export const formatDetailsBouteille = (texte) => {
 	if (!texte) return "";
 
 	// Remplacer les | par des virgules
-	let texteFormate = texte.replaceAll("|", ",");
+	let texteFormate = texte.replaceAll("identite produit:", "");
+	// Remplacer les | par des virgules
+	let texteFormateFinal = texteFormate.replaceAll("|", ",");
 
-	formatMajDebut(texte);
+	formatMajDebut(texteFormateFinal);
 
 	// Nettoyer les espaces multiples
-	texteFormate = texteFormate.replace(/\s+/g, " ").trim();
+	texteFormate = texteFormateFinal.replace(/\s+/g, " ").trim();
 
 	return texteFormate;
 };
