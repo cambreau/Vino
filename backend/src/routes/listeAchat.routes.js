@@ -12,7 +12,7 @@ import {
 router.get("/:id_utilisateur", recupererListe);
 
 // Ajouter une bouteille à la liste d'achat
-router.post("/:id_utilisateur/bouteilles/:id_bouteille?", ajoutBouteilleListe);
+router.post("/:id_utilisateur/bouteilles/:id_bouteille", ajoutBouteilleListe);
 
 // Modifier la quantité d'une bouteille dans la liste d'achat
 router.put("/:id_utilisateur/:id_bouteille", modifierBouteilleListe);
