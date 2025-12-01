@@ -680,3 +680,26 @@ export const modifierBouteilleCellier = async (
 		return { succes: false, erreur: error.message };
 	}
 };
+
+/**
+ * Récupère toutes les bouteilles de la liste d'achat d'un utilisateur
+ * @param {number} id_utilisateur - L'ID de l'utilisateur
+ * @returns {Promise<Array>} - La liste des bouteilles
+ */
+export const recupererListeAchat = async (id_utilisateur) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL}/${id_utilisateur}`
+    );
+    
+    if (!reponse.ok) {
+      throw new Error("Erreur lors de la récupération de la liste");
+    }
+    
+    const donnees = reponse.json();
+    return donnees;
+  } catch (erreur) {
+    console.error("Erreur recupererListeAchat:", erreur);
+    throw erreur;
+  }
+};
