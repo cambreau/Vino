@@ -7,6 +7,7 @@ import { supprimerUtilisateur } from "@lib/requetes.js";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import { FaUser } from "react-icons/fa";
 import authentificationStore from "@store/authentificationStore";
+import { useDocumentTitle } from "@lib/utils.js";
 
 function Profil() {
 	const navigate = useNavigate();
@@ -25,6 +26,9 @@ function Profil() {
 			return;
 		}
 	}, [estConnecte, utilisateur, navigate]);
+
+	// Titre de page à partir du nom de l'utilisateur
+	useDocumentTitle(utilisateur?.nom || "Profil");
 
 	/**
 	 * Ouvre la boîte modale de confirmation de suppression du profil
