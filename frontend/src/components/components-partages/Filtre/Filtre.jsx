@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, useId } from "react";
 import Bouton from "@components/components-partages/Boutons/Bouton";
+import Recherche from "@components/components-partages/Recherche/Recherche";
 import {
 	formatString,
 	filtrerBouteilles as filtres,
@@ -75,6 +76,7 @@ function Filtres({
 	className = "",
 }) {
 	const [estOuvert, setEstOuvert] = useState(true);
+	const [modeRecherche, setModeRecherche] = useState(false);
 	const [criteres, setCriteres] = useState(() => ({
 		type: "",
 		pays: "",
@@ -158,6 +160,26 @@ function Filtres({
 		},
 	];
 
+	const handleBasculerRecherche = () => {
+		setModeRecherche(true);
+	};
+
+	const handleBasculerFiltres = () => {
+		setModeRecherche(false);
+	};
+
+	// Si on est en mode recherche, afficher le composant Recherche
+	if (modeRecherche) {
+		return (
+			<Recherche
+				valeursInitiales={{}}
+				onRechercher={onRecherche}
+				onFiltrer={handleBasculerFiltres}
+				className={className}
+			/>
+		);
+	}
+
 	return (
 		<section
 			className={`w-full max-w-[380px] bg-fond-secondaire border border-principal-100 rounded-(--arrondi-tres-grand) p-(--rythme-base) shadow-md flex flex-col gap-(--rythme-base) ${className}`}
@@ -182,9 +204,8 @@ function Filtres({
 				<div className="h-6 w-px bg-principal-100" aria-hidden="true" />
 				<button
 					type="button"
-					onClick={onRecherche ?? undefined}
-					disabled={!onRecherche}
-					className="flex items-center gap-2 px-4 text-principal-200 disabled:opacity-50 disabled:cursor-not-allowed"
+					onClick={handleBasculerRecherche}
+					className="flex items-center gap-2 px-4 text-principal-200 hover:text-principal-300 transition-colors"
 					aria-label="Rechercher">
 					<FaSearch />
 				</button>
