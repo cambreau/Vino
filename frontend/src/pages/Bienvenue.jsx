@@ -16,11 +16,12 @@ function Bienvenue() {
         {/* Texte de bienvenue */}
         <header
           className="
-            text-center mb-(--rythme-espace)
+            text-center mb-(--rythme-tres-espace)
           "
         >
           <h1
             className="
+			mb-(--rythme-base)
               text-(length:--taille-tres-gros)
               font-display font-bold
               text-fond
