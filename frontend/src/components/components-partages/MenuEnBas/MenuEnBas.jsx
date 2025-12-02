@@ -31,13 +31,12 @@ function MenuEnBas({}) {
     zones.some((segment) => pathname.startsWith(segment));
 
   return (
-    <footer className="grid grid-cols-4 mt-auto p-(--rythme-base) bg-principal-300">
+    <footer className="grid grid-cols-4 bg-principal-300 border-t border-principal-200">
       {menuItems.map((item) => {
         const actif = estActif(item.zonesActives);
         const baseClasses =
-          "flex flex-col items-center gap-(--rythme-tres-serre) rounded-full py-(--rythme-serre) transition-all duration-200 ease-out transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fond-secondaire";
-        const actifClasses =
-          "bg-fond-secondaire text-principal-300 shadow-md -translate-y-0.5";
+          "flex flex-col items-center gap-(--rythme-tres-serre)  py-(--rythme-serre) transition-all duration-200 ease-out transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fond-secondaire";
+        const actifClasses = "bg-fond-secondaire text-principal-300";
         const inactifClasses =
           "text-principal-100/80 hover:text-fond-secondaire hover:-translate-y-0.5";
 
