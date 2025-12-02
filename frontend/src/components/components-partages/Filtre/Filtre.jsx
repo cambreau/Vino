@@ -5,7 +5,7 @@ import {
 	filtrerBouteilles as filtres,
 	normaliserTexte,
 } from "@lib/utils";
-import { FaFilter, FaExchangeAlt, FaWarehouse, FaChevronDown } from "react-icons/fa";
+import { FaFilter, FaExchangeAlt, FaWarehouse, FaChevronDown, FaSearch } from "react-icons/fa";
 import { GiGrapes } from "react-icons/gi";
 import { BiWorld } from "react-icons/bi";
 import { MdOutlineCalendarMonth } from "react-icons/md";
@@ -68,6 +68,7 @@ function Filtres({
 	valeursInitiales = {},
 	onFiltrer,
 	onTri,
+	onRecherche,
 	titreFiltrer = "Filtrer",
 	titreTri = "Tri",
 	texteBouton = "Chercher",
@@ -181,11 +182,11 @@ function Filtres({
 				<div className="h-6 w-px bg-principal-100" aria-hidden="true" />
 				<button
 					type="button"
-					onClick={onTri ?? undefined}
-					disabled={!onTri}
-					className="flex items-center gap-2 text-principal-200 disabled:opacity-50 disabled:cursor-not-allowed">
-					<FaExchangeAlt />
-					<span>{titreTri}</span>
+					onClick={onRecherche ?? undefined}
+					disabled={!onRecherche}
+					className="flex items-center gap-2 px-4 text-principal-200 disabled:opacity-50 disabled:cursor-not-allowed"
+					aria-label="Rechercher">
+					<FaSearch />
 				</button>
 			</header>
 			{estOuvert && (
@@ -193,6 +194,15 @@ function Filtres({
 					id={formulaireId}
 					className="flex flex-col gap-(--rythme-base)"
 					onSubmit={handleSubmit}>
+				{onTri && (
+					<button
+						type="button"
+						onClick={onTri}
+						className="flex items-center gap-2 text-(length:--taille-petit) text-principal-200 hover:text-principal-300 transition-colors">
+						<FaExchangeAlt/>
+						<span>{titreTri}</span>
+					</button>
+				)}
 				{champSelects.map((champ) => (
 					<div key={champ.id} className="flex flex-col gap-(--rythme-tres-serre)">
 						<label
