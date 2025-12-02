@@ -20,12 +20,18 @@ function Profil() {
 	const [estModaleSuppressionOuverte, setEstModaleSuppressionOuverte] =
 		useState(false);
 
+	// État pour éviter la redirection de déconnexion lors de la suppression
+	const [enCoursDeSuppression, setEnCoursDeSuppression] = useState(false);
+
 	useEffect(() => {
 		if (!estConnecte || !utilisateur) {
-			navigate("/?deconnexionSucces=true");
+			// Ne pas rediriger si on est en cours de suppression (la redirection est gérée par supprimerUtilisateur)
+			if (!enCoursDeSuppression) {
+				navigate("/?deconnexionSucces=true");
+			}
 			return;
 		}
-	}, [estConnecte, utilisateur, navigate]);
+	}, [estConnecte, utilisateur, navigate, enCoursDeSuppression]);
 
 	// Titre de page à partir du nom de l'utilisateur
 	useDocumentTitle(utilisateur?.nom || "Profil");
@@ -42,6 +48,7 @@ function Profil() {
 	 */
 	const confirmerSuppressionProfil = async () => {
 		setEstModaleSuppressionOuverte(false);
+		setEnCoursDeSuppression(true);
 		if (utilisateur && utilisateur.id) {
 			console.log(
 				"Tentative de suppression du profil, ID:",
