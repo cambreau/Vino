@@ -741,3 +741,42 @@ export const ajouterBouteilleListe = async (id_utilisateur, donnees) => {
     };
   }
 };
+
+
+/**
+ * Retire une bouteille de la liste d'achat d'un utilisateur
+ * @param {number} id_utilisateur - L'ID de l'utilisateur
+ * @param {number} id_bouteille - L'ID de la bouteille à retirer
+ * @returns {Promise<Object>} - Résultat de l'opération
+ */
+export const retirerBouteilleListe = async (id_utilisateur, id_bouteille) => {
+  try {
+    // Envoie une requête DELETE à l'API pour retirer la bouteille
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL}/${id_utilisateur}/${id_bouteille}`,
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+    
+    if (reponse.ok) {
+      const data = await reponse.json();
+      return { succes: true, donnees: data };
+    }
+
+    const erreurData = await reponse.json().catch(() => ({}));
+    console.error("Erreur HTTP:", reponse.status, erreurData);
+
+    return {
+      succes: false,
+      erreur: erreurData.message || "Erreur lors du retrait de la liste",
+    };
+  } catch (error) {
+    console.error("Erreur lors du retrait de la liste:", error);
+    return {
+      succes: false,
+      erreur: "Le serveur ne répond pas.",
+    };
+  }
+};
