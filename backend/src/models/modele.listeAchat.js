@@ -92,8 +92,47 @@ export default class modeleListeAchat {
   }
 
   //Modifier une quantite bouteille a la liste d'achat
-  static async modifierBouteilleListe(id_utilisateur, id_bouteille) {}
-  
+  static async modifierBouteilleListe(
+    id_utilisateur,
+    id_bouteille,
+    quantite) {
+    if (!id_utilisateur || !id_bouteille) {
+      throw new Error(
+        "Les identifiants utilisateur et bouteille sont requis"
+      );
+    }
+
+    const sql = `
+      UPDATE listeAchat 
+      SET quantite = ?
+      WHERE id_utilisateur = ? AND id_bouteille = ?
+    `;
+
+    const [resultat] = await connexion.query(sql, [
+      quantite,
+      id_utilisateur,
+      id_bouteille,
+
+    ]);
+
+    return {
+      id_utilisateur,
+      id_bouteille,
+      quantite,
+      lignesAffectees: resultat.affectedRows,
+    };
+  }
+
+  // Requête pour récupére une bouteille d'un utilisateur
+  static async recupererBouteille(id_utilisateur, id_bouteille) {
+
+    const sql = `SELECT * FROM listeAchat WHERE id_utilisateur = ? AND id_bouteille = ? LIMIT 1`;
+    const [rows] = await connexion.query(sql, [id_utilisateur, id_bouteille]);
+
+    // Retourne la bouteille trouvé ou null si aucun résultat
+    return rows.length > 0 ? rows[0] : null;
+  }
+
   //Supprimer une bouteille a la liste d'achat
   static async supprimerBouteilleListe(id_utilisateur, id_bouteille) {
     const sql = `
@@ -103,4 +142,5 @@ export default class modeleListeAchat {
     const [resultat] = await connexion.execute(sql, [id_utilisateur, id_bouteille]);
     return resultat.affectedRows > 0;
   }
-  }
+
+}
