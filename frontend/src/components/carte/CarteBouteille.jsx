@@ -1,5 +1,6 @@
 import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuantite";
 import BoutonAction from "@components/components-partages/Boutons/BoutonAction";
+import { GiNotebook } from "react-icons/gi";
 
 const CarteBouteille = ({
   bouteille,
@@ -7,6 +8,7 @@ const CarteBouteille = ({
   onAugmenter = () => {},
   onDiminuer = () => {},
   onAjouter = () => {},
+  onAjouterListe = () => {},
   disabled = false, //désactiver le bouton
 }) => {
   /**
@@ -20,12 +22,24 @@ const CarteBouteille = ({
      * ------------------------------ */
     if (type === "catalogue") {
       return (
-        <BoutonAction
-          texte={disabled ? "Déjà dans le cellier" : "Ajouter au cellier"}
-          onClick={() => onAjouter(bouteille)}
-          type="secondaire"
-          disabled={disabled}
-        />
+        <div className="grid grid-cols-[1fr_auto] gap-4 w-full items-center">
+            <BoutonAction
+              texte={disabled ? "Déjà dans le cellier" : "Ajouter au cellier"}
+              onClick={() => onAjouter(bouteille)}
+              type="secondaire"
+              disabled={disabled}
+            />
+            <button 
+            onClick={(e) => handleAjouterListe(e)}
+            disabled={disabled}
+            className="p-2 rounded-full text-principal-200 border-1 border-(--color-principal-200) shadow-md 
+            hover:bg-principal-200  hover:text-principal-100 
+            transition-all cursor-pointer"
+          > 
+            <GiNotebook size={20}/>
+          </button>
+
+       </div>
       );
     }
 
@@ -71,12 +85,18 @@ const CarteBouteille = ({
     onAjouter(bouteille); 
   };
 
+  const handleAjouterListe = (e) => {
+    e.stopPropagation(); 
+    e.preventDefault(); 
+    onAjouterListe(bouteille); 
+  };
+
   return (
     <div
       className="
-      flex flex-col 
+      flex flex-col justify-between
       bg-fond-secondaire p-(--rythme-serre) 
-      rounded-(--arrondi-grand) shadow-md"
+      rounded-(--arrondi-grand) shadow-md min-h-[320px]"
     >
       {/* Section IMAGE de la bouteille */}
       <div
@@ -92,7 +112,7 @@ const CarteBouteille = ({
       </div>
 
       {/* Section INFORMATIONS de la bouteille */}
-      <div className="flex-1 mb-4">
+      <div className="mb-4">
         {/* Nom */}
         <h2 className="mb-2 text-(length:--taille-normal) font-bold text-texte-secondaire">
           {bouteille.nom}

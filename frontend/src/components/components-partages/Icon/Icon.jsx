@@ -9,6 +9,8 @@ import { MdLogout } from "react-icons/md"; // Deconnection
 // import { PiCastleTurret } from "react-icons/pi"; // Chateau
 import { IoClose } from "react-icons/io5"; // Fermer
 import { formatMajDebut } from "@lib/utils";
+
+
 // Objet qui mappe les noms aux icônes
 const icons = {
 	catalogue: GrCatalog,

@@ -703,3 +703,41 @@ export const recupererListeAchat = async (id_utilisateur) => {
     throw erreur;
   }
 };
+
+/**
+ * Ajoute une bouteille à la liste d'achat d'un utilisateur
+ * @param {number} id_utilisateur - L'ID de l'utilisateur
+ * @param {Object} donnees - Les données de la bouteille à ajouter (id_bouteille)
+ * @returns {Promise<Object>} - Résultat de l'opération
+ */
+export const ajouterBouteilleListe = async (id_utilisateur, donnees) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL}/${id_utilisateur}/bouteilles/${donnees.id_bouteille}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      }
+    );
+    
+    if (reponse.ok) {
+      const data = await reponse.json();
+      return { succes: true, donnees: data };
+    }
+
+    const erreurData = await reponse.json().catch(() => ({}));
+    console.error("Erreur HTTP:", reponse.status, erreurData);
+
+    return {
+      succes: false,
+      erreur: erreurData.message || "Erreur lors de l'ajout à la liste",
+    };
+  } catch (error) {
+    console.error("Erreur lors de l'ajout à la liste:", error);
+    return {
+      succes: false,
+      erreur: "Le serveur ne répond pas.",
+    };
+  }
+};
