@@ -1,6 +1,16 @@
 import { connexion } from "../database/connexion.js";
 
 export default class modeleListeAchat {
+  //Vérifier si une bouteille existe déjà dans la liste d'achat
+  static async bouteilleExisteDansListe(id_utilisateur, id_bouteille) {
+    const sql = `
+      SELECT * FROM listeAchat
+      WHERE id_utilisateur = ? AND id_bouteille = ?
+    `;
+    const [resultat] = await connexion.query(sql, [id_utilisateur, id_bouteille]);
+    return resultat.length > 0 ? resultat[0] : null;
+  }
+
   //Ajouter une bouteille a la liste d'achat
   static async ajoutBouteilleListe(
     id_utilisateur,
@@ -17,10 +27,18 @@ export default class modeleListeAchat {
       quantite = 1;
     }
 
+    // Vérifier si la bouteille existe déjà dans la liste
+    const bouteilleExistante = await this.bouteilleExisteDansListe(id_utilisateur, id_bouteille);
+    if (bouteilleExistante) {
+      return {
+        existe: true,
+        bouteilleExistante,
+      };
+    }
+
     const sql = `
       INSERT INTO listeAchat (id_utilisateur, id_bouteille, quantite)
       VALUES (?, ?, ?)
-      ON DUPLICATE KEY UPDATE quantite = quantite + VALUES(quantite);
     `;
 
     const [resultat] = await connexion.query(sql, [
@@ -30,6 +48,7 @@ export default class modeleListeAchat {
     ]);
 
     return {
+      existe: false,
       id_utilisateur,
       id_bouteille,
       quantite,

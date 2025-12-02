@@ -40,6 +40,14 @@ export const ajoutBouteilleListe = async (req, res) => {
 			quantite
 		);
 
+		// Si la bouteille existe déjà dans la liste d'achat
+		if (resultat.existe) {
+			return res.status(409).json({
+				message: "Cette bouteille existe déjà dans votre liste d'achat.",
+				data: resultat.bouteilleExistante,
+			});
+		}
+
 		return res.status(201).json({
 			message: "Bouteille ajoutée à la liste d'achat",
 			data: resultat,
