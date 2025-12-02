@@ -50,7 +50,7 @@ export const formatDetailsBouteille = (texte) => {
 };
 
 
-const normaliserTexte = (valeur) => {
+export const normaliserTexte = (valeur) => {
   if (valeur === undefined || valeur === null) return "";
   return valeur
     .toString()
@@ -170,7 +170,7 @@ export function useDocumentTitle(titre, suffixe = "Vino") {
 				document.title = `${titre} - ${suffixe}`;
 			}
 		} catch (e) {
-			// ignore si document n'est pas disponible (ex.: SSR)
+      // ignore
 		}
 	}, [titre, suffixe]);
 }

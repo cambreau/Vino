@@ -1,10 +1,18 @@
-import { useEffect, useCallback, useRef, useReducer, useMemo } from "react";
+import {
+  useEffect,
+  useCallback,
+  useRef,
+  useReducer,
+  useMemo,
+  useState,
+} from "react";
 import { Link } from "react-router-dom";
 import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
 import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
 import CarteBouteille from "@components/carte/CarteBouteille";
 import Message from "@components/components-partages/Message/Message";
 import BoiteModale from "@components/components-partages/BoiteModale/BoiteModale";
+import Filtres from "@components/components-partages/Filtre/Filtre";
 
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuantite";
@@ -20,20 +28,15 @@ import {
 } from "@lib/requetes";
 
 import authentificationStore from "@store/authentificationStore";
-import { useDocumentTitle } from "@lib/utils.js";
+import { useDocumentTitle, filtrerBouteilles } from "@lib/utils.js";
 
-const linkBouteille = [
-  {
-    nom: "catalogue",
-    to: "/catalogue",
-    zonesActives: ["/catalogue", "/bouteilles"],
-  },
-];
+
 
 /*
  * Constante: nombre d'éléments à charger par page lors de la pagination.
  */
 const LIMITE_BOUTEILLES = 10;
+const LIMITE_CHARGEMENT_CATALOGUE = 250;
 
 /*
  * Crée l'état initial du catalogue. Propriété par propriété :
@@ -209,15 +212,65 @@ function Catalogue() {
     creerEtatInitial
   );
   const etatRef = useRef(etat);
+  const sentinelPretRef = useRef(true);
   // Référence de contrôle pour éviter les réponses asynchrones obsolètes lors des vérifications
   // (incrémentée à chaque requête pour s'assurer que la réponse correspond à la dernière requête).
   const verificationRef = useRef(0);
+  const [resultatsFiltres, setResultatsFiltres] = useState(null);
+  const [criteresFiltres, setCriteresFiltres] = useState({});
+  const [modeTri, setModeTri] = useState("nom_asc");
+  const [catalogueComplet, setCatalogueComplet] = useState([]);
+  const [chargementCatalogueComplet, setChargementCatalogueComplet] = useState(false);
+  const [erreurCatalogueComplet, setErreurCatalogueComplet] = useState(null);
+  const filtresActifs = useMemo(
+    () => Object.values(criteresFiltres ?? {}).some((valeur) => Boolean(valeur)),
+    [criteresFiltres]
+  );
+  const donneesFiltres = useMemo(
+    () => (catalogueComplet.length ? catalogueComplet : etat.bouteilles),
+    [catalogueComplet, etat.bouteilles]
+  );
+
+  const handleFiltrer = useCallback((resultats, criteres) => {
+    const actifs = Object.values(criteres ?? {}).some((valeur) => Boolean(valeur));
+    setCriteresFiltres(criteres);
+    setResultatsFiltres(actifs ? resultats : null);
+  }, []);
+
+  const handleTri = useCallback(() => {
+    setModeTri((courant) => (courant === "nom_asc" ? "nom_desc" : "nom_asc"));
+  }, []);
+
+  const trierBouteilles = useCallback((liste = [], mode = "nom_asc") => {
+    if (!Array.isArray(liste)) return [];
+    const copie = [...liste];
+    const direction = mode === "nom_desc" ? -1 : 1;
+    return copie.sort((a = {}, b = {}) => {
+      const nomA = a?.nom ?? "";
+      const nomB = b?.nom ?? "";
+      return nomA.localeCompare(nomB, "fr", { sensitivity: "base" }) * direction;
+    });
+  }, []);
+
+  const bouteillesAffichees = useMemo(
+    () => trierBouteilles(resultatsFiltres ?? etat.bouteilles, modeTri),
+    [resultatsFiltres, etat.bouteilles, modeTri, trierBouteilles]
+  );
+
+  const etiquetteTri = modeTri === "nom_asc" ? "A → Z" : "Z → A";
 
   // Effet principal: charge les bouteilles et les celliers de l'utilisateur au montage
   // et à chaque changement d'id d'utilisateur.
   useEffect(() => {
     etatRef.current = etat;
   }, [etat]);
+
+  useEffect(() => {
+    if (!filtresActifs) return;
+    setResultatsFiltres(
+      filtrerBouteilles(donneesFiltres ?? [], criteresFiltres)
+    );
+  }, [donneesFiltres, filtresActifs, criteresFiltres]);
 
   useEffect(() => {
     scrollStateRef.current = {
@@ -227,8 +280,15 @@ function Catalogue() {
   }, [etat.hasMore, etat.scrollLoading]);
 
   useEffect(() => {
+    if (!filtresActifs) {
+      sentinelPretRef.current = true;
+    }
+  }, [filtresActifs]);
+
+  useEffect(() => {
     if (!utilisateur?.id) {
       dispatch({ type: ACTIONS.RESET });
+      setCatalogueComplet([]);
       return;
     }
 
@@ -293,6 +353,59 @@ function Catalogue() {
     };
   }, [utilisateur?.id]);
 
+  useEffect(() => {
+    if (!utilisateur?.id) {
+      setCatalogueComplet([]);
+      setChargementCatalogueComplet(false);
+      setErreurCatalogueComplet(null);
+      return;
+    }
+
+    let ignore = false;
+
+    const chargerCatalogueComplet = async () => {
+      setChargementCatalogueComplet(true);
+      setErreurCatalogueComplet(null);
+      const toutesLesBouteilles = [];
+      let page = 1;
+      let continuer = true;
+
+      while (continuer && !ignore) {
+        try {
+          const reponse = await recupererBouteilles(
+            page,
+            LIMITE_CHARGEMENT_CATALOGUE
+          );
+          const lot = Array.isArray(reponse?.donnees) ? reponse.donnees : [];
+          toutesLesBouteilles.push(...lot);
+
+          const metaHasMore = reponse?.meta?.hasMore;
+          const aEncore =
+            typeof metaHasMore === "boolean"
+              ? metaHasMore
+              : lot.length === LIMITE_CHARGEMENT_CATALOGUE;
+
+          continuer = aEncore && lot.length > 0;
+          page += 1;
+        } catch (error) {
+          console.error("Erreur lors du chargement complet du catalogue", error);
+          setErreurCatalogueComplet("Impossible de charger toutes les bouteilles");
+          continuer = false;
+        }
+      }
+
+      if (!ignore) {
+        setCatalogueComplet(toutesLesBouteilles);
+        setChargementCatalogueComplet(false);
+      }
+    };
+
+    chargerCatalogueComplet();
+    return () => {
+      ignore = true;
+    };
+  }, [utilisateur?.id]);
+
   // Paginer — charger la page suivante de bouteilles.
   // Appelée par l'IntersectionObserver ou par le fallback du scroll.
   const chargerPlus = useCallback(async () => {
@@ -341,24 +454,34 @@ function Catalogue() {
     }
   }, []);
 
+  const demanderChargement = useCallback(() => {
+    if (!sentinelPretRef.current) return;
+    sentinelPretRef.current = false;
+    chargerPlus();
+  }, [chargerPlus]);
+
   // Fallback pour les environnements où l'IntersectionObserver manque le sentinel
   const verifierScrollEtCharger = useCallback(() => {
+    if (filtresActifs) return;
     const node = mainRef.current;
     if (!node) return;
 
     const { scrollTop, clientHeight, scrollHeight } = node;
     const distanceRestante = scrollHeight - (scrollTop + clientHeight);
+    if (distanceRestante > 400) {
+      sentinelPretRef.current = true;
+    }
     const { hasMore, scrollLoading } = scrollStateRef.current;
     if (distanceRestante <= 200 && hasMore && !scrollLoading) {
-      chargerPlus();
+      demanderChargement();
     }
-  }, [chargerPlus]);
+  }, [demanderChargement, filtresActifs]);
 
   // Effet de mise en place d'un IntersectionObserver pour détecter quand le sentinel
   // (élément placé en bas de la liste) devient visible, déclenchant alors le chargement
   // additionnel (pagination).
   useEffect(() => {
-    if (etat.chargementInitial) return;
+    if (etat.chargementInitial || filtresActifs) return;
 
     const root = mainRef.current;
     const sentinel = sentinelRef.current;
@@ -367,24 +490,29 @@ function Catalogue() {
     const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
-        if (!entry?.isIntersecting) return;
+        if (!entry) return;
+
+        if (!entry.isIntersecting) {
+          sentinelPretRef.current = true;
+          return;
+        }
 
         const { hasMore, scrollLoading } = scrollStateRef.current;
         if (!hasMore || scrollLoading) return;
 
-        chargerPlus();
+        demanderChargement();
       },
       { root, rootMargin: "0px 0px 200px 0px", threshold: 0.1 }
     );
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [chargerPlus, etat.bouteilles.length, etat.chargementInitial]);
+  }, [demanderChargement, etat.bouteilles.length, etat.chargementInitial, filtresActifs]);
 
   // Effet qui installe le fallback du scroll sur le conteneur principal pour
   // déclencher `verifierScrollEtCharger` quand l'utilisateur scroll.
   useEffect(() => {
-    if (etat.chargementInitial) return;
+    if (etat.chargementInitial || filtresActifs) return;
 
     const node = mainRef.current;
     if (!node) return;
@@ -396,7 +524,7 @@ function Catalogue() {
     return () => {
       node.removeEventListener("scroll", verifierScrollEtCharger);
     };
-  }, [verifierScrollEtCharger, etat.chargementInitial]);
+  }, [verifierScrollEtCharger, etat.chargementInitial, filtresActifs]);
 
   // Ouvre la modale d'ajout d'une bouteille pour permettre la sélection du cellier
   // et l'ajout d'une quantité. Vérifie si la bouteille existe déjà dans le cellier.
@@ -576,6 +704,7 @@ const ajouterALaListe = useCallback(async (bouteille) => {
     celliers,
     cellierSelectionne,
     scrollLoading,
+    hasMore,
   } = etat;
 
   const optionsCelliers = useMemo(() => celliers.map((c) => c.nom), [celliers]);
@@ -584,6 +713,9 @@ const ajouterALaListe = useCallback(async (bouteille) => {
       celliers.find((c) => String(c.id_cellier) === cellierSelectionne) ?? null,
     [celliers, cellierSelectionne]
   );
+  const messageListeVide = filtresActifs
+    ? "Aucune bouteille ne correspond à vos filtres"
+    : "Aucune bouteille disponible";
 
   if (!utilisateur?.id) {
     return (
@@ -617,42 +749,66 @@ const ajouterALaListe = useCallback(async (bouteille) => {
               <Message texte={message.texte} type={message.type} />
             )}
 
-            {chargementInitial ? (
-              <div className="flex justify-center items-center py-(--rythme-espace)">
-                <Spinner
-                  size={220}
-                  ariaLabel="Chargement du catalogue de bouteilles"
+            <div className="flex flex-col gap-(--rythme-espace) lg:flex-row">
+              <div className="space-y-(--rythme-base)">
+                <Filtres
+                  bouteilles={donneesFiltres}
+                  valeursInitiales={criteresFiltres}
+                  onFiltrer={handleFiltrer}
+                  onTri={handleTri}
+                  titreTri={etiquetteTri}
+                  className="shrink-0"
                 />
+                {chargementCatalogueComplet && (
+                  <p className="text-(length:--taille-petit) text-texte-secondaire">
+                    Chargement de toutes les bouteilles...
+                  </p>
+                )}
+                {erreurCatalogueComplet && (
+                  <Message texte={erreurCatalogueComplet} type="erreur" />
+                )}
               </div>
-            ) : bouteilles.length > 0 ? (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {bouteilles.map((b) => (
-                    <Link key={b.id} to={`/bouteilles/${b.id}`}>
-                      <CarteBouteille
-                        key={b.id}
-                        bouteille={b}
-                        type="catalogue"
-                        onAjouter={ouvrirModale}
-                        onAjouterListe={ajouterALaListe}
-                      />
-                    </Link>
-                  ))}
-                </div>
-                {scrollLoading && (
-                  <div className="flex justify-center py-(--rythme-base)">
+
+              <div className="flex-1">
+                {chargementInitial ? (
+                  <div className="flex justify-center items-center py-(--rythme-espace)">
                     <Spinner
-                      size={140}
-                      ariaLabel="Chargement de nouvelles bouteilles"
+                      size={220}
+                      ariaLabel="Chargement du catalogue de bouteilles"
                     />
                   </div>
+                ) : bouteillesAffichees.length > 0 ? (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {bouteillesAffichees.map((b) => (
+                        <Link key={b.id} to={`/bouteilles/${b.id}`}>
+                          <CarteBouteille
+                            key={b.id}
+                            bouteille={b}
+                            type="catalogue"
+                            onAjouter={ouvrirModale}
+                          />
+                        </Link>
+                      ))}
+                    </div>
+                    {!filtresActifs && scrollLoading && hasMore && (
+                      <div className="flex justify-center py-(--rythme-base)">
+                        <Spinner
+                          size={140}
+                          ariaLabel="Chargement de nouvelles bouteilles"
+                        />
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <Message texte={messageListeVide} type="information" />
                 )}
-              </>
-            ) : (
-              <Message texte="Aucune bouteille disponible" type="information" />
-            )}
+              </div>
+            </div>
 
-            <div ref={sentinelRef} className="h-1 w-full" aria-hidden="true" />
+            {!filtresActifs && (
+              <div ref={sentinelRef} className="h-1 w-full" aria-hidden="true" />
+            )}
           </section>
         </main>
 
