@@ -1,5 +1,6 @@
 import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuantite";
-import BoutonAction from "@components/components-partages/Boutons/BoutonAction";
+import Bouton from "@components/components-partages/Boutons/Bouton";
+
 import { GiNotebook } from "react-icons/gi";
 
 const CarteBouteille = ({
@@ -23,22 +24,19 @@ const CarteBouteille = ({
     if (type === "catalogue") {
       return (
         <div className="grid grid-cols-[1fr_auto] gap-4 w-full items-center">
-            <BoutonAction
+            <Bouton
               texte={disabled ? "Déjà dans le cellier" : "Ajouter au cellier"}
-              onClick={() => onAjouter(bouteille)}
               type="secondaire"
+              action={handleAjouter}     
               disabled={disabled}
             />
-            <button 
-            onClick={(e) => handleAjouterListe(e)}
-            disabled={disabled}
-            className="p-2 rounded-full text-principal-200 border-1 border-(--color-principal-200) shadow-md 
-            hover:bg-principal-200  hover:text-principal-100 
-            transition-all cursor-pointer"
-          > 
-            <GiNotebook size={20}/>
-          </button>
 
+            <Bouton
+              variante="icone"
+              icone={<GiNotebook size={20} />}
+              action={gererAjouterListe}
+              disabled={disabled}
+            />
        </div>
       );
     }
@@ -50,7 +48,7 @@ const CarteBouteille = ({
       return (
         <div className="flex flex-row gap-2 items-center w-full justify-center">
           {/* Contrôles de quantité */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 justify-center">
             {/* Bouton MOINS (-) */}
             <BoutonQuantite
               type="diminuer"
@@ -73,6 +71,7 @@ const CarteBouteille = ({
               disabled={disabled}
             />
           </div>
+
         </div>
       );
     }
@@ -80,15 +79,19 @@ const CarteBouteille = ({
 
 	// Arreter la propagation et afficher le modale pour ajouter la bouteille
   const handleAjouter = (e) => {
-    e.stopPropagation(); 
-    e.preventDefault(); 
+     if (e && typeof e.stopPropagation === "function") {
+      e.stopPropagation();
+      e.preventDefault();
+    }
     onAjouter(bouteille); 
   };
 
-  const handleAjouterListe = (e) => {
-    e.stopPropagation(); 
-    e.preventDefault(); 
-    onAjouterListe(bouteille); 
+  const gererAjouterListe = (e) => {
+    if (e && typeof e.stopPropagation === "function") {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    onAjouterListe(bouteille);
   };
 
   return (
@@ -126,9 +129,7 @@ const CarteBouteille = ({
 
       {/* Section des contrôles (catalogue ou cellier) */}
       <div
-        className="flex justify-center items-center gap-3"
-        onClick={handleAjouter}
-      >
+        className="flex justify-center items-center gap-3">
         {genererControles()}
       </div>
     </div>
