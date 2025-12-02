@@ -158,7 +158,7 @@ export const supprimerUtilisateur = async (id, navigate) => {
 		if (reponse.ok) {
 			// Déconnecter l'utilisateur du store
 			authentificationStore.getState().deconnexion();
-			navigate(`/connexion?supprimerSucces=true`);
+			navigate(`/?supprimerSucces=true`);
 			return { succes: true };
 		} else {
 			// Gestion des erreurs HTTP
