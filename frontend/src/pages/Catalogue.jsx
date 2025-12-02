@@ -30,8 +30,6 @@ import {
 import authentificationStore from "@store/authentificationStore";
 import { useDocumentTitle, filtrerBouteilles } from "@lib/utils.js";
 
-
-
 /*
  * Constante: nombre d'éléments à charger par page lors de la pagination.
  */
@@ -220,10 +218,12 @@ function Catalogue() {
   const [criteresFiltres, setCriteresFiltres] = useState({});
   const [modeTri, setModeTri] = useState("nom_asc");
   const [catalogueComplet, setCatalogueComplet] = useState([]);
-  const [chargementCatalogueComplet, setChargementCatalogueComplet] = useState(false);
+  const [chargementCatalogueComplet, setChargementCatalogueComplet] =
+    useState(false);
   const [erreurCatalogueComplet, setErreurCatalogueComplet] = useState(null);
   const filtresActifs = useMemo(
-    () => Object.values(criteresFiltres ?? {}).some((valeur) => Boolean(valeur)),
+    () =>
+      Object.values(criteresFiltres ?? {}).some((valeur) => Boolean(valeur)),
     [criteresFiltres]
   );
   const donneesFiltres = useMemo(
@@ -232,7 +232,9 @@ function Catalogue() {
   );
 
   const handleFiltrer = useCallback((resultats, criteres) => {
-    const actifs = Object.values(criteres ?? {}).some((valeur) => Boolean(valeur));
+    const actifs = Object.values(criteres ?? {}).some((valeur) =>
+      Boolean(valeur)
+    );
     setCriteresFiltres(criteres);
     setResultatsFiltres(actifs ? resultats : null);
   }, []);
@@ -248,7 +250,9 @@ function Catalogue() {
     return copie.sort((a = {}, b = {}) => {
       const nomA = a?.nom ?? "";
       const nomB = b?.nom ?? "";
-      return nomA.localeCompare(nomB, "fr", { sensitivity: "base" }) * direction;
+      return (
+        nomA.localeCompare(nomB, "fr", { sensitivity: "base" }) * direction
+      );
     });
   }, []);
 
@@ -388,8 +392,13 @@ function Catalogue() {
           continuer = aEncore && lot.length > 0;
           page += 1;
         } catch (error) {
-          console.error("Erreur lors du chargement complet du catalogue", error);
-          setErreurCatalogueComplet("Impossible de charger toutes les bouteilles");
+          console.error(
+            "Erreur lors du chargement complet du catalogue",
+            error
+          );
+          setErreurCatalogueComplet(
+            "Impossible de charger toutes les bouteilles"
+          );
           continuer = false;
         }
       }
@@ -507,7 +516,12 @@ function Catalogue() {
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [demanderChargement, etat.bouteilles.length, etat.chargementInitial, filtresActifs]);
+  }, [
+    demanderChargement,
+    etat.bouteilles.length,
+    etat.chargementInitial,
+    filtresActifs,
+  ]);
 
   // Effet qui installe le fallback du scroll sur le conteneur principal pour
   // déclencher `verifierScrollEtCharger` quand l'utilisateur scroll.
@@ -744,6 +758,9 @@ const ajouterALaListe = useCallback(async (bouteille) => {
         </header>
 
         <main ref={mainRef} className="bg-fond overflow-y-auto">
+          <h1 className="text-(length:--taille-moyen)  my-(--rythme-espace) text-center font-display font-semibold text-principal-300">
+            Catalogue des vins
+          </h1>
           <section className="pt-(--rythme-espace) px-(--rythme-serre)">
             {message.texte && (
               <Message texte={message.texte} type={message.type} />
@@ -808,7 +825,11 @@ const ajouterALaListe = useCallback(async (bouteille) => {
             </div>
 
             {!filtresActifs && (
-              <div ref={sentinelRef} className="h-1 w-full" aria-hidden="true" />
+              <div
+                ref={sentinelRef}
+                className="h-1 w-full"
+                aria-hidden="true"
+              />
             )}
           </section>
         </main>
