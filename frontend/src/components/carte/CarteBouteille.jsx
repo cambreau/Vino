@@ -52,7 +52,11 @@ const CarteBouteille = ({
             {/* Bouton MOINS (-) */}
             <BoutonQuantite
               type="diminuer"
-              onClick={() => onDiminuer(bouteille.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onDiminuer(bouteille.id);
+              }}
               disabled={disabled || bouteille.quantite <= 0}
             />
 
@@ -67,7 +71,11 @@ const CarteBouteille = ({
             {/* Bouton PLUS (+) */}
             <BoutonQuantite
               type="augmenter"
-              onClick={() => onAugmenter(bouteille.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onAugmenter(bouteille.id);
+              }}
               disabled={disabled}
             />
           </div>
