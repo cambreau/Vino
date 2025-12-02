@@ -138,7 +138,7 @@ export const filtrerBouteilles = (bouteilles = [], filtres = {}) => {
     }
 
     if (anneeActif) {
-      const champsAnnees = ["annee", "millesime", "vintage"];
+      const champsAnnees = ["millenisme", "annee", "millesime", "vintage"];
       let anneeBouteille = null;
       for (const champ of champsAnnees) {
         const valeur = bouteille[champ];
@@ -174,3 +174,112 @@ export function useDocumentTitle(titre, suffixe = "Vino") {
 		}
 	}, [titre, suffixe]);
 }
+
+/**
+ * Recherche des bouteilles selon des critères textuels (recherche partielle).
+ * Contrairement à filtrerBouteilles qui fait une correspondance exacte sur les selects,
+ * cette fonction effectue une recherche partielle sur les champs textuels.
+ *
+ * @param {Array<Object>} bouteilles - Liste complète des bouteilles.
+ * @param {Object} criteres - Critères de recherche.
+ * @param {string} [criteres.nom] - Texte à rechercher dans le nom de la bouteille.
+ * @param {string} [criteres.type] - Texte à rechercher dans le type/couleur.
+ * @param {string} [criteres.pays] - Texte à rechercher dans le pays.
+ * @param {string|number} [criteres.annee] - Année à rechercher (correspondance exacte).
+ * @returns {Array<Object>} Bouteilles correspondant aux critères de recherche.
+ */
+export const rechercherBouteilles = (bouteilles = [], criteres = {}) => {
+	if (!Array.isArray(bouteilles) || bouteilles.length === 0) {
+		return [];
+	}
+
+	const nomRecherche = normaliserTexte(criteres.nom);
+	const typeRecherche = normaliserTexte(criteres.type);
+	const paysRecherche = normaliserTexte(criteres.pays);
+	const anneeRecherche =
+		criteres.annee !== undefined && criteres.annee !== null && `${criteres.annee}` !== ""
+			? Number(criteres.annee)
+			: null;
+
+	const nomActif = Boolean(nomRecherche);
+	const typeActif = Boolean(typeRecherche);
+	const paysActif = Boolean(paysRecherche);
+	const anneeActif = Number.isFinite(anneeRecherche);
+
+	// Si aucun critère n'est actif, retourner toutes les bouteilles
+	if (!nomActif && !typeActif && !paysActif && !anneeActif) {
+		return [...bouteilles];
+	}
+
+	// Cherche la première propriété non vide parmi la liste puis la normalise.
+	const obtenirValeurNormalisee = (source, champs) => {
+		for (const champ of champs) {
+			const valeur = source[champ];
+			if (valeur !== undefined && valeur !== null && valeur !== "") {
+				return normaliserTexte(valeur);
+			}
+		}
+		return "";
+	};
+
+	return bouteilles.filter((bouteille) => {
+		if (!bouteille || typeof bouteille !== "object") return false;
+
+		// Recherche partielle sur le nom
+		if (nomActif) {
+			const nomBouteille = obtenirValeurNormalisee(bouteille, [
+				"nom",
+				"name",
+				"titre",
+				"title",
+				"description",
+			]);
+			if (!nomBouteille || !nomBouteille.includes(nomRecherche)) {
+				return false;
+			}
+		}
+
+		// Recherche partielle sur le type/couleur
+		if (typeActif) {
+			const typeBouteille = obtenirValeurNormalisee(bouteille, [
+				"type",
+				"couleur",
+			]);
+			if (!typeBouteille || !typeBouteille.includes(typeRecherche)) {
+				return false;
+			}
+		}
+
+		// Recherche partielle sur le pays
+		if (paysActif) {
+			const paysBouteille = obtenirValeurNormalisee(bouteille, [
+				"pays",
+				"country",
+				"origine",
+			]);
+			if (!paysBouteille || !paysBouteille.includes(paysRecherche)) {
+				return false;
+			}
+		}
+
+		// Correspondance exacte sur l'année
+		if (anneeActif) {
+			const champsAnnees = ["millenisme", "annee", "millesime", "vintage"];
+			let anneeBouteille = null;
+			for (const champ of champsAnnees) {
+				const valeur = bouteille[champ];
+				const nombre = Number(valeur);
+				if (Number.isFinite(nombre)) {
+					anneeBouteille = nombre;
+					break;
+				}
+			}
+			if (anneeBouteille !== anneeRecherche) {
+				return false;
+			}
+		}
+
+		return true;
+	});
+};
+

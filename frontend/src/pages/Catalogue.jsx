@@ -28,7 +28,7 @@ import {
 } from "@lib/requetes";
 
 import authentificationStore from "@store/authentificationStore";
-import { useDocumentTitle, filtrerBouteilles } from "@lib/utils.js";
+import { useDocumentTitle, filtrerBouteilles, rechercherBouteilles } from "@lib/utils.js";
 
 /*
  * Constante: nombre d'éléments à charger par page lors de la pagination.
@@ -216,6 +216,7 @@ function Catalogue() {
   const verificationRef = useRef(0);
   const [resultatsFiltres, setResultatsFiltres] = useState(null);
   const [criteresFiltres, setCriteresFiltres] = useState({});
+  const [modeRecherche, setModeRecherche] = useState(false);
   const [modeTri, setModeTri] = useState("nom_asc");
   const [catalogueComplet, setCatalogueComplet] = useState([]);
   const [chargementCatalogueComplet, setChargementCatalogueComplet] =
@@ -235,9 +236,25 @@ function Catalogue() {
     const actifs = Object.values(criteres ?? {}).some((valeur) =>
       Boolean(valeur)
     );
+    setModeRecherche(false);
     setCriteresFiltres(criteres);
     setResultatsFiltres(actifs ? resultats : null);
   }, []);
+
+  const handleRecherche = useCallback((criteres) => {
+    const actifs = Object.values(criteres ?? {}).some((valeur) =>
+      Boolean(valeur)
+    );
+    setModeRecherche(true);
+    if (!actifs) {
+      setResultatsFiltres(null);
+      setCriteresFiltres({});
+      return;
+    }
+    const resultats = rechercherBouteilles(donneesFiltres, criteres);
+    setResultatsFiltres(resultats);
+    setCriteresFiltres(criteres);
+  }, [donneesFiltres]);
 
   const handleTri = useCallback(() => {
     setModeTri((courant) => (courant === "nom_asc" ? "nom_desc" : "nom_asc"));
@@ -271,10 +288,17 @@ function Catalogue() {
 
   useEffect(() => {
     if (!filtresActifs) return;
-    setResultatsFiltres(
-      filtrerBouteilles(donneesFiltres ?? [], criteresFiltres)
-    );
-  }, [donneesFiltres, filtresActifs, criteresFiltres]);
+    // Réappliquer les filtres ou la recherche selon le mode actif
+    if (modeRecherche) {
+      setResultatsFiltres(
+        rechercherBouteilles(donneesFiltres ?? [], criteresFiltres)
+      );
+    } else {
+      setResultatsFiltres(
+        filtrerBouteilles(donneesFiltres ?? [], criteresFiltres)
+      );
+    }
+  }, [donneesFiltres, filtresActifs, criteresFiltres, modeRecherche]);
 
   useEffect(() => {
     scrollStateRef.current = {
@@ -772,6 +796,7 @@ const ajouterALaListe = useCallback(async (bouteille) => {
                   bouteilles={donneesFiltres}
                   valeursInitiales={criteresFiltres}
                   onFiltrer={handleFiltrer}
+                  onRecherche={handleRecherche}
                   onTri={handleTri}
                   titreTri={etiquetteTri}
                   className="shrink-0"

@@ -1,7 +1,10 @@
+import { useState } from "react";
 import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuantite";
-import Bouton from "@components/components-partages/Boutons/Bouton";
-
 import { GiNotebook } from "react-icons/gi";
+import BoutonAction from "@components/components-partages/Boutons/BoutonAction";
+import iconNotez from "@assets/images/evaluation.svg";
+import Bouton from "@components/components-partages/Boutons/Bouton";
+import BoiteModaleNotes from "@components/boiteModaleNotes/boiteModaleNotes";
 
 const CarteBouteille = ({
   bouteille,
@@ -12,6 +15,28 @@ const CarteBouteille = ({
   onAjouterListe = () => {},
   disabled = false, //désactiver le bouton
 }) => {
+  const [estModaleNotezOuverte, setEstModaleNotezOuverte] = useState(false);
+
+  const ouvrirBoiteModaleNotez = (idBouteille) => {
+    setEstModaleNotezOuverte(true);
+  };
+
+  const fermerBoiteModaleNotez = () => {
+    setEstModaleNotezOuverte(false);
+  };
+
+  const validerNote = (data) => {
+    console.log(
+      "Note:",
+      data.note,
+      "Commentaire:",
+      data.commentaire,
+      "Bouteille ID:",
+      bouteille.id
+    );
+    // Ici tu peux ajouter l'appel API pour sauvegarder la note
+    fermerBoiteModaleNotez();
+  };
   /**
    * Génère les contrôles (boutons) selon le type :
    * - catalogue : bouton "Ajouter au cellier"
@@ -48,7 +73,7 @@ const CarteBouteille = ({
       return (
         <div className="flex flex-row gap-2 items-center w-full justify-center">
           {/* Contrôles de quantité */}
-          <div className="flex items-center gap-2 justify-center">
+          <div className="flex items-center gap-2 justify-center mr-(--rythme-base)">
             {/* Bouton MOINS (-) */}
             <BoutonQuantite
               type="diminuer"
@@ -79,19 +104,32 @@ const CarteBouteille = ({
               disabled={disabled}
             />
           </div>
-
+          <Bouton
+            texte={
+              <span className="flex items-center gap-(--rythme-tres-serre)">
+                Notez
+                <img
+                  src={iconNotez}
+                  alt="Icône évaluation"
+                  className="w-5 h-5"
+                />
+              </span>
+            }
+            type="secondaire"
+            action={() => ouvrirBoiteModaleNotez(bouteille.id)}
+            typeHtml="button"
+            disabled={false}
+          />
         </div>
       );
     }
   };
 
-	// Arreter la propagation et afficher le modale pour ajouter la bouteille
+  // Arreter la propagation et afficher le modale pour ajouter la bouteille
   const handleAjouter = (e) => {
-     if (e && typeof e.stopPropagation === "function") {
-      e.stopPropagation();
-      e.preventDefault();
-    }
-    onAjouter(bouteille); 
+    e.stopPropagation();
+    e.preventDefault();
+    onAjouter(bouteille);
   };
 
   const gererAjouterListe = (e) => {
@@ -140,6 +178,15 @@ const CarteBouteille = ({
         className="flex justify-center items-center gap-3">
         {genererControles()}
       </div>
+
+      {/* Boîte modale pour noter la bouteille */}
+      {estModaleNotezOuverte && (
+        <BoiteModaleNotes
+          nomBouteille={bouteille.nom}
+          onFermer={fermerBoiteModaleNotez}
+          onValider={validerNote}
+        />
+      )}
     </div>
   );
 };
