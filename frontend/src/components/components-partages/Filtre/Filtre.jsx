@@ -106,7 +106,7 @@ function Filtres({
 			const regions = extraireValeurs(bouteilles, ["region", "appellation"]);
 			const annees = extraireValeurs(
 				bouteilles,
-				["annee", "millesime", "millenisme", "vintage"],
+				["millenisme", "annee", "millesime", "vintage"],
 				{ numeric: true },
 			);
 			const regionsParPays = construireIndexRegionsParPays(bouteilles);
@@ -172,6 +172,7 @@ function Filtres({
 	if (modeRecherche) {
 		return (
 			<Recherche
+				bouteilles={bouteilles}
 				valeursInitiales={{}}
 				onRechercher={onRecherche}
 				onFiltrer={handleBasculerFiltres}

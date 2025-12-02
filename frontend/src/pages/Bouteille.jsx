@@ -70,8 +70,8 @@ function Bouteille() {
           </div>
 
           <img
-            src={bouteille.image}
-            alt={bouteille.nom}
+            src={bouteille.image || "/Vino/frontend/src/assets/images/grape_logo.svg"} // À remplacer par une image par défaut
+            alt={bouteille.nom || "Bouteille de vin"}
             className=" h-full object-cover"
           />
         </picture>
