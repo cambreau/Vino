@@ -170,7 +170,7 @@ export function useDocumentTitle(titre, suffixe = "Vino") {
 				document.title = `${titre} - ${suffixe}`;
 			}
 		} catch (e) {
-			// ignore si document n'est pas disponible (ex.: SSR)
+      // ignore
 		}
 	}, [titre, suffixe]);
 }
