@@ -1,5 +1,6 @@
 import { useState } from "react";
 import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuantite";
+import { GiNotebook } from "react-icons/gi";
 import BoutonAction from "@components/components-partages/Boutons/BoutonAction";
 import iconNotez from "@assets/images/evaluation.svg";
 import Bouton from "@components/components-partages/Boutons/Bouton";
@@ -72,7 +73,7 @@ const CarteBouteille = ({
       return (
         <div className="flex flex-row gap-2 items-center w-full justify-center">
           {/* Contrôles de quantité */}
-          <div className="flex items-center gap-2 mr-(--rythme-base)">
+          <div className="flex items-center gap-2 justify-center mr-(--rythme-base)">
             {/* Bouton MOINS (-) */}
             <BoutonQuantite
               type="diminuer"
