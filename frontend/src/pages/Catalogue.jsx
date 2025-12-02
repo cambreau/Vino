@@ -24,6 +24,7 @@ import {
   ajouterBouteilleCellier,
   recupererTousCellier,
   verifierBouteilleCellier,
+  ajouterBouteilleListe
 } from "@lib/requetes";
 
 import authentificationStore from "@store/authentificationStore";
@@ -695,6 +696,44 @@ function Catalogue() {
     }
   }, [etat.cellierSelectionne, etat.celliers, etat.modale, fermerModale]);
 
+/*================================= */
+//Ajouter a la liste 
+const ajouterALaListe = useCallback(async (bouteille) => {
+  try {
+    const resultat = await ajouterBouteilleListe(utilisateur.id, {
+      id_bouteille: bouteille.id
+    });
+
+    if (resultat?.succes) {
+      dispatch({
+        type: ACTIONS.SET_MESSAGE,
+        payload: {
+          texte: `${bouteille.nom} a été ajouté à votre liste avec succès`,
+          type: "succes",
+        },
+      });
+    } else {
+      dispatch({
+        type: ACTIONS.SET_MESSAGE,
+        payload: {
+          texte: resultat?.erreur || "Erreur lors de l'ajout à la liste",
+          type: "erreur",
+        },
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    dispatch({
+      type: ACTIONS.SET_MESSAGE,
+      payload: { 
+        texte: "Erreur lors de l'ajout à la liste", 
+        type: "erreur" 
+      },
+    });
+  }
+}, [utilisateur.id]);
+/*================================= */
+
   const {
     chargementInitial,
     bouteilles,
@@ -790,6 +829,7 @@ function Catalogue() {
                             bouteille={b}
                             type="catalogue"
                             onAjouter={ouvrirModale}
+                            onAjouterListe={ajouterALaListe}
                           />
                         </Link>
                       ))}
