@@ -61,14 +61,72 @@ export const ajoutBouteilleListe = async (req, res) => {
 /**
  * Fonction asynchrone qui recupere la liste d'achat.
  */
-export const recupererListe = async (req, res) => {};
+export const recupererListe = async (req, res) => {
+	try {
+		const { id_utilisateur } = req.params;
+		const idUtilisateurNombre = parseInt(id_utilisateur, 10);
 
-/**
- * Fonction asynchrone qui supprime une bouteille a la liste achat.
- */
-export const supprimerBouteilleListe = async (req, res) => {};
+		if (!Number.isInteger(idUtilisateurNombre) || idUtilisateurNombre <= 0) {
+			return res.status(400).json({
+				message: "Identifiant utilisateur invalide",
+			});
+		}
+
+		const liste = await modeleListeAchat.recupererListe(
+			idUtilisateurNombre
+		);
+
+		return res.status(200).json({
+			message: "Liste d'achat récupérée",
+			total: liste.length,
+			data: liste,
+		});
+	} catch (error) {
+		console.error(
+			"Erreur lors de la récupération de la liste d'achat",
+			error
+		);
+		return res.status(500).json({ message: "Erreur serveur" });
+	}
+};
 
 /**
  * Fonction asynchrone qui modifie la quantite d'une bouteille de la liste achat.
  */
 export const modifierBouteilleListe = async (req, res) => {};
+
+
+/**
+ * Fonction asynchrone qui supprime une bouteille a la liste achat.
+ */
+export const supprimerBouteilleListe = async (req, res) => {
+  try {
+    const { id_utilisateur, id_bouteille } = req.params;
+
+    if (!id_utilisateur || !id_bouteille) {
+      return res.status(400).json({
+        message: "ID utilisateur et ID bouteille sont requis."
+      });
+    }
+
+    const resultat = await modeleListeAchat.supprimerBouteilleListe(
+      id_utilisateur,
+      id_bouteille
+    );
+
+    if (!resultat) {
+      return res.status(404).json({
+        message: "Bouteille non trouvée dans la liste."
+      });
+    }
+
+    return res.status(200).json({
+      message: "Bouteille retirée de la liste d'achat."
+    });
+  } catch (err) {
+    console.error("Erreur lors de la suppression:", err);
+    return res.status(500).json({
+      error: "Erreur serveur lors de la suppression."
+    });
+  }
+};

@@ -1,9 +1,11 @@
-import MenuEnHaut from "../components/components-partages/MenuEnHaut/MenuEnHaut";
-import MenuEnBas from "../components/components-partages/MenuEnBas/MenuEnBas";
-import Bouton from "../components/components-partages/Boutons/Bouton";
+import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
+import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
+import Bouton from "@components/components-partages/Boutons/Bouton";
+import BoutonRetour from "@components/components-partages/Boutons/BoutonRetour";
 
-import { formatDetailsBouteille } from "../lib/utils.js";
-import { recupererBouteille } from "../lib/requetes.js";
+import { formatDetailsBouteille } from "@lib/utils.js";
+import { useDocumentTitle } from "@lib/utils.js";
+import { recupererBouteille } from "@lib/requetes.js";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 function Bouteille() {
@@ -24,6 +26,8 @@ function Bouteille() {
     pays: "",
     type: "",
   });
+
+  useDocumentTitle(bouteille.nom || "Bouteille");
 
   /**
    * Recuperer les informations d'une bouteille' cote backend.
@@ -60,7 +64,11 @@ function Bouteille() {
         <MenuEnHaut />
       </header>
       <main className="flex gap-(--rythme-tres-serre) font-body py-(--rythme-base) bg-fond overflow-y-auto">
-        <picture className="w-1/2">
+        <picture className="relative w-1/2">
+          <div className="absolute left-(--rythme-base)">
+            <BoutonRetour />
+          </div>
+
           <img
             src={bouteille.image}
             alt={bouteille.nom}

@@ -1,7 +1,8 @@
 import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuantite";
 import BoutonAction from "@components/components-partages/Boutons/BoutonAction";
 
-const CarteBouteille = ({
+import { formatDetailsBouteille } from "@lib/utils.js";
+const CarteListeAchat = ({
   bouteille,
   type = "catalogue",
   onAugmenter = () => {},
@@ -64,55 +65,62 @@ const CarteBouteille = ({
     }
   };
 
-	// Arreter la propagation et afficher le modale pour ajouter la bouteille
+  // Arreter la propagation et afficher le modale pour ajouter la bouteille
   const handleAjouter = (e) => {
-    e.stopPropagation(); 
-    e.preventDefault(); 
-    onAjouter(bouteille); 
+    e.stopPropagation();
+    e.preventDefault();
+    onAjouter(bouteille);
   };
 
   return (
     <div
       className="
-      flex flex-col 
-      bg-fond-secondaire p-(--rythme-serre) 
+      flex gap-(--rythme-serre)
+      bg-fond-secondaire p-(--rythme-base) 
       rounded-(--arrondi-grand) shadow-md"
     >
       {/* Section IMAGE de la bouteille */}
-      <div
-        className="
-        flex items-center justify-center bg-fond-secondaire 
-        rounded-(--arrondi-grand) mb-(--rythme-tres-serre)"
-      >
+      <div>
         <img
           src={bouteille.image || "/placeholder-bottle.png"}
           alt={`Photo de la bouteille ${bouteille.nom}`}
-          className="h-40 w-auto object-contain"
+          className="h-[200px] object-cover"
         />
+
+        {/* Section des contrôles (catalogue ou cellier) */}
+        <div className="mt-(--rythme-base)" onClick={handleAjouter}>
+          {genererControles()}
+        </div>
       </div>
 
       {/* Section INFORMATIONS de la bouteille */}
-      <div className="flex-1 mb-4">
+      <div className="flex-1 flex flex-col gap-(--rythme-serre) mb-4">
         {/* Nom */}
-        <h2 className="mb-2 text-(length:--taille-normal) font-bold text-texte-secondaire">
-          {bouteille.nom}
-        </h2>
+        <header>
+          <h2 className="mb-2 text-(length:--taille-normal) font-semibold text-principal-300">
+            {bouteille.nom}
+          </h2>
+          <hr />
+        </header>
 
-        {/* Type ou couleur */}
-        <p className="text-(length:--taille-petit) text-texte-secondaire">
-          {bouteille.type || bouteille.couleur}
-        </p>
-      </div>
-
-      {/* Section des contrôles (catalogue ou cellier) */}
-      <div
-        className="flex justify-center items-center gap-3"
-        onClick={handleAjouter}
-      >
-        {genererControles()}
+        {/* Type ou couleur et description */}
+        <div className="flex flex-col gap-(--rythme-serre)">
+          <p className="text-(length:--taille-petit) text-texte-secondaire">
+            Couleur:{" "}
+            <strong className="font-semibold text-principal-300">
+              {bouteille.type || bouteille.couleur}
+            </strong>
+          </p>
+          <p className="text-(length:--taille-petit) text-texte-secondaire">
+            Description:{" "}
+            <strong className="font-semibold text-principal-300">
+              {formatDetailsBouteille(bouteille.description)}
+            </strong>
+          </p>
+        </div>
       </div>
     </div>
   );
 };
 
-export default CarteBouteille;
+export default CarteListeAchat;
