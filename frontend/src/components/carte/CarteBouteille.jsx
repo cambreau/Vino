@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuantite";
 import { GiNotebook } from "react-icons/gi";
-import BoutonAction from "@components/components-partages/Boutons/BoutonAction";
 import iconNotez from "@assets/images/evaluation.svg";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import BoiteModaleNotes from "@components/boiteModaleNotes/boiteModaleNotes";
@@ -17,7 +17,11 @@ const CarteBouteille = ({
 }) => {
   const [estModaleNotezOuverte, setEstModaleNotezOuverte] = useState(false);
 
-  const ouvrirBoiteModaleNotez = (idBouteille) => {
+  const ouvrirBoiteModaleNotez = (e, idBouteille) => {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
     setEstModaleNotezOuverte(true);
   };
 
@@ -49,20 +53,20 @@ const CarteBouteille = ({
     if (type === "catalogue") {
       return (
         <div className="grid grid-cols-[1fr_auto] gap-4 w-full items-center">
-            <Bouton
-              texte={disabled ? "Déjà dans le cellier" : "Ajouter au cellier"}
-              type="secondaire"
-              action={handleAjouter}     
-              disabled={disabled}
-            />
+          <Bouton
+            texte={disabled ? "Déjà dans le cellier" : "Ajouter au cellier"}
+            type="secondaire"
+            action={handleAjouter}
+            disabled={disabled}
+          />
 
-            <Bouton
-              variante="icone"
-              icone={<GiNotebook size={20} />}
-              action={gererAjouterListe}
-              disabled={disabled}
-            />
-       </div>
+          <Bouton
+            variante="icone"
+            icone={<GiNotebook size={20} />}
+            action={gererAjouterListe}
+            disabled={disabled}
+          />
+        </div>
       );
     }
 
@@ -116,7 +120,7 @@ const CarteBouteille = ({
               </span>
             }
             type="secondaire"
-            action={() => ouvrirBoiteModaleNotez(bouteille.id)}
+            action={(e) => ouvrirBoiteModaleNotez(e, bouteille.id)}
             typeHtml="button"
             disabled={false}
           />
@@ -140,6 +144,19 @@ const CarteBouteille = ({
     onAjouterListe(bouteille);
   };
 
+  /**
+   * Utilise createPortal pour rendre la modale directement dans le body
+   * Cela garantit qu'elle est en dehors de la hiérarchie DOM (et donc du Link)
+   * Ref: https://react.dev/reference/react-dom/createPortal
+   */
+  const modaleContent = estModaleNotezOuverte ? (
+    <BoiteModaleNotes
+      nomBouteille={bouteille.nom}
+      onFermer={fermerBoiteModaleNotez}
+      onValider={validerNote}
+    />
+  ) : null;
+
   return (
     <div
       className="
@@ -159,7 +176,6 @@ const CarteBouteille = ({
           className="h-40 w-auto object-contain"
         />
       </div>
-
       {/* Section INFORMATIONS de la bouteille */}
       <div className="mb-4">
         {/* Nom */}
@@ -172,21 +188,12 @@ const CarteBouteille = ({
           {bouteille.type || bouteille.couleur}
         </p>
       </div>
-
       {/* Section des contrôles (catalogue ou cellier) */}
-      <div
-        className="flex justify-center items-center gap-3">
+      <div className="flex justify-center items-center gap-3">
         {genererControles()}
       </div>
-
       {/* Boîte modale pour noter la bouteille */}
-      {estModaleNotezOuverte && (
-        <BoiteModaleNotes
-          nomBouteille={bouteille.nom}
-          onFermer={fermerBoiteModaleNotez}
-          onValider={validerNote}
-        />
-      )}
+      {modaleContent && createPortal(modaleContent, document.body)}
     </div>
   );
 };
