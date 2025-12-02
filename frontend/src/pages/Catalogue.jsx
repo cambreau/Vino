@@ -24,10 +24,11 @@ import {
   ajouterBouteilleCellier,
   recupererTousCellier,
   verifierBouteilleCellier,
+  ajouterBouteilleListe
 } from "@lib/requetes";
 
 import authentificationStore from "@store/authentificationStore";
-import { useDocumentTitle, filtrerBouteilles } from "@lib/utils.js";
+import { useDocumentTitle, filtrerBouteilles, rechercherBouteilles } from "@lib/utils.js";
 
 /*
  * Constante: nombre d'éléments à charger par page lors de la pagination.
@@ -215,6 +216,7 @@ function Catalogue() {
   const verificationRef = useRef(0);
   const [resultatsFiltres, setResultatsFiltres] = useState(null);
   const [criteresFiltres, setCriteresFiltres] = useState({});
+  const [modeRecherche, setModeRecherche] = useState(false);
   const [modeTri, setModeTri] = useState("nom_asc");
   const [catalogueComplet, setCatalogueComplet] = useState([]);
   const [chargementCatalogueComplet, setChargementCatalogueComplet] =
@@ -234,9 +236,25 @@ function Catalogue() {
     const actifs = Object.values(criteres ?? {}).some((valeur) =>
       Boolean(valeur)
     );
+    setModeRecherche(false);
     setCriteresFiltres(criteres);
     setResultatsFiltres(actifs ? resultats : null);
   }, []);
+
+  const handleRecherche = useCallback((criteres) => {
+    const actifs = Object.values(criteres ?? {}).some((valeur) =>
+      Boolean(valeur)
+    );
+    setModeRecherche(true);
+    if (!actifs) {
+      setResultatsFiltres(null);
+      setCriteresFiltres({});
+      return;
+    }
+    const resultats = rechercherBouteilles(donneesFiltres, criteres);
+    setResultatsFiltres(resultats);
+    setCriteresFiltres(criteres);
+  }, [donneesFiltres]);
 
   const handleTri = useCallback(() => {
     setModeTri((courant) => (courant === "nom_asc" ? "nom_desc" : "nom_asc"));
@@ -270,10 +288,17 @@ function Catalogue() {
 
   useEffect(() => {
     if (!filtresActifs) return;
-    setResultatsFiltres(
-      filtrerBouteilles(donneesFiltres ?? [], criteresFiltres)
-    );
-  }, [donneesFiltres, filtresActifs, criteresFiltres]);
+    // Réappliquer les filtres ou la recherche selon le mode actif
+    if (modeRecherche) {
+      setResultatsFiltres(
+        rechercherBouteilles(donneesFiltres ?? [], criteresFiltres)
+      );
+    } else {
+      setResultatsFiltres(
+        filtrerBouteilles(donneesFiltres ?? [], criteresFiltres)
+      );
+    }
+  }, [donneesFiltres, filtresActifs, criteresFiltres, modeRecherche]);
 
   useEffect(() => {
     scrollStateRef.current = {
@@ -671,6 +696,44 @@ function Catalogue() {
     }
   }, [etat.cellierSelectionne, etat.celliers, etat.modale, fermerModale]);
 
+/*================================= */
+//Ajouter a la liste 
+const ajouterALaListe = useCallback(async (bouteille) => {
+  try {
+    const resultat = await ajouterBouteilleListe(utilisateur.id, {
+      id_bouteille: bouteille.id
+    });
+
+    if (resultat?.succes) {
+      dispatch({
+        type: ACTIONS.SET_MESSAGE,
+        payload: {
+          texte: `${bouteille.nom} a été ajouté à votre liste avec succès`,
+          type: "succes",
+        },
+      });
+    } else {
+      dispatch({
+        type: ACTIONS.SET_MESSAGE,
+        payload: {
+          texte: resultat?.erreur || "Erreur lors de l'ajout à la liste",
+          type: "erreur",
+        },
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    dispatch({
+      type: ACTIONS.SET_MESSAGE,
+      payload: { 
+        texte: "Erreur lors de l'ajout à la liste", 
+        type: "erreur" 
+      },
+    });
+  }
+}, [utilisateur.id]);
+/*================================= */
+
   const {
     chargementInitial,
     bouteilles,
@@ -733,6 +796,7 @@ function Catalogue() {
                   bouteilles={donneesFiltres}
                   valeursInitiales={criteresFiltres}
                   onFiltrer={handleFiltrer}
+                  onRecherche={handleRecherche}
                   onTri={handleTri}
                   titreTri={etiquetteTri}
                   className="shrink-0"
@@ -765,6 +829,7 @@ function Catalogue() {
                             bouteille={b}
                             type="catalogue"
                             onAjouter={ouvrirModale}
+                            onAjouterListe={ajouterALaListe}
                           />
                         </Link>
                       ))}

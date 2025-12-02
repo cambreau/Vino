@@ -1,5 +1,10 @@
+import { useState } from "react";
 import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuantite";
+import { GiNotebook } from "react-icons/gi";
 import BoutonAction from "@components/components-partages/Boutons/BoutonAction";
+import iconNotez from "@assets/images/evaluation.svg";
+import Bouton from "@components/components-partages/Boutons/Bouton";
+import BoiteModaleNotes from "@components/boiteModaleNotes/boiteModaleNotes";
 
 const CarteBouteille = ({
   bouteille,
@@ -7,8 +12,31 @@ const CarteBouteille = ({
   onAugmenter = () => {},
   onDiminuer = () => {},
   onAjouter = () => {},
+  onAjouterListe = () => {},
   disabled = false, //désactiver le bouton
 }) => {
+  const [estModaleNotezOuverte, setEstModaleNotezOuverte] = useState(false);
+
+  const ouvrirBoiteModaleNotez = (idBouteille) => {
+    setEstModaleNotezOuverte(true);
+  };
+
+  const fermerBoiteModaleNotez = () => {
+    setEstModaleNotezOuverte(false);
+  };
+
+  const validerNote = (data) => {
+    console.log(
+      "Note:",
+      data.note,
+      "Commentaire:",
+      data.commentaire,
+      "Bouteille ID:",
+      bouteille.id
+    );
+    // Ici tu peux ajouter l'appel API pour sauvegarder la note
+    fermerBoiteModaleNotez();
+  };
   /**
    * Génère les contrôles (boutons) selon le type :
    * - catalogue : bouton "Ajouter au cellier"
@@ -20,12 +48,21 @@ const CarteBouteille = ({
      * ------------------------------ */
     if (type === "catalogue") {
       return (
-        <BoutonAction
-          texte={disabled ? "Déjà dans le cellier" : "Ajouter au cellier"}
-          onClick={() => onAjouter(bouteille)}
-          type="secondaire"
-          disabled={disabled}
-        />
+        <div className="grid grid-cols-[1fr_auto] gap-4 w-full items-center">
+            <Bouton
+              texte={disabled ? "Déjà dans le cellier" : "Ajouter au cellier"}
+              type="secondaire"
+              action={handleAjouter}     
+              disabled={disabled}
+            />
+
+            <Bouton
+              variante="icone"
+              icone={<GiNotebook size={20} />}
+              action={gererAjouterListe}
+              disabled={disabled}
+            />
+       </div>
       );
     }
 
@@ -36,11 +73,15 @@ const CarteBouteille = ({
       return (
         <div className="flex flex-row gap-2 items-center w-full justify-center">
           {/* Contrôles de quantité */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 justify-center mr-(--rythme-base)">
             {/* Bouton MOINS (-) */}
             <BoutonQuantite
               type="diminuer"
-              onClick={() => onDiminuer(bouteille.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onDiminuer(bouteille.id);
+              }}
               disabled={disabled || bouteille.quantite <= 0}
             />
 
@@ -55,28 +96,56 @@ const CarteBouteille = ({
             {/* Bouton PLUS (+) */}
             <BoutonQuantite
               type="augmenter"
-              onClick={() => onAugmenter(bouteille.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onAugmenter(bouteille.id);
+              }}
               disabled={disabled}
             />
           </div>
+          <Bouton
+            texte={
+              <span className="flex items-center gap-(--rythme-tres-serre)">
+                Notez
+                <img
+                  src={iconNotez}
+                  alt="Icône évaluation"
+                  className="w-5 h-5"
+                />
+              </span>
+            }
+            type="secondaire"
+            action={() => ouvrirBoiteModaleNotez(bouteille.id)}
+            typeHtml="button"
+            disabled={false}
+          />
         </div>
       );
     }
   };
 
-	// Arreter la propagation et afficher le modale pour ajouter la bouteille
+  // Arreter la propagation et afficher le modale pour ajouter la bouteille
   const handleAjouter = (e) => {
-    e.stopPropagation(); 
-    e.preventDefault(); 
-    onAjouter(bouteille); 
+    e.stopPropagation();
+    e.preventDefault();
+    onAjouter(bouteille);
+  };
+
+  const gererAjouterListe = (e) => {
+    if (e && typeof e.stopPropagation === "function") {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    onAjouterListe(bouteille);
   };
 
   return (
     <div
       className="
-      flex flex-col 
+      flex flex-col justify-between
       bg-fond-secondaire p-(--rythme-serre) 
-      rounded-(--arrondi-grand) shadow-md"
+      rounded-(--arrondi-grand) shadow-md min-h-[320px]"
     >
       {/* Section IMAGE de la bouteille */}
       <div
@@ -92,7 +161,7 @@ const CarteBouteille = ({
       </div>
 
       {/* Section INFORMATIONS de la bouteille */}
-      <div className="flex-1 mb-4">
+      <div className="mb-4">
         {/* Nom */}
         <h2 className="mb-2 text-(length:--taille-normal) font-bold text-texte-secondaire">
           {bouteille.nom}
@@ -106,11 +175,18 @@ const CarteBouteille = ({
 
       {/* Section des contrôles (catalogue ou cellier) */}
       <div
-        className="flex justify-center items-center gap-3"
-        onClick={handleAjouter}
-      >
+        className="flex justify-center items-center gap-3">
         {genererControles()}
       </div>
+
+      {/* Boîte modale pour noter la bouteille */}
+      {estModaleNotezOuverte && (
+        <BoiteModaleNotes
+          nomBouteille={bouteille.nom}
+          onFermer={fermerBoiteModaleNotez}
+          onValider={validerNote}
+        />
+      )}
     </div>
   );
 };

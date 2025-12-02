@@ -1,8 +1,9 @@
 function BoutonAction({
-  texte = "Action",
-  onClick,
+  texte,
+  type = "primaire",
+  action = () => {},
   disabled = false,
-  type = "primaire", // "primaire" ou "secondaire"
+  typeHtml = "button",
 }) {
   // Classes de base
   const classesBase = `

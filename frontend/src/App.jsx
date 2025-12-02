@@ -7,7 +7,7 @@ import Catalogue from "@pages/Catalogue";
 import Cellier from "@pages/Cellier";
 import Bouteille from "@pages/Bouteille";
 import SommaireCellier from "@pages/SommaireCellier";
-import ListeAchat from "./pages/ListeAchat";
+import ListeAchat from "@pages/ListeAchat";
 
 function App() {
   return (
