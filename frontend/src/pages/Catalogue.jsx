@@ -787,6 +787,7 @@ const ajouterALaListe = useCallback(async (bouteille) => {
                             bouteille={b}
                             type="catalogue"
                             onAjouter={ouvrirModale}
+                            onAjouterListe={ajouterALaListe}
                           />
                         </Link>
                       ))}
