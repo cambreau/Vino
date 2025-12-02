@@ -37,17 +37,20 @@ export const formatDetailsBouteille = (texte) => {
 	if (!texte) return "";
 
 	// Remplacer les | par des virgules
-	let texteFormate = texte.replaceAll("|", ",");
+	let texteFormate = texte.replaceAll("identite produit:", "");
+	// Remplacer les | par des virgules
+	let texteFormateFinal = texteFormate.replaceAll("|", ",");
 
-	formatMajDebut(texte);
+	formatMajDebut(texteFormateFinal);
 
 	// Nettoyer les espaces multiples
-	texteFormate = texteFormate.replace(/\s+/g, " ").trim();
+	texteFormate = texteFormateFinal.replace(/\s+/g, " ").trim();
 
 	return texteFormate;
 };
 
-export const normaliserTexte = (valeur) => {
+
+const normaliserTexte = (valeur) => {
   if (valeur === undefined || valeur === null) return "";
   return valeur
     .toString()
@@ -75,48 +78,77 @@ export const filtrerBouteilles = (bouteilles = [], filtres = {}) => {
   const typeFiltre = normaliserTexte(filtres.type);
   const paysFiltre = normaliserTexte(filtres.pays);
   const regionFiltre = normaliserTexte(filtres.region);
-  const anneeFiltre = filtres.annee ? Number(filtres.annee) : null;
+  const anneeFiltre =
+    filtres.annee !== undefined && filtres.annee !== null && `${filtres.annee}` !== ""
+      ? Number(filtres.annee)
+      : null;
 
-  const typeActif = typeFiltre && typeFiltre !== "tous";
+  const typeActif = Boolean(typeFiltre && typeFiltre !== "tous");
+  const paysActif = Boolean(paysFiltre);
+  const regionActif = Boolean(regionFiltre);
+  const anneeActif = Number.isFinite(anneeFiltre);
+
+  if (!typeActif && !paysActif && !regionActif && !anneeActif) {
+    return [...bouteilles];
+  }
+
+  // Cherche la première propriété non vide parmi la liste puis la normalise.
+  const obtenirValeurNormalisee = (source, champs) => {
+    for (const champ of champs) {
+      const valeur = source[champ];
+      if (valeur !== undefined && valeur !== null && valeur !== "") {
+        return normaliserTexte(valeur);
+      }
+    }
+    return "";
+  };
 
   return bouteilles.filter((bouteille) => {
-    if (!bouteille) return false;
+    if (!bouteille || typeof bouteille !== "object") return false;
 
     if (typeActif) {
-      const typeBouteille = normaliserTexte(
-        bouteille.type ?? bouteille.couleur,
-      );
+      const typeBouteille = obtenirValeurNormalisee(bouteille, [
+        "type",
+        "couleur",
+      ]);
       if (!typeBouteille || typeBouteille !== typeFiltre) {
         return false;
       }
     }
 
-    if (paysFiltre) {
-      const paysBouteille = normaliserTexte(
-        bouteille.pays ?? bouteille.country ?? bouteille.origine,
-      );
+    if (paysActif) {
+      const paysBouteille = obtenirValeurNormalisee(bouteille, [
+        "pays",
+        "country",
+        "origine",
+      ]);
       if (!paysBouteille || !paysBouteille.includes(paysFiltre)) {
         return false;
       }
     }
 
-    if (regionFiltre) {
-      const regionBouteille = normaliserTexte(
-        bouteille.region ?? bouteille.appellation,
-      );
+    if (regionActif) {
+      const regionBouteille = obtenirValeurNormalisee(bouteille, [
+        "region",
+        "appellation",
+      ]);
       if (!regionBouteille || !regionBouteille.includes(regionFiltre)) {
         return false;
       }
     }
 
-    if (anneeFiltre) {
-      const anneeSource =
-        bouteille.annee ??
-        bouteille.millesime ??
-        bouteille.millenisme ??
-        bouteille.vintage;
-      const anneeBouteille = Number(anneeSource);
-      if (!anneeBouteille || anneeBouteille !== anneeFiltre) {
+    if (anneeActif) {
+      const champsAnnees = ["annee", "millesime", "vintage"];
+      let anneeBouteille = null;
+      for (const champ of champsAnnees) {
+        const valeur = bouteille[champ];
+        const nombre = Number(valeur);
+        if (Number.isFinite(nombre)) {
+          anneeBouteille = nombre;
+          break;
+        }
+      }
+      if (anneeBouteille !== anneeFiltre) {
         return false;
       }
     }
@@ -124,7 +156,6 @@ export const filtrerBouteilles = (bouteilles = [], filtres = {}) => {
     return true;
   });
 };
-
 /**
  * Hook : set document title
  * @param {string} titre - Titre de la page
