@@ -138,7 +138,7 @@ export const filtrerBouteilles = (bouteilles = [], filtres = {}) => {
     }
 
     if (anneeActif) {
-      const champsAnnees = ["annee", "millesime", "vintage"];
+      const champsAnnees = ["millenisme", "annee", "millesime", "vintage"];
       let anneeBouteille = null;
       for (const champ of champsAnnees) {
         const valeur = bouteille[champ];
@@ -264,7 +264,7 @@ export const rechercherBouteilles = (bouteilles = [], criteres = {}) => {
 
 		// Correspondance exacte sur l'année
 		if (anneeActif) {
-			const champsAnnees = ["annee", "millesime", "vintage"];
+			const champsAnnees = ["millenisme", "annee", "millesime", "vintage"];
 			let anneeBouteille = null;
 			for (const champ of champsAnnees) {
 				const valeur = bouteille[champ];

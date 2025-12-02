@@ -1,5 +1,6 @@
-import { useState, useId } from "react";
+import { useState, useId, useMemo } from "react";
 import Bouton from "@components/components-partages/Boutons/Bouton";
+import { rechercherBouteilles } from "@lib/utils";
 import { FaSearch, FaChevronDown, FaFilter } from "react-icons/fa";
 import { GiGrapes } from "react-icons/gi";
 import { BiWorld } from "react-icons/bi";
@@ -11,6 +12,7 @@ import { LuWine } from "react-icons/lu";
  * Affiche un panneau déroulant avec des champs de saisie pour la recherche
  *
  * @param {Object} props - Les propriétés du composant
+ * @param {Array} props.bouteilles - Liste des bouteilles à rechercher
  * @param {Object} props.valeursInitiales - Les valeurs initiales des champs de recherche
  * @param {Function} props.onRechercher - Callback appelé lors de la soumission de la recherche
  * @param {Function} props.onFiltrer - Callback pour basculer vers le mode filtres
@@ -19,6 +21,7 @@ import { LuWine } from "react-icons/lu";
  * @param {string} props.className - Classes CSS additionnelles
  */
 function Recherche({
+	bouteilles = [],
 	valeursInitiales = {},
 	onRechercher,
 	onFiltrer,
@@ -35,6 +38,12 @@ function Recherche({
 		...valeursInitiales,
 	}));
 	const formulaireId = useId();
+
+	// Calculer les résultats de recherche en temps réel
+	const resultats = useMemo(() => {
+		if (!bouteilles.length) return [];
+		return rechercherBouteilles(bouteilles, criteres);
+	}, [bouteilles, criteres]);
 
 	const handleChange = (event) => {
 		const { name, value } = event.target;
@@ -158,6 +167,9 @@ function Recherche({
 								Réinitialiser
 							</button>
 						)}
+						<p className="text-(length:--taille-petit) text-texte-secondaire">
+							{resultats.length} résultat{resultats.length > 1 ? "s" : ""} trouvé{resultats.length > 1 ? "s" : ""}
+						</p>
 						<Bouton texte={texteBouton} typeHtml="submit" taille="moyen" />
 					</div>
 				</form>
