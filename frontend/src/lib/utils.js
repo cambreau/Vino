@@ -50,7 +50,7 @@ export const formatDetailsBouteille = (texte) => {
 };
 
 
-const normaliserTexte = (valeur) => {
+export const normaliserTexte = (valeur) => {
   if (valeur === undefined || valeur === null) return "";
   return valeur
     .toString()
