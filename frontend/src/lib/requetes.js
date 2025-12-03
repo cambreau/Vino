@@ -744,14 +744,13 @@ export const ajouterBouteilleListe = async (id_utilisateur, donnees) => {
 
 
 /**
- * Retire une bouteille de la liste d'achat d'un utilisateur
+ * Supprime une bouteille de la liste d'achat
  * @param {number} id_utilisateur - L'ID de l'utilisateur
- * @param {number} id_bouteille - L'ID de la bouteille à retirer
+ * @param {number} id_bouteille - L'ID de la bouteille à supprimer
  * @returns {Promise<Object>} - Résultat de l'opération
  */
-export const retirerBouteilleListe = async (id_utilisateur, id_bouteille) => {
+export const supprimerBouteilleListe = async (id_utilisateur, id_bouteille) => {
   try {
-    // Envoie une requête DELETE à l'API pour retirer la bouteille
     const reponse = await fetch(
       `${import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL}/${id_utilisateur}/${id_bouteille}`,
       {
@@ -761,8 +760,7 @@ export const retirerBouteilleListe = async (id_utilisateur, id_bouteille) => {
     );
     
     if (reponse.ok) {
-      const data = await reponse.json();
-      return { succes: true, donnees: data };
+      return { succes: true };
     }
 
     const erreurData = await reponse.json().catch(() => ({}));
@@ -770,10 +768,10 @@ export const retirerBouteilleListe = async (id_utilisateur, id_bouteille) => {
 
     return {
       succes: false,
-      erreur: erreurData.message || "Erreur lors du retrait de la liste",
+      erreur: erreurData.message || "Erreur lors de la suppression",
     };
   } catch (error) {
-    console.error("Erreur lors du retrait de la liste:", error);
+    console.error("Erreur lors de la suppression:", error);
     return {
       succes: false,
       erreur: "Le serveur ne répond pas.",
