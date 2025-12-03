@@ -33,6 +33,7 @@ import {
   filtrerBouteilles,
   rechercherBouteilles,
 } from "@lib/utils.js";
+import filtresStore from "@store/filtresStore";
 
 /*
  * Constante: nombre d'éléments à charger par page lors de la pagination.
@@ -204,6 +205,21 @@ const catalogueReducer = (state, action) => {
 function Catalogue() {
   useDocumentTitle("Catalogue");
   const utilisateur = authentificationStore((state) => state.utilisateur);
+
+  // Store des filtres persistants
+  const {
+    criteres: criteresFiltresStore,
+    modeRecherche: modeRechercheStore,
+    criteresRecherche: criteresRechercheStore,
+    modeTri: modeTriStore,
+    setCriteres: setCriteresStore,
+    setModeRecherche: setModeRechercheStore,
+    desactiverModeRecherche: desactiverModeRechercheStore,
+    setModeTri: setModeTriStore,
+    toggleModeTri: toggleModeTriStore,
+    supprimerCritere: supprimerCritereStore,
+    reinitialiserFiltres: reinitialiserFiltresStore,
+  } = filtresStore();
   // Référence vers le conteneur scrollable principal (utilisé pour l'observer et le fallback).
   const mainRef = useRef(null);
   const sentinelRef = useRef(null);
@@ -219,13 +235,18 @@ function Catalogue() {
   // (incrémentée à chaque requête pour s'assurer que la réponse correspond à la dernière requête).
   const verificationRef = useRef(0);
   const [resultatsFiltres, setResultatsFiltres] = useState(null);
-  const [criteresFiltres, setCriteresFiltres] = useState({});
-  const [modeRecherche, setModeRecherche] = useState(false);
-  const [modeTri, setModeTri] = useState("nom_asc");
   const [catalogueComplet, setCatalogueComplet] = useState([]);
   const [chargementCatalogueComplet, setChargementCatalogueComplet] =
     useState(false);
   const [erreurCatalogueComplet, setErreurCatalogueComplet] = useState(null);
+
+  // Utiliser les valeurs du store pour les critères et le mode
+  const criteresFiltres = modeRechercheStore
+    ? criteresRechercheStore
+    : criteresFiltresStore;
+  const modeRecherche = modeRechercheStore;
+  const modeTri = modeTriStore;
+
   const filtresActifs = useMemo(
     () =>
       Object.values(criteresFiltres ?? {}).some((valeur) => Boolean(valeur)),
@@ -236,14 +257,17 @@ function Catalogue() {
     [catalogueComplet, etat.bouteilles]
   );
 
-  const handleFiltrer = useCallback((resultats, criteres) => {
-    const actifs = Object.values(criteres ?? {}).some((valeur) =>
-      Boolean(valeur)
-    );
-    setModeRecherche(false);
-    setCriteresFiltres(criteres);
-    setResultatsFiltres(actifs ? resultats : null);
-  }, []);
+  const handleFiltrer = useCallback(
+    (resultats, criteres) => {
+      const actifs = Object.values(criteres ?? {}).some((valeur) =>
+        Boolean(valeur)
+      );
+      desactiverModeRechercheStore();
+      setCriteresStore(criteres);
+      setResultatsFiltres(actifs ? resultats : null);
+    },
+    [desactiverModeRechercheStore, setCriteresStore]
+  );
 
   const handleRecherche = useCallback(
     (criteres) => {
@@ -262,10 +286,38 @@ function Catalogue() {
     },
     [donneesFiltres]
   );
+  const handleRecherche = useCallback(
+    (criteres) => {
+      const actifs = Object.values(criteres ?? {}).some((valeur) =>
+        Boolean(valeur)
+      );
+      if (!actifs) {
+        setResultatsFiltres(null);
+        desactiverModeRechercheStore();
+        return;
+      }
+      setModeRechercheStore(criteres);
+      const resultats = rechercherBouteilles(donneesFiltres, criteres);
+      setResultatsFiltres(resultats);
+    },
+    [donneesFiltres, setModeRechercheStore, desactiverModeRechercheStore]
+  );
 
   const handleTri = useCallback(() => {
-    setModeTri((courant) => (courant === "nom_asc" ? "nom_desc" : "nom_asc"));
-  }, []);
+    toggleModeTriStore();
+  }, [toggleModeTriStore]);
+
+  const handleSupprimerFiltre = useCallback(
+    (cle) => {
+      supprimerCritereStore(cle);
+    },
+    [supprimerCritereStore]
+  );
+
+  const handleReinitialiserFiltres = useCallback(() => {
+    reinitialiserFiltresStore();
+    setResultatsFiltres(null);
+  }, [reinitialiserFiltresStore]);
 
   const trierBouteilles = useCallback((liste = [], mode = "nom_asc") => {
     if (!Array.isArray(liste)) return [];
@@ -804,10 +856,12 @@ function Catalogue() {
               <div className="space-y-(--rythme-base)">
                 <Filtres
                   bouteilles={donneesFiltres}
-                  valeursInitiales={criteresFiltres}
+                  valeursInitiales={criteresFiltresStore}
                   onFiltrer={handleFiltrer}
                   onRecherche={handleRecherche}
                   onTri={handleTri}
+                  onSupprimerFiltre={handleSupprimerFiltre}
+                  onReinitialiserFiltres={handleReinitialiserFiltres}
                   titreTri={etiquetteTri}
                   className="shrink-0"
                 />
