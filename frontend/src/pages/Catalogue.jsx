@@ -24,11 +24,15 @@ import {
   ajouterBouteilleCellier,
   recupererTousCellier,
   verifierBouteilleCellier,
-  ajouterBouteilleListe
+  ajouterBouteilleListe,
 } from "@lib/requetes";
 
 import authentificationStore from "@store/authentificationStore";
-import { useDocumentTitle, filtrerBouteilles, rechercherBouteilles } from "@lib/utils.js";
+import {
+  useDocumentTitle,
+  filtrerBouteilles,
+  rechercherBouteilles,
+} from "@lib/utils.js";
 
 /*
  * Constante: nombre d'éléments à charger par page lors de la pagination.
@@ -241,20 +245,23 @@ function Catalogue() {
     setResultatsFiltres(actifs ? resultats : null);
   }, []);
 
-  const handleRecherche = useCallback((criteres) => {
-    const actifs = Object.values(criteres ?? {}).some((valeur) =>
-      Boolean(valeur)
-    );
-    setModeRecherche(true);
-    if (!actifs) {
-      setResultatsFiltres(null);
-      setCriteresFiltres({});
-      return;
-    }
-    const resultats = rechercherBouteilles(donneesFiltres, criteres);
-    setResultatsFiltres(resultats);
-    setCriteresFiltres(criteres);
-  }, [donneesFiltres]);
+  const handleRecherche = useCallback(
+    (criteres) => {
+      const actifs = Object.values(criteres ?? {}).some((valeur) =>
+        Boolean(valeur)
+      );
+      setModeRecherche(true);
+      if (!actifs) {
+        setResultatsFiltres(null);
+        setCriteresFiltres({});
+        return;
+      }
+      const resultats = rechercherBouteilles(donneesFiltres, criteres);
+      setResultatsFiltres(resultats);
+      setCriteresFiltres(criteres);
+    },
+    [donneesFiltres]
+  );
 
   const handleTri = useCallback(() => {
     setModeTri((courant) => (courant === "nom_asc" ? "nom_desc" : "nom_asc"));
@@ -696,43 +703,46 @@ function Catalogue() {
     }
   }, [etat.cellierSelectionne, etat.celliers, etat.modale, fermerModale]);
 
-/*================================= */
-//Ajouter a la liste 
-const ajouterALaListe = useCallback(async (bouteille) => {
-  try {
-    const resultat = await ajouterBouteilleListe(utilisateur.id, {
-      id_bouteille: bouteille.id
-    });
+  /*================================= */
+  //Ajouter a la liste
+  const ajouterALaListe = useCallback(
+    async (bouteille) => {
+      try {
+        const resultat = await ajouterBouteilleListe(utilisateur.id, {
+          id_bouteille: bouteille.id,
+        });
 
-    if (resultat?.succes) {
-      dispatch({
-        type: ACTIONS.SET_MESSAGE,
-        payload: {
-          texte: `${bouteille.nom} a été ajouté à votre liste avec succès`,
-          type: "succes",
-        },
-      });
-    } else {
-      dispatch({
-        type: ACTIONS.SET_MESSAGE,
-        payload: {
-          texte: resultat?.erreur || "Erreur lors de l'ajout à la liste",
-          type: "erreur",
-        },
-      });
-    }
-  } catch (error) {
-    console.error(error);
-    dispatch({
-      type: ACTIONS.SET_MESSAGE,
-      payload: { 
-        texte: "Erreur lors de l'ajout à la liste", 
-        type: "erreur" 
-      },
-    });
-  }
-}, [utilisateur.id]);
-/*================================= */
+        if (resultat?.succes) {
+          dispatch({
+            type: ACTIONS.SET_MESSAGE,
+            payload: {
+              texte: `${bouteille.nom} a été ajouté à votre liste avec succès`,
+              type: "succes",
+            },
+          });
+        } else {
+          dispatch({
+            type: ACTIONS.SET_MESSAGE,
+            payload: {
+              texte: resultat?.erreur || "Erreur lors de l'ajout à la liste",
+              type: "erreur",
+            },
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        dispatch({
+          type: ACTIONS.SET_MESSAGE,
+          payload: {
+            texte: "Erreur lors de l'ajout à la liste",
+            type: "erreur",
+          },
+        });
+      }
+    },
+    [utilisateur.id]
+  );
+  /*================================= */
 
   const {
     chargementInitial,
@@ -762,7 +772,7 @@ const ajouterALaListe = useCallback(async (bouteille) => {
           <MenuEnHaut />
         </header>
         <main ref={mainRef} className="bg-fond overflow-y-auto">
-          <section className="pt-(--rythme-espace) px-(--rythme-serre)">
+          <section className="pt-(--rythme-base) px-(--rythme-serre)">
             <Message
               texte="Vous devez être connecté pour accéder au catalogue"
               type="erreur"
@@ -782,7 +792,7 @@ const ajouterALaListe = useCallback(async (bouteille) => {
         </header>
 
         <main ref={mainRef} className="bg-fond overflow-y-auto">
-          <h1 className="text-(length:--taille-moyen)  my-(--rythme-espace) text-center font-display font-semibold text-principal-300">
+          <h1 className="text-(length:--taille-moyen)  mt-(--rythme-base) text-center font-display font-semibold text-principal-300">
             Catalogue des vins
           </h1>
           <section className="pt-(--rythme-espace) px-(--rythme-serre)">
