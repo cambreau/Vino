@@ -13,6 +13,7 @@ import CarteBouteille from "@components/carte/CarteBouteille";
 import Message from "@components/components-partages/Message/Message";
 import BoiteModale from "@components/components-partages/BoiteModale/BoiteModale";
 import Filtres from "@components/components-partages/Filtre/Filtre";
+import NonTrouver from "@components/components-partages/NonTrouver/NonTrouver";
 
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuantite";
@@ -891,7 +892,12 @@ function Catalogue() {
                     )}
                   </>
                 ) : (
-                  <Message texte={messageListeVide} type="information" />
+                  <div className="flex justify-center py-(--rythme-espace)">
+                    <NonTrouver
+                      size={180}
+                      message={messageListeVide}
+                    />
+                  </div>
                 )}
               </div>
             </div>

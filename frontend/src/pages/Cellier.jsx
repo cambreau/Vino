@@ -8,6 +8,7 @@ import Bouton from "@components/components-partages/Boutons/Bouton";
 import Message from "@components/components-partages/Message/Message";
 import CarteBouteille from "@components/carte/CarteBouteille";
 import Filtres from "@components/components-partages/Filtre/Filtre";
+import NonTrouver from "@components/components-partages/NonTrouver/NonTrouver";
 import {
   recupererCellier,
   recupererBouteillesCellier,
@@ -252,10 +253,12 @@ function Cellier() {
                     ))}
                   </div>
                 ) : (
-                  <Message
-                    type="information"
-                    texte="Aucune bouteille ne correspond à vos filtres."
-                  />
+                  <div className="flex justify-center py-(--rythme-espace)">
+                    <NonTrouver
+                      size={180}
+                      message={modeRecherche ? "Aucune bouteille ne correspond à votre recherche" : "Aucune bouteille ne correspond à vos filtres"}
+                    />
+                  </div>
                 )}
               </>
             ) : (

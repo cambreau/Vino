@@ -9,11 +9,18 @@ const LottieComponent =
 		? LottieImport.default
 		: null;
 
-function NonTrouver({ size = 160, ariaLabel = "Chargement", className = "" }) {
+function NonTrouver({
+	size = 160,
+	ariaLabel = "Aucun résultat trouvé",
+	className = "",
+	message = "Aucune bouteille ne correspond à votre recherche",
+}) {
 	const wrapperStyle = {
-		display: "inline-flex",
+		display: "flex",
+		flexDirection: "column",
 		justifyContent: "center",
 		alignItems: "center",
+		gap: "1rem",
 	};
 
 	const animationStyle = {
@@ -35,6 +42,9 @@ function NonTrouver({ size = 160, ariaLabel = "Chargement", className = "" }) {
 					autoplay
 					style={animationStyle}
 				/>
+				<p className="text-texte-secondaire text-(length:--taille-base) text-center">
+					{message}
+				</p>
 			</div>
 		)
 	);
