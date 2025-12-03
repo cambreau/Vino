@@ -85,7 +85,7 @@ export default class ModeleDegustation {
   ) {}
 
   // Requête pour suprimmer une dégustation
-  static async supprimer(id_utilisateur, id_bouteille, date) {
+  static async supprimer(id_utilisateur, id_bouteille) {
     const idUtilisateur = Number.parseInt(id_utilisateur, 10);
     const idBouteille = Number.parseInt(id_bouteille, 10);
 
@@ -97,20 +97,11 @@ export default class ModeleDegustation {
       throw new Error("ID bouteille invalide");
     }
 
-    if (!date) {
-      throw new Error("Date requise pour supprimer la dégustation");
-    }
-
     const sql = `DELETE FROM degustation 
                WHERE id_utilisateur = ? 
-               AND id_bouteille = ? 
-               AND date_degustation = ?`;
+               AND id_bouteille = ?`;
 
-    const [resultat] = await connexion.query(sql, [
-      idUtilisateur,
-      idBouteille,
-      date,
-    ]);
+    const [resultat] = await connexion.query(sql, [idUtilisateur, idBouteille]);
 
     return resultat;
   }

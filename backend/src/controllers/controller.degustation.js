@@ -91,12 +91,10 @@ export const modifierDegustation = async (req, res) => {};
 export const supprimerDegustation = async (req, res) => {
   try {
     const { id_bouteille, id_utilisateur } = req.params;
-    const { date_degustation } = req.query;
 
     const resultat = await ModeleDegustation.supprimer(
       id_utilisateur,
-      id_bouteille,
-      date_degustation
+      id_bouteille
     );
 
     return res.status(200).json({
