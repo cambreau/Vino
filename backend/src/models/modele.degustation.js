@@ -35,6 +35,7 @@ export default class ModeleDegustation {
 
   // Requête pour ajouter une dégustation
   static async ajouter(id_bouteille, id_utilisateur, note, commentaire) {
+    // Validation des entrées
     const idBouteille = Number.parseInt(id_bouteille, 10);
     const idUtilisateur = Number.parseInt(id_utilisateur, 10);
     if (!Number.isInteger(idBouteille) || idBouteille <= 0) {
@@ -53,6 +54,7 @@ export default class ModeleDegustation {
       throw new Error("Utilisateur requis pour ajouter une dégustation");
     }
 
+    // Insertion dans la base de données
     const sql = `INSERT INTO degustation (id_bouteille, id_utilisateur, note, commentaire) VALUES (?, ?, ?, ?)`;
     const [result] = await connexion.query(sql, [
       idBouteille,
@@ -60,6 +62,7 @@ export default class ModeleDegustation {
       note,
       commentaire,
     ]);
+    // Retourne le resultat de l'insertion
     return result;
   }
 
