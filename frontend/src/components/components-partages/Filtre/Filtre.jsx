@@ -6,7 +6,7 @@ import {
 	filtrerBouteilles as filtres,
 	normaliserTexte,
 } from "@lib/utils";
-import { FaFilter, FaExchangeAlt, FaWarehouse, FaChevronDown, FaSearch } from "react-icons/fa";
+import { FaFilter, FaExchangeAlt, FaWarehouse, FaChevronDown, FaSearch, FaTimes } from "react-icons/fa";
 import { GiGrapes } from "react-icons/gi";
 import { BiWorld } from "react-icons/bi";
 import { MdOutlineCalendarMonth } from "react-icons/md";
@@ -70,12 +70,14 @@ function Filtres({
 	onFiltrer,
 	onTri,
 	onRecherche,
+	onSupprimerFiltre,
+	onReinitialiserFiltres,
 	titreFiltrer = "Filtrer",
 	titreTri = "Tri",
 	texteBouton = "Chercher",
 	className = "",
 }) {
-	const [estOuvert, setEstOuvert] = useState(true);
+	const [estOuvert, setEstOuvert] = useState(false);
 	const [modeRecherche, setModeRecherche] = useState(false);
 	const [criteres, setCriteres] = useState(() => ({
 		type: "",
@@ -85,6 +87,11 @@ function Filtres({
 		...valeursInitiales,
 	}));
 	const formulaireId = useId();
+
+	// Vérifie si des filtres sont actifs
+	const aDesFiltresActifs = useMemo(() => {
+		return Object.values(criteres).some((v) => v !== "" && v !== null && v !== undefined);
+	}, [criteres]);
 
 	useEffect(() => {
 		setCriteres((precedent) => ({ ...precedent, ...valeursInitiales }));
@@ -131,12 +138,41 @@ function Filtres({
 
 	const handleChange = (event) => {
 		const { name, value } = event.target;
-		setCriteres((precedent) => ({ ...precedent, [name]: value }));
+		setCriteres((precedent) => {
+			const nouveauxCriteres = { ...precedent, [name]: value };
+			// Si on change le pays, on réinitialise la région
+			if (name === "pays" && value !== precedent.pays) {
+				nouveauxCriteres.region = "";
+			}
+			return nouveauxCriteres;
+		});
 	};
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
 		onFiltrer?.(resultats, criteres);
+	};
+
+	const handleSupprimerFiltre = (cle) => {
+		setCriteres((precedent) => {
+			const nouveauxCriteres = { ...precedent, [cle]: "" };
+			// Si on supprime le pays, on vide aussi la région
+			if (cle === "pays") {
+				nouveauxCriteres.region = "";
+			}
+			return nouveauxCriteres;
+		});
+		onSupprimerFiltre?.(cle);
+	};
+
+	const handleReinitialiser = () => {
+		setCriteres({
+			type: "",
+			pays: "",
+			region: "",
+			annee: "",
+		});
+		onReinitialiserFiltres?.();
 	};
 
 	const champSelects = [
@@ -233,19 +269,30 @@ function Filtres({
 								{champ.icone}
 								<span>{champ.label} :</span>
 							</label>
-							<select
-								id={champ.id}
-								name={champ.id}
-								value={criteres[champ.id]}
-								onChange={handleChange}
-								className="w-full rounded-(--arrondi-grand) border border-principal-100 px-(--rythme-base) py-(--rythme-tres-serre) text-(length:--taille-normal) text-texte-secondaire focus:outline-none focus:border-principal-200">
-								<option value="">Choisissez</option>
-								{(champ.options ?? []).map((option) => (
-									<option key={`${champ.id}-${formatString(option)}`} value={option}>
-										{option}
-									</option>
-								))}
-							</select>
+							<div className="relative">
+								<select
+									id={champ.id}
+									name={champ.id}
+									value={criteres[champ.id]}
+									onChange={handleChange}
+									className="w-full rounded-(--arrondi-grand) border border-principal-100 px-(--rythme-base) py-(--rythme-tres-serre) pr-10 text-(length:--taille-normal) text-texte-secondaire focus:outline-none focus:border-principal-200">
+									<option value="">Choisissez</option>
+									{(champ.options ?? []).map((option) => (
+										<option key={`${champ.id}-${formatString(option)}`} value={option}>
+											{option}
+										</option>
+									))}
+								</select>
+								{criteres[champ.id] && (
+									<button
+										type="button"
+										onClick={() => handleSupprimerFiltre(champ.id)}
+										className="absolute right-8 top-1/2 -translate-y-1/2 p-1 text-principal-200 hover:text-erreur transition-colors"
+										aria-label={`Supprimer le filtre ${champ.label}`}>
+										<FaTimes className="w-3 h-3" />
+									</button>
+								)}
+							</div>
 						</div>
 					))}
 				<div className="flex flex-col gap-(--rythme-tres-serre)">
@@ -255,18 +302,29 @@ function Filtres({
 							<MdOutlineCalendarMonth className="text-principal-200" />
 							<span>Année :</span>
 						</label>
-					<input
-						type="number"
-						id="annee"
-						name="annee"
-						min="1900"
-						max="2100"
-						list="liste-annees"
-						value={criteres.annee}
-						onChange={handleChange}
-						placeholder="Choisissez"
-						className="w-full rounded-(--arrondi-grand) border border-principal-100 px-(--rythme-base) py-(--rythme-tres-serre) text-(length:--taille-normal) text-texte-secondaire focus:outline-none focus:border-principal-200"
-					/>
+					<div className="relative">
+						<input
+							type="number"
+							id="annee"
+							name="annee"
+							min="1900"
+							max="2100"
+							list="liste-annees"
+							value={criteres.annee}
+							onChange={handleChange}
+							placeholder="Choisissez"
+							className="w-full rounded-(--arrondi-grand) border border-principal-100 px-(--rythme-base) py-(--rythme-tres-serre) pr-10 text-(length:--taille-normal) text-texte-secondaire focus:outline-none focus:border-principal-200"
+						/>
+						{criteres.annee && (
+							<button
+								type="button"
+								onClick={() => handleSupprimerFiltre("annee")}
+								className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-principal-200 hover:text-erreur transition-colors"
+								aria-label="Supprimer le filtre année">
+								<FaTimes className="w-3 h-3" />
+							</button>
+						)}
+					</div>
 					<datalist id="liste-annees">
 						{(options.annees ?? []).map((option) => (
 							<option key={`annee-${option}`} value={option} />
@@ -277,7 +335,18 @@ function Filtres({
 					<p className="text-(length:--taille-petit) text-texte-secondaire">
 						{resultats.length} résultat{resultats.length > 1 ? "s" : ""} trouvé{resultats.length > 1 ? "s" : ""}
 					</p>
-					<Bouton texte={texteBouton} typeHtml="submit" taille="moyen" />
+					<div className="flex gap-(--rythme-serre)">
+						<Bouton texte={texteBouton} typeHtml="submit" taille="moyen" />
+						{aDesFiltresActifs && (
+							<Bouton 
+								texte="Réinitialiser" 
+								typeHtml="button" 
+								taille="moyen" 
+								type="secondaire"
+								action={handleReinitialiser}
+							/>
+						)}
+					</div>
 				</div>
 			</form>
 			)}
