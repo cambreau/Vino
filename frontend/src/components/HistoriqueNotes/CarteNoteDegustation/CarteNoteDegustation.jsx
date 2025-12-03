@@ -80,6 +80,7 @@ const CarteNoteDegustation = ({
         className="
         flex gap-(--rythme-serre)
         bg-fond-secondaire p-(--rythme-base) 
+        mb-(--rythme-serre)
         rounded-(--arrondi-grand) shadow-md"
       >
         {/* Section INFORMATIONS de la bouteille */}
