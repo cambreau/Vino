@@ -730,6 +730,42 @@ export const ajouterBouteilleListe = async (id_utilisateur, donnees) => {
   }
 };
 
+/**
+ * Supprime une bouteille de la liste d'achat
+ * @param {number} id_utilisateur - L'ID de l'utilisateur
+ * @param {number} id_bouteille - L'ID de la bouteille à supprimer
+ * @returns {Promise<Object>} - Résultat de l'opération
+ */
+export const supprimerBouteilleListe = async (id_utilisateur, id_bouteille) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL}/${id_utilisateur}/${id_bouteille}`,
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+    
+    if (reponse.ok) {
+      return { succes: true };
+    }
+
+    const erreurData = await reponse.json().catch(() => ({}));
+    console.error("Erreur HTTP:", reponse.status, erreurData);
+
+    return {
+      succes: false,
+      erreur: erreurData.message || "Erreur lors de la suppression",
+    };
+  } catch (error) {
+    console.error("Erreur lors de la suppression:", error);
+    return {
+      succes: false,
+      erreur: "Le serveur ne répond pas.",
+    };
+  }
+};
+
 // *************************** Notes degustations
 /**
  * Créer une nouvelle note degustation dans la base de données via l'API backend.
