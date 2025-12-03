@@ -768,3 +768,29 @@ export const creerNoteDegustations = async (datas, navigate) => {
     return { succes: false, erreur: "Erreur lors de l'ajout de la note" };
   }
 };
+
+/**
+ * Récupère les notes de dégustation d'une bouteille par son identifiant via l'API backend.
+ * @param {string|number} id_bouteille - L'identifiant unique de la bouteille
+ * @returns {Promise<Object|null>} Les données des notes de dégustation ou null en cas d'erreur
+ */
+export const recupererNotes = async (id_bouteille) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_DEGUSTATION_URL}/${id_bouteille}`
+    );
+
+    if (!reponse.ok) {
+      // Pour debug
+      console.error("Erreur HTTP:", reponse.status);
+      return null;
+    }
+
+    const notes = await reponse.json();
+    return notes;
+  } catch (error) {
+    // Pour debug
+    console.error("Erreur lors de la récupération des notes :", error);
+    return null;
+  }
+};
