@@ -28,12 +28,12 @@ import {
 } from "@lib/requetes";
 
 import authentificationStore from "@store/authentificationStore";
-import filtresStore from "@store/filtresStore";
 import {
   useDocumentTitle,
   filtrerBouteilles,
   rechercherBouteilles,
 } from "@lib/utils.js";
+import filtresStore from "@store/filtresStore";
 
 /*
  * Constante: nombre d'éléments à charger par page lors de la pagination.
@@ -807,7 +807,7 @@ function Catalogue() {
           <MenuEnHaut />
         </header>
         <main ref={mainRef} className="bg-fond overflow-y-auto">
-          <section className="pt-(--rythme-espace) px-(--rythme-serre)">
+          <section className="pt-(--rythme-base) px-(--rythme-serre)">
             <Message
               texte="Vous devez être connecté pour accéder au catalogue"
               type="erreur"
@@ -827,7 +827,7 @@ function Catalogue() {
         </header>
 
         <main ref={mainRef} className="bg-fond overflow-y-auto">
-          <h1 className="text-(length:--taille-moyen)  my-(--rythme-espace) text-center font-display font-semibold text-principal-300">
+          <h1 className="text-(length:--taille-grand)  mt-(--rythme-base) text-center font-display font-semibold text-principal-300">
             Catalogue des vins
           </h1>
           <section className="pt-(--rythme-espace) px-(--rythme-serre)">
