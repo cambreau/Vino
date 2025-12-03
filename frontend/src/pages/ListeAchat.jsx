@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
@@ -8,116 +8,62 @@ import Bouton from "@components/components-partages/Boutons/Bouton";
 import Message from "@components/components-partages/Message/Message";
 import CarteListeAchat from "@components/carte-liste-achat/CarteListeAchat";
 import {
-  recupererCellier,
-  recupererBouteillesCellier,
-  modifierBouteilleCellier,
+  recupererListeAchatComplete, 
 } from "@lib/requetes.js";
 import { useDocumentTitle } from "@lib/utils.js";
+import authentificationStore from "@store/authentificationStore";
 
 function ListeAchat() {
   const navigate = useNavigate();
-  // Récupérer id du cellier dans l'URL
-  const idCellier = 12;
+  const utilisateur = authentificationStore((state) => state.utilisateur);
 
-  // Etat pour le cellier : nom
-  const [cellier, setCellier] = useState({
-    nom: "",
-  });
-  useDocumentTitle(cellier.nom ? `Cellier - ${cellier.nom}` : "Cellier");
+  useDocumentTitle("Liste d'achat");
 
-  useEffect(() => {
-    const chargerCellier = async () => {
-      const donneesCellier = await recupererCellier(idCellier);
-      setCellier({
-        nom: donneesCellier.nom || "",
-      });
-    };
-    chargerCellier();
-  }, [idCellier]);
-
-  // Etat pour les bouteilles : récupérer les bouteilles complètes du cellier
   const [bouteillesCellier, setBouteillesCellier] = useState([]);
   const [chargementBouteilles, setChargementBouteilles] = useState(false);
-  const [messageAction, setMessageAction] = useState({ texte: "", type: "" });
-  const [bouteillesEnTraitement, setBouteillesEnTraitement] = useState(
-    () => new Set()
-  );
 
+  // Charger la liste d'achat
   useEffect(() => {
-    const chargerBouteillesCellier = async () => {
+    const chargerListeAchat = async () => {
+      if (!utilisateur?.id) return;
       setChargementBouteilles(true);
-      const datas = await recupererBouteillesCellier(idCellier);
-      console.log("Bouteilles récupérées pour le cellier:", datas);
+      const datas = await recupererListeAchatComplete(utilisateur.id);
       setBouteillesCellier(datas || []);
       setChargementBouteilles(false);
     };
-    chargerBouteillesCellier();
-  }, [idCellier]);
+    chargerListeAchat();
+  }, [utilisateur?.id]);
 
-  const definirTraitement = (idBouteille, actif) => {
-    setBouteillesEnTraitement((courant) => {
-      const prochain = new Set(courant);
-      if (actif) {
-        prochain.add(idBouteille);
-      } else {
-        prochain.delete(idBouteille);
-      }
-      return prochain;
-    });
-  };
+  // Gestion utilisateur non connecté
+  if (!utilisateur?.id) {
+    return (
+      <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
+        <header>
+          <MenuEnHaut />
+        </header>
 
-  const mettreAJourQuantite = async (idBouteille, variation) => {
-    if (bouteillesEnTraitement.has(idBouteille)) {
-      return;
-    }
+        <main className="bg-fond overflow-y-auto">
+          <div className="flex flex-col items-center justify-center min-h-[400px] gap-(--rythme-base) p-(--rythme-base)">
+            <Message
+              type="information"
+              texte="Veuillez vous connecter pour accéder à votre liste d'achat."
+            />
+            <Bouton
+              taille = ""
+              texte="Se connecter"
+              type="primaire"
+              typeHtml="button"
+              action={() => navigate("/")}
+            />
+          </div>
+        </main>
 
-    const bouteilleCible = bouteillesCellier.find((b) => b.id === idBouteille);
-
-    if (!bouteilleCible) {
-      return;
-    }
-
-    const prochaineQuantite = Math.max(
-      0,
-      (bouteilleCible.quantite || 0) + variation
+        <MenuEnBas />
+      </div>
     );
-    definirTraitement(idBouteille, true);
-    const resultat = await modifierBouteilleCellier(
-      bouteilleCible.idCellier ?? Number.parseInt(idCellier, 10),
-      idBouteille,
-      prochaineQuantite
-    );
-    definirTraitement(idBouteille, false);
+  }
 
-    if (!resultat?.succes) {
-      setMessageAction({
-        texte:
-          resultat?.erreur ||
-          "Impossible de mettre à jour la quantité pour cette bouteille.",
-        type: "erreur",
-      });
-      return;
-    }
-
-    // Nettoyer un éventuel ancien message d'erreur
-    setMessageAction({ texte: "", type: "" });
-
-    setBouteillesCellier((precedent) => {
-      if (prochaineQuantite === 0 || resultat.supprime) {
-        return precedent.filter((b) => b.id !== idBouteille);
-      }
-
-      return precedent.map((b) =>
-        b.id === idBouteille
-          ? { ...b, quantite: resultat.quantite ?? prochaineQuantite }
-          : b
-      );
-    });
-  };
-
-  const handleAugmenter = (idBouteille) => mettreAJourQuantite(idBouteille, 1);
-  const handleDiminuer = (idBouteille) => mettreAJourQuantite(idBouteille, -1);
-
+  // Structure principale et affichage des bouteilles
   return (
     <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
       <header>
@@ -132,27 +78,19 @@ function ListeAchat() {
         </header>
 
         <article className="mt-(--rythme-base) p-(--rythme-serre) min-h-[200px]">
-          {messageAction.texte && (
-            <div className="mb-(--rythme-base)">
-              <Message type={messageAction.type} texte={messageAction.texte} />
-            </div>
-          )}
           {chargementBouteilles ? (
             <Message
               type="information"
               texte="Chargement des bouteilles de la liste..."
             />
           ) : bouteillesCellier.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
+              {/* Affichage des bouteilles */}
               {bouteillesCellier.map((bouteille) => (
                 <Link key={bouteille.id} to={`/bouteilles/${bouteille.id}`}>
                   <CarteListeAchat
                     key={bouteille.id}
                     bouteille={bouteille}
-                    type="cellier"
-                    onAugmenter={handleAugmenter}
-                    onDiminuer={handleDiminuer}
-                    disabled={bouteillesEnTraitement.has(bouteille.id)}
                   />
                 </Link>
               ))}
