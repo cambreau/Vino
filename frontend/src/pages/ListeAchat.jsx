@@ -9,7 +9,9 @@ import Message from "@components/components-partages/Message/Message";
 import CarteListeAchat from "@components/carte-liste-achat/CarteListeAchat";
 import {
   recupererListeAchatComplete,
-  supprimerBouteilleListe 
+  supprimerBouteilleListe,
+  ajouterBouteilleCellier,
+  modifierBouteilleCellier
 } from "@lib/requetes.js";
 import { useDocumentTitle } from "@lib/utils.js";
 import authentificationStore from "@store/authentificationStore";
@@ -36,7 +38,7 @@ function ListeAchat() {
 
       console.log("Données reçues:", datas);
 
-      
+
       setBouteillesCellier(datas || []);
       setChargementBouteilles(false);
     };
@@ -64,7 +66,7 @@ function ListeAchat() {
     });
   };
 
-  // Supprimer une bouteille de la liste
+//  ************** Supprimer une bouteille de la liste
   const gererSupprimer = async (idBouteille) => {
     if (bouteillesEnTraitement.has(idBouteille)) return;
     
@@ -91,6 +93,68 @@ function ListeAchat() {
     );
   };
 
+
+// ************** Ajouter/Modifier quantité au cellier**
+const gererAjouterCellier = async (idBouteille, idCellier, variation = 1) => {
+  const cleBouteille = `${idBouteille}-${idCellier}`;
+  if (bouteillesEnTraitement.has(cleBouteille)) return;
+  
+  const bouteilleCible = bouteillesCellier.find((b) => b.id === idBouteille);
+  if (!bouteilleCible) return;
+  
+  const cellierCible = bouteilleCible.celliers.find((c) => c.idCellier === idCellier);
+  if (!cellierCible) return;
+  
+  const nouvelleQuantite = (cellierCible.quantite || 0) + variation;
+  
+  if (nouvelleQuantite < 0) return;
+  
+  definirTraitement(cleBouteille, true);
+  
+  // Si la quantité est actuellement 0, on ajoute la bouteille
+  if (cellierCible.quantite === 0 && variation > 0) {
+    const resultat = await ajouterBouteilleCellier(idCellier, {
+      id_bouteille: idBouteille,
+      quantite: nouvelleQuantite  
+    });
+    
+    definirTraitement(cleBouteille, false);
+
+    if (!resultat?.succes) {
+      setMessageAction({
+        texte: resultat?.erreur || "Impossible d'ajouter la bouteille au cellier.",
+        type: "erreur",
+      });
+      return;
+    }
+
+    setMessageAction({ 
+      texte: "Bouteille ajoutée au cellier", 
+      type: "succes" 
+    });
+  } else {
+    const resultat = await modifierBouteilleCellier(idCellier, idBouteille, nouvelleQuantite);
+    
+    definirTraitement(cleBouteille, false);
+
+    if (!resultat?.succes) {
+      setMessageAction({
+        texte: resultat?.erreur || "Impossible de modifier la quantité.",
+        type: "erreur",
+      });
+      return;
+    }
+
+    setMessageAction({ 
+      texte: variation > 0 ? "Quantité augmentée" : "Quantité diminuée", 
+      type: "succes" 
+    });
+  }
+  
+  // Rafraîchir la liste après modification**
+  const datas = await recupererListeAchatComplete(utilisateur.id);
+  setBouteillesCellier(datas || []);
+};
 
   // Gestion utilisateur non connecté
   if (!utilisateur?.id) {
@@ -157,6 +221,7 @@ function ListeAchat() {
                     key={bouteille.id}
                     bouteille={bouteille}
                     onSupprimer={gererSupprimer}
+                    onAjouterCellier={gererAjouterCellier} 
                   />
                 </Link>
               ))}
