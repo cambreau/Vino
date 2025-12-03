@@ -4,10 +4,20 @@ import Message from "@components/components-partages/Message/Message";
 import Spinner from "@components/components-partages/Spinner/Spinner";
 import MoyenneNotes from "@components/components-partages/MoyenneNotes/MoyenneNotes";
 import CarteNoteDegustation from "@components/HistoriqueNotes/CarteNoteDegustation/CarteNoteDegustation";
-import { recupererNotes } from "@lib/requetes";
+import {
+  recupererNotes,
+  modifierNote,
+  supprimerNote,
+  traiterNotes,
+} from "@lib/requetes";
+import authentificationStore from "@store/authentificationStore";
 
 function HistoriqueNotes({ id_bouteille }) {
+  const utilisateur = authentificationStore((state) => state.utilisateur);
   const [notes, setNotes] = useState([]);
+  //Si l'utilisateur a deja mis une note
+  const [noteUtilisateur, setNoteUtilisateur] = useState(null);
+  //On est en cours de chargement des notes false ou true
   const [chargement, setChargement] = useState(true);
   // On affiche seulement 5 notes au chargement de la page.
   const [nombreNotesAffichees, setNombreNotesAffichees] = useState(5);
@@ -17,27 +27,51 @@ function HistoriqueNotes({ id_bouteille }) {
     const chargerNotes = async () => {
       setChargement(true);
       const notesRecuperees = await recupererNotes(id_bouteille);
-      if (notesRecuperees) {
-        // Trier les notes par date (les plus récentes en premier)
-        const notesTriees = Array.isArray(notesRecuperees)
-          ? [...notesRecuperees].sort((a, b) => {
-              const dateA = new Date(
-                a.date_creation || a.date || a.created_at || 0
-              );
-              const dateB = new Date(
-                b.date_creation || b.date || b.created_at || 0
-              );
-              return dateB - dateA; // Ordre décroissant (plus récent en premier)
-            })
-          : [];
-        setNotes(notesTriees);
-      } else {
-        setNotes([]);
-      }
+      const idUtilisateurActuel = utilisateur?.id;
+      const { noteUtilisateur, autresNotes } = traiterNotes(
+        notesRecuperees,
+        idUtilisateurActuel
+      );
+      setNoteUtilisateur(noteUtilisateur);
+      setNotes(autresNotes);
       setChargement(false);
     };
     chargerNotes();
-  }, [id_bouteille]);
+  }, [id_bouteille, utilisateur?.id]);
+
+  // Fonction pour recharger les notes
+  const rechargerNotes = async () => {
+    setChargement(true);
+    const notesRecuperees = await recupererNotes(id_bouteille);
+    const idUtilisateurActuel = utilisateur?.id;
+    const { noteUtilisateur, autresNotes } = traiterNotes(
+      notesRecuperees,
+      idUtilisateurActuel
+    );
+    setNoteUtilisateur(noteUtilisateur);
+    setNotes(autresNotes);
+    setChargement(false);
+  };
+
+  // Fonction pour recharger les notes après modification
+  // L'API est gérée directement dans BoiteModaleNotes
+  const gererModifierNote = async () => {
+    await rechargerNotes();
+  };
+
+  // Fonction pour supprimer une note
+  const gererSupprimerNote = async (note) => {
+    const resultat = await supprimerNote({
+      id_utilisateur: note.id_utilisateur,
+      id_bouteille: note.id_bouteille,
+    });
+    if (resultat.succes) {
+      // Recharger les notes après suppression
+      await rechargerNotes();
+    } else {
+      console.error("Erreur lors de la suppression:", resultat.erreur);
+    }
+  };
 
   // Fonction pour afficher plus de notes
   const afficherPlus = () => {
@@ -72,10 +106,26 @@ function HistoriqueNotes({ id_bouteille }) {
       )}
       {chargement ? (
         <Spinner />
-      ) : notes.length > 0 ? (
+      ) : noteUtilisateur || notes.length > 0 ? (
         <>
+          {/* Note de l'utilisateur actuel en premier avec fond pâle */}
+          {noteUtilisateur && (
+            <div className="mb-(--rythme-base) bg-principal-50 rounded-(--arrondi-grand) p-(--rythme-base)">
+              <CarteNoteDegustation
+                note={noteUtilisateur}
+                estNoteUtilisateur={true}
+                onModifier={gererModifierNote}
+                onSupprimer={gererSupprimerNote}
+              />
+            </div>
+          )}
+          {/* Autres notes */}
           {notesAffichees.map((note, index) => (
-            <CarteNoteDegustation key={index} note={note} />
+            <CarteNoteDegustation
+              key={index}
+              note={note}
+              estNoteUtilisateur={false}
+            />
           ))}
           {!toutesNotesAffichees && (
             // Max 5 de plus a chaque clics

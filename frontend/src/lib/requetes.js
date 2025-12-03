@@ -751,7 +751,10 @@ export const creerNoteDegustations = async (datas, navigate) => {
 
     if (reponse.ok) {
       const noteAjout = await reponse.json();
-      navigate(`/bouteilles/${datas.id_bouteille}`);
+      // Naviguer seulement si navigate est fourni
+      if (navigate) {
+        navigate(`/bouteilles/${datas.id_bouteille}`);
+      }
       return { succes: true, data: noteAjout };
     }
 
@@ -765,8 +768,46 @@ export const creerNoteDegustations = async (datas, navigate) => {
     // Gestion des erreurs pour debug (exemple: pas de connexion) ou autres exceptions JavaScript
     console.error("Erreur lors de l'ajout de la note :", error);
     // Retourner l'erreur sans naviguer (rester sur la page actuelle)
-    return { succes: false, erreur: "Erreur lors de l'ajout de la note" };
+    return {
+      succes: false,
+      erreur: "Erreur lors de l'ajout de la note",
+    };
   }
+};
+
+/**
+ * Traite les notes recuperees pour separer la note de l'utilisateur des autres notes.
+ * Et trier les autres par date.
+ * @param {Object|Array} notesRecuperees - Les notes récupérées du backend (peut être un objet avec data ou un array)
+ * @param {string|number} idUtilisateurActuel - L'identifiant de l'utilisateur actuel
+ * @returns {{noteUtilisateur: Object|null, autresNotes: Array}} Un objet avec la note utilisateur et les autres notes triées
+ */
+export const traiterNotes = (notesRecuperees, idUtilisateurActuel) => {
+  // Extraire data si la réponse du backend est un objet avec une propriété data (les notes)
+  const notesData = notesRecuperees.data || notesRecuperees;
+
+  // S'assurer que notesData est un tableau sinon on utilise un tableau vide
+  const notesArray = Array.isArray(notesData) ? notesData : [];
+
+  // Séparer la note de l'utilisateur actuel des autres notes
+  const noteUtilisateurActuel = notesArray.find(
+    (note) => note.id_utilisateur === idUtilisateurActuel
+  );
+  const autresNotes = notesArray.filter(
+    (note) => note.id_utilisateur !== idUtilisateurActuel
+  );
+
+  // Trier les autres notes par date (les plus récentes en premier)
+  const notesTriees = autresNotes.sort((a, b) => {
+    const dateA = new Date(a.date_creation || a.date || a.created_at || 0);
+    const dateB = new Date(b.date_creation || b.date || b.created_at || 0);
+    return dateB - dateA; // Ordre décroissant (plus récent en premier)
+  });
+
+  return {
+    noteUtilisateur: noteUtilisateurActuel || null,
+    autresNotes: notesTriees,
+  };
 };
 
 /**
@@ -792,5 +833,85 @@ export const recupererNotes = async (id_bouteille) => {
     // Pour debug
     console.error("Erreur lors de la récupération des notes :", error);
     return null;
+  }
+};
+
+/**
+ * Modifie une note de dégustation existante dans la base de données via l'API backend.
+ * @param {Object} datas - Les données de la note à modifier (id_bouteille, id_utilisateur, date, notes, commentaire)
+ * @returns {Promise<{succes: boolean, erreur?: Object|string}>} Un objet indiquant le succès de l'opération et l'erreur éventuelle
+ */
+export const modifierNote = async (datas) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_DEGUSTATION_URL}/${
+        datas.id_utilisateur
+      }/${datas.id_bouteille}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datas),
+      }
+    );
+
+    if (reponse.ok) {
+      const resultat = await reponse.json();
+      return { succes: true, data: resultat };
+    }
+
+    // Gestion des erreurs HTTP (400, 500, etc.)
+    const erreurData = await reponse.json().catch(() => ({}));
+    console.error("Erreur HTTP:", reponse.status, erreurData);
+
+    return {
+      succes: false,
+      erreur:
+        erreurData?.message || "Erreur lors de la modification de la note",
+    };
+  } catch (error) {
+    // Gestion des erreurs réseau (exemple: pas de connexion) ou autres exceptions JavaScript
+    console.error("Erreur lors de la modification de la note :", error);
+    return { succes: false, erreur: error.message };
+  }
+};
+
+/**
+ * Supprime une note de dégustation de la base de données via l'API backend.
+ * @param {Object} datas - Les données de la note à supprimer (id_utilisateur, id_bouteille, date)
+ * @returns {Promise<{succes: boolean, erreur?: Object|string}>} Un objet indiquant le succès de l'opération et l'erreur éventuelle
+ */
+export const supprimerNote = async (datas) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_DEGUSTATION_URL}/${
+        datas.id_utilisateur
+      }/${datas.id_bouteille}`,
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    if (reponse.ok) {
+      const resultat = await reponse.json();
+      return { succes: true, data: resultat };
+    }
+
+    // Gestion des erreurs HTTP
+    const erreurData = await reponse.json().catch(() => ({}));
+    console.error(
+      "Erreur HTTP lors de la suppression:",
+      reponse.status,
+      erreurData
+    );
+
+    return {
+      succes: false,
+      erreur: erreurData?.message || "Erreur lors de la suppression de la note",
+    };
+  } catch (error) {
+    // Gestion des erreurs réseau (exemple: pas de connexion) ou autres exceptions JavaScript
+    console.error("Erreur lors de la suppression de la note :", error);
+    return { succes: false, erreur: error.message };
   }
 };
