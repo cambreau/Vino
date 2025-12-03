@@ -77,7 +77,7 @@ function Filtres({
 	texteBouton = "Chercher",
 	className = "",
 }) {
-	const [estOuvert, setEstOuvert] = useState(true);
+	const [estOuvert, setEstOuvert] = useState(false);
 	const [modeRecherche, setModeRecherche] = useState(false);
 	const [criteres, setCriteres] = useState(() => ({
 		type: "",

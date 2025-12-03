@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 
@@ -7,12 +7,13 @@ import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import Message from "@components/components-partages/Message/Message";
 import CarteBouteille from "@components/carte/CarteBouteille";
+import Filtres from "@components/components-partages/Filtre/Filtre";
 import {
   recupererCellier,
   recupererBouteillesCellier,
   modifierBouteilleCellier,
 } from "@lib/requetes.js";
-import { useDocumentTitle } from "@lib/utils.js";
+import { useDocumentTitle, filtrerBouteilles, rechercherBouteilles } from "@lib/utils.js";
 
 function Cellier() {
   const navigate = useNavigate();
@@ -118,6 +119,83 @@ function Cellier() {
   const handleAugmenter = (idBouteille) => mettreAJourQuantite(idBouteille, 1);
   const handleDiminuer = (idBouteille) => mettreAJourQuantite(idBouteille, -1);
 
+  // États pour les filtres
+  const [criteresFiltres, setCriteresFiltres] = useState({});
+  const [modeRecherche, setModeRecherche] = useState(false);
+  const [resultatsFiltres, setResultatsFiltres] = useState(null);
+  const [modeTri, setModeTri] = useState("nom_asc");
+
+  // Vérifie si des filtres sont actifs
+  const filtresActifs = useMemo(
+    () => Object.values(criteresFiltres ?? {}).some((valeur) => Boolean(valeur)),
+    [criteresFiltres]
+  );
+
+  // Handler pour le filtrage
+  const handleFiltrer = useCallback((resultats, criteres) => {
+    const actifs = Object.values(criteres ?? {}).some((valeur) => Boolean(valeur));
+    setModeRecherche(false);
+    setCriteresFiltres(criteres);
+    setResultatsFiltres(actifs ? resultats : null);
+  }, []);
+
+  // Handler pour la recherche
+  const handleRecherche = useCallback((criteres) => {
+    const actifs = Object.values(criteres ?? {}).some((valeur) => Boolean(valeur));
+    if (!actifs) {
+      setResultatsFiltres(null);
+      setModeRecherche(false);
+      return;
+    }
+    setModeRecherche(true);
+    setCriteresFiltres(criteres);
+    const resultats = rechercherBouteilles(bouteillesCellier, criteres);
+    setResultatsFiltres(resultats);
+  }, [bouteillesCellier]);
+
+  // Handler pour le tri
+  const handleTri = useCallback(() => {
+    setModeTri((prev) => (prev === "nom_asc" ? "nom_desc" : "nom_asc"));
+  }, []);
+
+  // Handler pour supprimer un filtre
+  const handleSupprimerFiltre = useCallback((cle) => {
+    setCriteresFiltres((prev) => {
+      const nouveauxCriteres = { ...prev, [cle]: "" };
+      if (cle === "pays") {
+        nouveauxCriteres.region = "";
+      }
+      return nouveauxCriteres;
+    });
+  }, []);
+
+  // Handler pour réinitialiser les filtres
+  const handleReinitialiserFiltres = useCallback(() => {
+    setCriteresFiltres({});
+    setModeRecherche(false);
+    setResultatsFiltres(null);
+  }, []);
+
+  // Fonction de tri des bouteilles
+  const trierBouteilles = useCallback((liste = [], mode = "nom_asc") => {
+    if (!Array.isArray(liste)) return [];
+    const copie = [...liste];
+    const direction = mode === "nom_desc" ? -1 : 1;
+    return copie.sort((a = {}, b = {}) => {
+      const nomA = a?.nom ?? "";
+      const nomB = b?.nom ?? "";
+      return nomA.localeCompare(nomB, "fr", { sensitivity: "base" }) * direction;
+    });
+  }, []);
+
+  // Bouteilles à afficher (filtrées et triées)
+  const bouteillesAffichees = useMemo(
+    () => trierBouteilles(resultatsFiltres ?? bouteillesCellier, modeTri),
+    [resultatsFiltres, bouteillesCellier, modeTri, trierBouteilles]
+  );
+
+  const etiquetteTri = modeTri === "nom_asc" ? "A → Z" : "Z → A";
+
   return (
     <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
       <header>
@@ -145,20 +223,41 @@ function Cellier() {
                 texte="Chargement des bouteilles du cellier..."
               />
             ) : bouteillesCellier.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {bouteillesCellier.map((bouteille) => (
-                  <Link key={bouteille.id} to={`/bouteilles/${bouteille.id}`}>
-                    <CarteBouteille
-                      key={bouteille.id}
-                      bouteille={bouteille}
-                      type="cellier"
-                      onAugmenter={handleAugmenter}
-                      onDiminuer={handleDiminuer}
-                      disabled={bouteillesEnTraitement.has(bouteille.id)}
-                    />
-                  </Link>
-                ))}
-              </div>
+              <>
+                <div className="mb-(--rythme-base)">
+                  <Filtres
+                    bouteilles={bouteillesCellier}
+                    valeursInitiales={criteresFiltres}
+                    onFiltrer={handleFiltrer}
+                    onRecherche={handleRecherche}
+                    onTri={handleTri}
+                    onSupprimerFiltre={handleSupprimerFiltre}
+                    onReinitialiserFiltres={handleReinitialiserFiltres}
+                    titreTri={etiquetteTri}
+                  />
+                </div>
+                {bouteillesAffichees.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {bouteillesAffichees.map((bouteille) => (
+                      <Link key={bouteille.id} to={`/bouteilles/${bouteille.id}`}>
+                        <CarteBouteille
+                          key={bouteille.id}
+                          bouteille={bouteille}
+                          type="cellier"
+                          onAugmenter={handleAugmenter}
+                          onDiminuer={handleDiminuer}
+                          disabled={bouteillesEnTraitement.has(bouteille.id)}
+                        />
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <Message
+                    type="information"
+                    texte="Aucune bouteille ne correspond à vos filtres."
+                  />
+                )}
+              </>
             ) : (
               <div className="flex flex-col items-center justify-center gap-(--rythme-base)">
                 <div className="mb-(--rythme-base) w-full">
