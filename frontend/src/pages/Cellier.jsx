@@ -13,7 +13,11 @@ import {
   recupererBouteillesCellier,
   modifierBouteilleCellier,
 } from "@lib/requetes.js";
-import { useDocumentTitle, filtrerBouteilles, rechercherBouteilles } from "@lib/utils.js";
+import {
+  useDocumentTitle,
+  filtrerBouteilles,
+  rechercherBouteilles,
+} from "@lib/utils.js";
 
 function Cellier() {
   const navigate = useNavigate();
@@ -127,31 +131,39 @@ function Cellier() {
 
   // Vérifie si des filtres sont actifs
   const filtresActifs = useMemo(
-    () => Object.values(criteresFiltres ?? {}).some((valeur) => Boolean(valeur)),
+    () =>
+      Object.values(criteresFiltres ?? {}).some((valeur) => Boolean(valeur)),
     [criteresFiltres]
   );
 
   // Handler pour le filtrage
   const handleFiltrer = useCallback((resultats, criteres) => {
-    const actifs = Object.values(criteres ?? {}).some((valeur) => Boolean(valeur));
+    const actifs = Object.values(criteres ?? {}).some((valeur) =>
+      Boolean(valeur)
+    );
     setModeRecherche(false);
     setCriteresFiltres(criteres);
     setResultatsFiltres(actifs ? resultats : null);
   }, []);
 
   // Handler pour la recherche
-  const handleRecherche = useCallback((criteres) => {
-    const actifs = Object.values(criteres ?? {}).some((valeur) => Boolean(valeur));
-    if (!actifs) {
-      setResultatsFiltres(null);
-      setModeRecherche(false);
-      return;
-    }
-    setModeRecherche(true);
-    setCriteresFiltres(criteres);
-    const resultats = rechercherBouteilles(bouteillesCellier, criteres);
-    setResultatsFiltres(resultats);
-  }, [bouteillesCellier]);
+  const handleRecherche = useCallback(
+    (criteres) => {
+      const actifs = Object.values(criteres ?? {}).some((valeur) =>
+        Boolean(valeur)
+      );
+      if (!actifs) {
+        setResultatsFiltres(null);
+        setModeRecherche(false);
+        return;
+      }
+      setModeRecherche(true);
+      setCriteresFiltres(criteres);
+      const resultats = rechercherBouteilles(bouteillesCellier, criteres);
+      setResultatsFiltres(resultats);
+    },
+    [bouteillesCellier]
+  );
 
   // Handler pour le tri
   const handleTri = useCallback(() => {
@@ -184,7 +196,9 @@ function Cellier() {
     return copie.sort((a = {}, b = {}) => {
       const nomA = a?.nom ?? "";
       const nomB = b?.nom ?? "";
-      return nomA.localeCompare(nomB, "fr", { sensitivity: "base" }) * direction;
+      return (
+        nomA.localeCompare(nomB, "fr", { sensitivity: "base" }) * direction
+      );
     });
   }, []);
 
@@ -204,7 +218,7 @@ function Cellier() {
 
       <main className="bg-fond overflow-y-auto">
         <section className="pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)">
-          <h1 className="text-(length:--taille-moyen) text-center font-display font-semibold text-principal-300">
+          <h1 className="text-(length:--taille-grand) text-center font-display font-semibold text-principal-300">
             Cellier - {cellier.nom}
           </h1>
 
@@ -239,7 +253,10 @@ function Cellier() {
                 {bouteillesAffichees.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {bouteillesAffichees.map((bouteille) => (
-                      <Link key={bouteille.id} to={`/bouteilles/${bouteille.id}`}>
+                      <Link
+                        key={bouteille.id}
+                        to={`/bouteilles/${bouteille.id}`}
+                      >
                         <CarteBouteille
                           key={bouteille.id}
                           bouteille={bouteille}

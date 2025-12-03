@@ -126,7 +126,7 @@ function ListeAchat() {
 
       <main className="bg-fond overflow-y-auto">
         <header className="pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)">
-          <h1 className="text-(length:--taille-moyen) text-center font-display font-semibold text-principal-300">
+          <h1 className="text-(length:--taille-grand) text-center font-display font-semibold text-principal-300">
             Votre Liste d'achat
           </h1>
         </header>

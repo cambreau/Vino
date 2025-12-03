@@ -29,18 +29,6 @@ const CarteBouteille = ({
     setEstModaleNotezOuverte(false);
   };
 
-  const validerNote = (data) => {
-    console.log(
-      "Note:",
-      data.note,
-      "Commentaire:",
-      data.commentaire,
-      "Bouteille ID:",
-      bouteille.id
-    );
-    // Ici tu peux ajouter l'appel API pour sauvegarder la note
-    fermerBoiteModaleNotez();
-  };
   /**
    * Génère les contrôles (boutons) selon le type :
    * - catalogue : bouton "Ajouter au cellier"
@@ -151,9 +139,8 @@ const CarteBouteille = ({
    */
   const modaleContent = estModaleNotezOuverte ? (
     <BoiteModaleNotes
-      nomBouteille={bouteille.nom}
+      id_bouteille={bouteille.id}
       onFermer={fermerBoiteModaleNotez}
-      onValider={validerNote}
     />
   ) : null;
 
@@ -179,7 +166,7 @@ const CarteBouteille = ({
       {/* Section INFORMATIONS de la bouteille */}
       <div className="mb-4">
         {/* Nom */}
-        <h2 className="mb-2 text-(length:--taille-normal) font-bold text-texte-secondaire">
+        <h2 className="mb-2 text-(length:--taille-normal) font-semibold text-texte-secondaire">
           {bouteille.nom}
         </h2>
 
