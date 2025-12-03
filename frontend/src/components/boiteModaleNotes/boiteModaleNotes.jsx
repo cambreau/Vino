@@ -4,8 +4,10 @@ import FormulaireTextarea from "@components/components-partages/Formulaire/Formu
 import Icon from "@components/components-partages/Icon/Icon";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import iconNotez from "@assets/images/evaluation.svg";
+import authentificationStore from "@store/authentificationStore";
 
-function BoiteModaleNotes({ nomBouteille = "", onFermer, onValider }) {
+function BoiteModaleNotes({ id_bouteille, onFermer, onValider }) {
+  const utilisateur = authentificationStore((state) => state.utilisateur);
   const [note, setNote] = useState(0);
   const [hoverNote, setHoverNote] = useState(0);
   const [commentaire, setCommentaire] = useState("");
@@ -16,7 +18,17 @@ function BoiteModaleNotes({ nomBouteille = "", onFermer, onValider }) {
 
   const gererSoumission = () => {
     if (onValider) {
-      onValider({ note, commentaire });
+      const id_utilisateur = utilisateur?.id;
+
+      const donneesDegustation = {
+        date: new Date().toISOString(),
+        id_bouteille: id_bouteille,
+        id_utilisateur: id_utilisateur,
+        commentaire: commentaire,
+        notes: note,
+      };
+
+      onValider(donneesDegustation);
     }
   };
 

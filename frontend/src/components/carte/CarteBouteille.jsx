@@ -152,6 +152,7 @@ const CarteBouteille = ({
   const modaleContent = estModaleNotezOuverte ? (
     <BoiteModaleNotes
       nomBouteille={bouteille.nom}
+      id_bouteille={bouteille.id}
       onFermer={fermerBoiteModaleNotez}
       onValider={validerNote}
     />
