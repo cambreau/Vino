@@ -64,18 +64,23 @@ export const recupererDegustationsBouteille = async (req, res) => {
 
 export const ajouterDegustation = async (req, res) => {
   try {
+    // Récupération des données du corps de la requête
     const { id_bouteille, id_utilisateur, note, commentaire } = req.body;
+
+    // Appel du modèle pour ajouter la dégustation
     const resultat = await ModeleDegustation.ajouter(
       id_bouteille,
       id_utilisateur,
       note,
       commentaire
     );
+    // Retour de succès
     return res.status(201).json({
       message: "Dégustation ajoutée",
       data: resultat,
     });
   } catch (error) {
+    // Retour en cas d'erreur
     console.error("Erreur lors de l'ajout de la dégustation", error);
     return res.status(500).json({ message: "Erreur serveur" });
   }
