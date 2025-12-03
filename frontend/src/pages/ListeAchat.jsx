@@ -33,6 +33,10 @@ function ListeAchat() {
       if (!utilisateur?.id) return;
       setChargementBouteilles(true);
       const datas = await recupererListeAchatComplete(utilisateur.id);
+
+      console.log("Données reçues:", datas);
+
+      
       setBouteillesCellier(datas || []);
       setChargementBouteilles(false);
     };
