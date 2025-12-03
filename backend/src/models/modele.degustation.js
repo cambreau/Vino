@@ -38,6 +38,7 @@ export default class ModeleDegustation {
     // Validation des entrées
     const idBouteille = Number.parseInt(id_bouteille, 10);
     const idUtilisateur = Number.parseInt(id_utilisateur, 10);
+    const noteNombre = Number(note);
     if (!Number.isInteger(idBouteille) || idBouteille <= 0) {
       throw new Error("ID bouteille invalide");
     }
@@ -54,12 +55,20 @@ export default class ModeleDegustation {
       throw new Error("Utilisateur requis pour ajouter une dégustation");
     }
 
+    if (Number.isNaN(noteNombre) || noteNombre < 0 || noteNombre > 5) {
+      throw new Error("Note doit être un nombre entre 0 et 5");
+    }
+
+    if (typeof commentaire !== "string" || commentaire.trim() === "") {
+      throw new Error("Commentaire ne peut pas être vide");
+    }
+
     // Insertion dans la base de données
-    const sql = `INSERT INTO degustation (id_bouteille, id_utilisateur, note, commentaire) VALUES (?, ?, ?, ?)`;
+    const sql = `INSERT INTO degustation (id_bouteille, id_utilisateur, notes, commentaire) VALUES (?, ?, ?, ?)`;
     const [result] = await connexion.query(sql, [
       idBouteille,
       idUtilisateur,
-      note,
+      noteNombre,
       commentaire,
     ]);
     // Retourne le resultat de l'insertion
