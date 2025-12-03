@@ -24,4 +24,4 @@ router.post("/", ajouterDegustation);
 router.put("/", modifierDegustation);
 
 // Supprimer une dégustation
-router.delete("/", supprimerDegustation);
+router.delete("/:id_bouteille/:id_utilisateur", supprimerDegustation);

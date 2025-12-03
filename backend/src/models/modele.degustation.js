@@ -85,5 +85,24 @@ export default class ModeleDegustation {
   ) {}
 
   // Requête pour suprimmer une dégustation
-  static async supprimer(id_utilisateur, id_bouteille, date) {}
+  static async supprimer(id_utilisateur, id_bouteille) {
+    const idUtilisateur = Number.parseInt(id_utilisateur, 10);
+    const idBouteille = Number.parseInt(id_bouteille, 10);
+
+    if (!Number.isInteger(idUtilisateur) || idUtilisateur <= 0) {
+      throw new Error("ID utilisateur invalide");
+    }
+
+    if (!Number.isInteger(idBouteille) || idBouteille <= 0) {
+      throw new Error("ID bouteille invalide");
+    }
+
+    const sql = `DELETE FROM degustation 
+               WHERE id_utilisateur = ? 
+               AND id_bouteille = ?`;
+
+    const [resultat] = await connexion.query(sql, [idUtilisateur, idBouteille]);
+
+    return resultat;
+  }
 }
