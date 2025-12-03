@@ -13,9 +13,9 @@ const CarteNoteDegustation = ({}) => {
         {/* Nom */}
         <div>
           <header className="flex justify-between items-center mb-(--rythme-tres-serre)">
-            <h2 className="text-(length:--taille-normal) font-semibold text-principal-300">
+            <h3 className="text-(length:--taille-normal) font-semibold text-principal-300">
               nom utilisateur
-            </h2>
+            </h3>
             {/* Étoiles pour la notation */}
             <div className="flex justify-center items-center gap-(--rythme-serre)">
               <Icon

@@ -57,7 +57,7 @@ function HistoriqueNotes({ id_bouteille }) {
 
   return (
     <section className="border border-principal-100 rounded-(--arrondi-grand) shadow-md p-(--rythme-base)">
-      <h2 className="text-(length:--taille-normal) font-semibold text-principal-300 mb-(--rythme-base)">
+      <h2 className="mb-2 text-(length:--taille-normal) font-semibold text-texte-premier">
         Historique Notes
       </h2>
       {!chargement && (

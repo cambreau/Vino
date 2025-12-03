@@ -179,7 +179,7 @@ const CarteBouteille = ({
       {/* Section INFORMATIONS de la bouteille */}
       <div className="mb-4">
         {/* Nom */}
-        <h2 className="mb-2 text-(length:--taille-normal) font-bold text-texte-secondaire">
+        <h2 className="mb-2 text-(length:--taille-normal) font-semibold text-texte-secondaire">
           {bouteille.nom}
         </h2>
 

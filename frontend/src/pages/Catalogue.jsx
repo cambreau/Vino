@@ -827,7 +827,7 @@ function Catalogue() {
         </header>
 
         <main ref={mainRef} className="bg-fond overflow-y-auto">
-          <h1 className="text-(length:--taille-moyen)  mt-(--rythme-base) text-center font-display font-semibold text-principal-300">
+          <h1 className="text-(length:--taille-grand)  mt-(--rythme-base) text-center font-display font-semibold text-principal-300">
             Catalogue des vins
           </h1>
           <section className="pt-(--rythme-espace) px-(--rythme-serre)">

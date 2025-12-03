@@ -153,7 +153,7 @@ function SommaireCellier() {
       </header>
 
       <main className="bg-fond overflow-y-auto">
-        <h1 className="text-(length:--taille-moyen) my-(--rythme-espace) text-center font-display font-semibold text-principal-300">
+        <h1 className="text-(length:--taille-grand) my-(--rythme-espace) text-center font-display font-semibold text-principal-300">
           Sommaire de mes celliers
         </h1>
         <section className="p-(--rythme-base)">

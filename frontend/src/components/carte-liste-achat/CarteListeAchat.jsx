@@ -97,7 +97,7 @@ const CarteListeAchat = ({
       <div className="flex-1 flex flex-col gap-(--rythme-serre) mb-4">
         {/* Nom */}
         <header>
-          <h2 className="mb-2 text-(length:--taille-normal) font-semibold text-principal-300">
+          <h2 className="mb-2 text-(length:--taille-moyen) font-semibold text-principal-300">
             {bouteille.nom}
           </h2>
           <hr />
