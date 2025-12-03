@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import Message from "@components/components-partages/Message/Message";
 import Spinner from "@components/components-partages/Spinner/Spinner";
+import MoyenneNotes from "@components/components-partages/MoyenneNotes/MoyenneNotes";
 import CarteNoteDegustation from "@components/HistoriqueNotes/CarteNoteDegustation/CarteNoteDegustation";
 import { recupererNotes } from "@lib/requetes";
 
@@ -60,9 +61,14 @@ function HistoriqueNotes({ id_bouteille }) {
         Historique Notes
       </h2>
       {!chargement && (
-        <p className="text-(length:--taille-petit) italic text-texte-secondaire mb-(--rythme-base)">
-          ({notes.length} {notes.length === 1 ? "note" : "notes"})
-        </p>
+        <div className="mb-(--rythme-base)">
+          <p>
+            <MoyenneNotes id_bouteille={id_bouteille} />
+          </p>
+          <p className="text-(length:--taille-petit) italic text-texte-secondaire mb-(--rythme-base)">
+            ({notes.length} {notes.length === 1 ? "note" : "notes"})
+          </p>
+        </div>
       )}
       {chargement ? (
         <Spinner />
