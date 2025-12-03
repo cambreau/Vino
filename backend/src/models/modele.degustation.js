@@ -34,7 +34,34 @@ export default class ModeleDegustation {
   }
 
   // Requête pour ajouter une dégustation
-  static async ajouter(id_bouteille, id_utilisateur, note, commentaire) {}
+  static async ajouter(id_bouteille, id_utilisateur, note, commentaire) {
+    const idBouteille = Number.parseInt(id_bouteille, 10);
+    const idUtilisateur = Number.parseInt(id_utilisateur, 10);
+    if (!Number.isInteger(idBouteille) || idBouteille <= 0) {
+      throw new Error("ID bouteille invalide");
+    }
+
+    if (!Number.isInteger(idUtilisateur) || idUtilisateur <= 0) {
+      throw new Error("ID utilisateur invalide");
+    }
+
+    if (!idBouteille) {
+      throw new Error("Bouteille requise pour ajouter une dégustation");
+    }
+
+    if (!idUtilisateur) {
+      throw new Error("Utilisateur requis pour ajouter une dégustation");
+    }
+
+    const sql = `INSERT INTO degustation (id_bouteille, id_utilisateur, note, commentaire) VALUES (?, ?, ?, ?)`;
+    const [result] = await connexion.query(sql, [
+      idBouteille,
+      idUtilisateur,
+      note,
+      commentaire,
+    ]);
+    return result;
+  }
 
   // Requête pour modifier une dégustation
   static async modifier(
