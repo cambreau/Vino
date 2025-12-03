@@ -665,29 +665,64 @@ export const recupererBouteilles = async (page = 1, limit = 10) => {
   }
 };
 
-// *************************** Liste achat
+// **********************************************************  Liste achat
 /**
- * Récupère toutes les bouteilles de la liste d'achat d'un utilisateur
+ * Récupère la liste d'achat complète avec infos bouteilles
  * @param {number} id_utilisateur - L'ID de l'utilisateur
- * @returns {Promise<Array>} - La liste des bouteilles
+ * @returns {Promise<Array>} - La liste des bouteilles 
  */
-export const recupererListeAchat = async (id_utilisateur) => {
+export const recupererListeAchatComplete = async (id_utilisateur) => {
   try {
-    const reponse = await fetch(
-      `${import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL}/${id_utilisateur}`
-    );
-
-    if (!reponse.ok) {
-      throw new Error("Erreur lors de la récupération de la liste");
-    }
-
-    const donnees = await reponse.json();
-    return donnees;
-  } catch (erreur) {
-    console.error("Erreur recupererListeAchat:", erreur);
-    throw erreur;
+	const reponse = await fetch(
+	  `${import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL}/${id_utilisateur}`
+	);
+	
+	if (!reponse.ok) {
+	  throw new Error(`Erreur HTTP: ${reponse.status}`);
+	}
+	
+	const data = await reponse.json();
+	const bouteillesListe = data.data || [];
+	
+	if (!bouteillesListe.length) {
+	  return [];
+	}
+	
+	const celliersData = await recupererTousCellier(id_utilisateur);
+	const celliers = celliersData.data || celliersData.donnees || celliersData || [];
+	
+	const bouteillesCompletes = await Promise.all(
+	  bouteillesListe.map(async (item) => {
+		const quantitesParCellier = await Promise.all(
+		  celliers.map(async (cellier) => {
+			const bouteillesCellier = await recupererBouteillesCellier(cellier.id_cellier);
+			const bouteilleExistante = bouteillesCellier.find(
+			  (b) => b.id === item.id_bouteille
+			);
+			
+			return {
+			  idCellier: cellier.id_cellier,
+			  nomCellier: cellier.nom,
+			  quantite: bouteilleExistante ? bouteilleExistante.quantite : 0,
+			};
+		  })
+		);
+		
+		return {
+		  ...item.bouteille,
+		  id: item.id_bouteille,
+		  celliers: quantitesParCellier,
+		};
+	  })
+	);
+	
+	return bouteillesCompletes.filter(Boolean);
+  } catch (error) {
+	console.error("Erreur lors de la récupération de la liste d'achat:", error);
+	return [];
   }
 };
+
 
 /**
  * Ajoute une bouteille à la liste d'achat d'un utilisateur
@@ -728,6 +763,43 @@ export const ajouterBouteilleListe = async (id_utilisateur, donnees) => {
     };
   }
 };
+
+/**
+ * Supprime une bouteille de la liste d'achat
+ * @param {number} id_utilisateur - L'ID de l'utilisateur
+ * @param {number} id_bouteille - L'ID de la bouteille à supprimer
+ * @returns {Promise<Object>} - Résultat de l'opération
+ */
+export const supprimerBouteilleListe = async (id_utilisateur, id_bouteille) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL}/${id_utilisateur}/${id_bouteille}`,
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+    
+    if (reponse.ok) {
+      return { succes: true };
+    }
+
+    const erreurData = await reponse.json().catch(() => ({}));
+    console.error("Erreur HTTP:", reponse.status, erreurData);
+
+    return {
+      succes: false,
+      erreur: erreurData.message || "Erreur lors de la suppression",
+    };
+  } catch (error) {
+    console.error("Erreur lors de la suppression:", error);
+    return {
+      succes: false,
+      erreur: "Le serveur ne répond pas.",
+    };
+  }
+};
+
 
 // *************************** Notes degustations
 /**
