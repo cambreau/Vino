@@ -274,23 +274,6 @@ function Catalogue() {
       const actifs = Object.values(criteres ?? {}).some((valeur) =>
         Boolean(valeur)
       );
-      setModeRecherche(true);
-      if (!actifs) {
-        setResultatsFiltres(null);
-        setCriteresFiltres({});
-        return;
-      }
-      const resultats = rechercherBouteilles(donneesFiltres, criteres);
-      setResultatsFiltres(resultats);
-      setCriteresFiltres(criteres);
-    },
-    [donneesFiltres]
-  );
-  const handleRecherche = useCallback(
-    (criteres) => {
-      const actifs = Object.values(criteres ?? {}).some((valeur) =>
-        Boolean(valeur)
-      );
       if (!actifs) {
         setResultatsFiltres(null);
         desactiverModeRechercheStore();

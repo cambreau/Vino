@@ -750,39 +750,21 @@ export const creerNoteDegustations = async (datas, navigate) => {
     );
 
     if (reponse.ok) {
-      const data = await reponse.json();
-      const utilisateurCree = data?.utilisateur;
-      if (utilisateurCree) {
-        const datasUtilisateur = {
-          id: utilisateurCree.id_utilisateur,
-          nom: utilisateurCree.nom,
-          courriel: utilisateurCree.courriel,
-        };
-
-        authentificationStore.getState().connexion(datasUtilisateur);
-        bouteillesStore.getState().chargerBouteilles();
-      }
-
-      navigate("/catalogue");
-      return { succes: true, utilisateur: utilisateurCree };
+      const noteAjout = await reponse.json();
+      navigate(`/bouteilles/${datas.id_bouteille}`);
+      return { succes: true, data: noteAjout };
     }
 
     // Gestion des erreurs HTTP (400, 500, etc.)
     const erreurData = await reponse.json().catch(() => ({}));
     console.error("Erreur HTTP:", reponse.status, erreurData);
 
-    // Gestion spécifique selon le code d'erreur
-    if (reponse.status === 409) {
-      // Conflit : courriel déjà utilisé
-      navigate("/inscription?echec=2");
-    } else {
-      navigate("/inscription?echec=1");
-    }
-    return { succes: false, erreur: erreurData };
+    // Retourner l'erreur sans naviguer (rester sur la page actuelle)
+    return { succes: false, erreur: "Erreur lors de l'ajout de la note" };
   } catch (error) {
-    // Gestion des erreurs réseau (exemple: pas de connexion) ou autres exceptions JavaScript
-    console.error("Erreur lors de la création de l'utilisateur :", error);
-    navigate("/inscription?echec=1");
-    return { succes: false, erreur: error.message };
+    // Gestion des erreurs pour debug (exemple: pas de connexion) ou autres exceptions JavaScript
+    console.error("Erreur lors de l'ajout de la note :", error);
+    // Retourner l'erreur sans naviguer (rester sur la page actuelle)
+    return { succes: false, erreur: "Erreur lors de l'ajout de la note" };
   }
 };
