@@ -4,17 +4,24 @@ import { formatDetailsBouteille } from "@lib/utils.js";
 
 const CarteListeAchat = ({
   bouteille,
+  onSupprimer = () => {},
   onAjouterCellier = () => {},
   disabled = false,
 }) => {
 
-  const handleAugmenter = (e, idCellier) => {
+  const gererSuppression = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onSupprimer(bouteille.id);
+  };
+
+  const gererAugmentation = (e, idCellier) => {
     e.stopPropagation();
     e.preventDefault();
     onAjouterCellier(bouteille.id, idCellier);
   };
 
-  const handleDiminuer = (e, idCellier, quantiteActuelle) => {
+  const gererDiminution = (e, idCellier, quantiteActuelle) => {
     e.stopPropagation();
     e.preventDefault();
     if (quantiteActuelle > 0) {
@@ -80,7 +87,7 @@ const CarteListeAchat = ({
                 <div className="flex items-center gap-2">
                   <BoutonQuantite
                     type="diminuer"
-                    onClick={(e) => handleDiminuer(e, cellier.idCellier, cellier.quantite)}
+                    onClick={(e) => gererDiminution(e, cellier.idCellier, cellier.quantite)}
                     disabled={disabled || cellier.quantite <= 0}
                   />
                   
@@ -90,7 +97,7 @@ const CarteListeAchat = ({
                   
                   <BoutonQuantite
                     type="augmenter"
-                    onClick={(e) => handleAugmenter(e, cellier.idCellier)}
+                    onClick={(e) => gererAugmentation(e, cellier.idCellier)}
                     disabled={disabled}
                   />
                 </div>
@@ -109,6 +116,7 @@ const CarteListeAchat = ({
           type="secondaire"
           typeHtml="button"
           disabled={disabled}
+          action={gererSuppression}
           className="w-full text-(length:--taille-petit)"
         />
       </div>
