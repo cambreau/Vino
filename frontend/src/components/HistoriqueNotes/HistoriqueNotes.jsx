@@ -61,11 +61,11 @@ function HistoriqueNotes({ id_bouteille }) {
         Historique Notes
       </h2>
       {!chargement && (
-        <div className="mb-(--rythme-base)">
-          <p>
+        <div className="inline-block mb-(--rythme-base)">
+          <p className="inline-block">
             <MoyenneNotes id_bouteille={id_bouteille} />
           </p>
-          <p className="text-(length:--taille-petit) italic text-texte-secondaire mb-(--rythme-base)">
+          <p className="inline-block text-(length:--taille-petit) italic text-texte-secondaire mb-(--rythme-base) ml-(--rythme-base)">
             ({notes.length} {notes.length === 1 ? "note" : "notes"})
           </p>
         </div>

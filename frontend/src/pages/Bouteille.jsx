@@ -2,7 +2,7 @@ import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
 import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import BoutonRetour from "@components/components-partages/Boutons/BoutonRetour";
-import CarteNoteDegustation from "@components/CarteNoteDegustation/CarteNoteDegustation";
+import HistoriqueNotes from "@components/HistoriqueNotes/HistoriqueNotes";
 
 import { formatDetailsBouteille } from "@lib/utils.js";
 import { useDocumentTitle } from "@lib/utils.js";
@@ -139,8 +139,7 @@ function Bouteille() {
           </div>
         </article>
         <div className="flex flex-col gap-(--rythme-serre) mx-(--rythme-serre)">
-          <CarteNoteDegustation />
-          <CarteNoteDegustation />
+          <HistoriqueNotes id_bouteille={id} />
         </div>
       </main>
 
