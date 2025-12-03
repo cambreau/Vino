@@ -97,20 +97,21 @@ export default class ModeleDegustation {
       throw new Error("ID bouteille invalide");
     }
 
-    if (!idUtilisateur) {
-      throw new Error("Utilisateur requis pour supprimer une dégustation");
+    if (!date) {
+      throw new Error("Date requise pour supprimer la dégustation");
     }
 
-    if (!idBouteille) {
-      throw new Error("Bouteille requise pour supprimer une dégustation");
-    }
+    const sql = `DELETE FROM degustation 
+               WHERE id_utilisateur = ? 
+               AND id_bouteille = ? 
+               AND date_degustation = ?`;
 
-    const sql = `DELETE FROM degustation WHERE id_utilisateur = ? AND id_bouteille = ? AND date_degustation = ?`;
     const [resultat] = await connexion.query(sql, [
       idUtilisateur,
       idBouteille,
       date,
     ]);
+
     return resultat;
   }
 }

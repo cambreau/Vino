@@ -88,4 +88,23 @@ export const ajouterDegustation = async (req, res) => {
 
 export const modifierDegustation = async (req, res) => {};
 
-export const supprimerDegustation = async (req, res) => {};
+export const supprimerDegustation = async (req, res) => {
+  try {
+    const { id_bouteille, id_utilisateur } = req.params;
+    const { date_degustation } = req.query;
+
+    const resultat = await ModeleDegustation.supprimer(
+      id_utilisateur,
+      id_bouteille,
+      date_degustation
+    );
+
+    return res.status(200).json({
+      message: "Dégustation supprimée",
+      data: resultat,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la suppression de la dégustation", error);
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
+};
