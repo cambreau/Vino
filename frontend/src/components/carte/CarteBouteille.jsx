@@ -7,6 +7,7 @@ import iconNotez from "@assets/images/evaluation.svg";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import BoiteModaleNotes from "@components/boiteModaleNotes/boiteModaleNotes";
 import BoiteModaleAjoutBouteilleCellier from "@components/boiteModaleAjoutBouteilleCellier/boiteModaleAjoutBouteilleCellier";
+import MoyenneEtCompteurNotes from "@components/HistoriqueNotes/MoyenneEtCompteurNotes/MoyenneEtCompteurNotes";
 
 const CarteBouteille = ({
   bouteille,
@@ -189,24 +190,21 @@ const CarteBouteille = ({
   ) : null;
 
   return (
-    <div
-      className="
-      flex flex-col justify-between
-      bg-fond-secondaire p-(--rythme-serre) 
-      rounded-(--arrondi-grand) shadow-md min-h-[320px]"
-    >
+    <div className="relative flex flex-col justify-between bg-fond-secondaire p-(--rythme-serre) rounded-(--arrondi-grand) shadow-md min-h-[320px]">
+      {/* Badge moyenne + nombre de notes en haut à droite */}
+      <div className="absolute top-(--rythme-tres-serre) right-(--rythme-tres-serre) z-10">
+        <MoyenneEtCompteurNotes id_bouteille={bouteille.id} />
+      </div>
+
       {/* Section IMAGE de la bouteille */}
-      <div
-        className="
-        flex items-center justify-center bg-fond-secondaire 
-        rounded-(--arrondi-grand) mb-(--rythme-tres-serre)"
-      >
+      <div className="flex items-center justify-center bg-fond-secondaire rounded-(--arrondi-grand) mb-(--rythme-tres-serre)">
         <img
           src={bouteille.image || "/placeholder-bottle.png"}
           alt={`Photo de la bouteille ${bouteille.nom}`}
           className="h-40 w-auto object-contain"
         />
       </div>
+
       {/* Section INFORMATIONS de la bouteille */}
       <div className="mb-4">
         {/* Nom */}
@@ -219,6 +217,7 @@ const CarteBouteille = ({
           {bouteille.type || bouteille.couleur}
         </p>
       </div>
+
       {/* Section des contrôles (catalogue ou cellier) */}
       <div className="flex justify-center items-center gap-3">
         {genererControles()}
