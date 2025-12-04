@@ -124,12 +124,36 @@ export default class ModeleDegustation {
 
   // Requête pour modifier une dégustation
   static async modifier(
-    id_bouteille,
-    id_utilisateur,
-    date,
-    note,
+    idBouteilleNombre,
+    idUtilisateurNombre,
+    date_degustation,
+    notes,
     commentaire
-  ) {}
+  ) {
+
+    const sql = `
+      UPDATE degustation
+      SET date_degustation = ? , notes = ? , commentaire = ?
+      WHERE id_utilisateur = ? AND id_bouteille = ?
+    `;
+
+    const [resultat] = await connexion.query(sql, [
+      date_degustation,
+      notes,
+      commentaire,
+      idUtilisateurNombre,
+      idBouteilleNombre
+    ]);
+
+    return {
+      date_degustation,
+      notes,
+      commentaire,
+      idUtilisateurNombre,
+      idBouteilleNombre,
+      lignesAffectees: resultat.affectedRows,
+    };
+  }
 
   // Requête pour suprimmer une dégustation
   static async supprimer(id_utilisateur, id_bouteille) {
