@@ -1,6 +1,5 @@
 // Ce fichier regroupe toutes les fonctions permettant de communiquer avec le backend.
 import authentificationStore from "@store/authentificationStore";
-import bouteillesStore from "@store/bouteillesStore";
 
 // *************************** Utilisateur
 /**
@@ -34,7 +33,6 @@ export const creerUtilisateur = async (datas, navigate) => {
         };
 
         authentificationStore.getState().connexion(datasUtilisateur);
-        bouteillesStore.getState().chargerBouteilles();
       }
 
       navigate("/catalogue");
@@ -202,9 +200,6 @@ export const connexionUtilisateur = async (datas, navigate) => {
       // Sauvegarder l'utilisateur dans le store
       authentificationStore.getState().connexion(datasUtilisateur);
 
-      // Charger les bouteilles une seule fois au moment de la connexion
-      bouteillesStore.getState().chargerBouteilles();
-
       // Rediriger vers la page catalogue après connexion
       navigate("/catalogue");
 
@@ -262,8 +257,7 @@ export const ajouterBouteilleCellier = async (idCellier, donnees) => {
 };
 
 /**
- * Récupère les bouteilles d'un cellier en récupérant les IDs depuis le backend
- * et en complétant avec les données du store bouteillesStore
+ * Récupère les bouteilles d'un cellier avec leurs données complètes
  * @param {string|number} idCellier - L'id du cellier
  * @returns {Promise<Array>} Array des bouteilles complètes avec quantités
  */
@@ -281,29 +275,31 @@ export const recupererBouteillesCellier = async (idCellier) => {
     const data = await reponse.json();
     const bouteillesIds = data.donnees || []; // [{ id_bouteille, quantite }, ...]
 
-    // 2. Récupérer les infos bouteilles du store
-    const bouteillesCatalogue = bouteillesStore.getState().bouteilles;
+    if (bouteillesIds.length === 0) {
+      return [];
+    }
 
-    // 3. Fusionner toutes les datas - ne retourner que les bouteilles de ce cellier
-    const bouteillesCompletes = bouteillesIds
-      .map((item) => {
-        // item: { id_bouteille, quantite }
-        const bouteilleCatalogue = bouteillesCatalogue.find(
-          (b) => b.id === item.id_bouteille
+    // 2. Récupérer les infos complètes des bouteilles depuis l'API
+    const bouteillesPromises = bouteillesIds.map(async (item) => {
+      try {
+        const reponseBouteille = await fetch(
+          `${import.meta.env.VITE_BACKEND_BOUTEILLES_URL}/${item.id_bouteille}`
         );
-
-        // Ne retourner que si la bouteille existe dans le store
-        if (!bouteilleCatalogue) return null;
-
+        if (!reponseBouteille.ok) return null;
+        const dataBouteille = await reponseBouteille.json();
         return {
-          ...bouteilleCatalogue, // Copie des infos du catalogue pour la bouteille
-          quantite: item.quantite, // + la quantite
-          idCellier: Number.parseInt(idCellier, 10), // Ajouter l'idCellier pour référence
+          ...dataBouteille.donnees,
+          quantite: item.quantite,
+          idCellier: Number.parseInt(idCellier, 10),
         };
-      })
-      .filter(Boolean); // Retire les null - garde que les bouteilles trouvées
+      } catch {
+        return null;
+      }
+    });
 
-    // Retourner uniquement les bouteilles qui sont dans ce cellier
+    const bouteillesCompletes = (await Promise.all(bouteillesPromises)).filter(
+      Boolean
+    );
     return bouteillesCompletes;
   } catch (error) {
     console.error(
