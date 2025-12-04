@@ -13,17 +13,20 @@ import {
   recupererCellier,
   recupererBouteillesCellier,
   modifierBouteilleCellier,
+  recupererNotesUtilisateur,
 } from "@lib/requetes.js";
 import {
   useDocumentTitle,
   filtrerBouteilles,
   rechercherBouteilles,
 } from "@lib/utils.js";
+import authentificationStore from "@store/authentificationStore";
 
 function Cellier() {
   const navigate = useNavigate();
   // Récupérer id du cellier dans l'URL
   const { idCellier } = useParams();
+  const utilisateur = authentificationStore((state) => state.utilisateur);
 
   // Etat pour le cellier : nom
   const [cellier, setCellier] = useState({
@@ -48,6 +51,8 @@ function Cellier() {
   const [bouteillesEnTraitement, setBouteillesEnTraitement] = useState(
     () => new Set()
   );
+  // État pour stocker les notes de l'utilisateur
+  const [notesUtilisateur, setNotesUtilisateur] = useState([]);
 
   useEffect(() => {
     const chargerBouteillesCellier = async () => {
@@ -59,6 +64,34 @@ function Cellier() {
     };
     chargerBouteillesCellier();
   }, [idCellier]);
+
+  // Récupérer toutes les notes de l'utilisateur
+  useEffect(() => {
+    const chargerNotesUtilisateur = async () => {
+      if (!utilisateur?.id) {
+        setNotesUtilisateur([]);
+        return;
+      }
+
+      const notes = await recupererNotesUtilisateur(utilisateur.id);
+      setNotesUtilisateur(notes || []);
+    };
+
+    chargerNotesUtilisateur();
+  }, [utilisateur?.id]);
+
+  // Calculer les IDs des bouteilles notées à partir des notes récupérées
+  const bouteillesNotees = useMemo(() => {
+    const bouteillesNoteesSet = new Set();
+    if (notesUtilisateur && Array.isArray(notesUtilisateur)) {
+      notesUtilisateur.forEach((note) => {
+        if (note.id_bouteille) {
+          bouteillesNoteesSet.add(note.id_bouteille);
+        }
+      });
+    }
+    return bouteillesNoteesSet;
+  }, [notesUtilisateur]);
 
   const definirTraitement = (idBouteille, actif) => {
     setBouteillesEnTraitement((courant) => {
@@ -265,6 +298,7 @@ function Cellier() {
                           onAugmenter={handleAugmenter}
                           onDiminuer={handleDiminuer}
                           disabled={bouteillesEnTraitement.has(bouteille.id)}
+                          aNote={bouteillesNotees.has(bouteille.id)}
                         />
                       </Link>
                     ))}
@@ -273,7 +307,11 @@ function Cellier() {
                   <div className="flex justify-center py-(--rythme-espace)">
                     <NonTrouver
                       size={180}
-                      message={modeRecherche ? "Aucune bouteille ne correspond à votre recherche" : "Aucune bouteille ne correspond à vos filtres"}
+                      message={
+                        modeRecherche
+                          ? "Aucune bouteille ne correspond à votre recherche"
+                          : "Aucune bouteille ne correspond à vos filtres"
+                      }
                     />
                   </div>
                 )}

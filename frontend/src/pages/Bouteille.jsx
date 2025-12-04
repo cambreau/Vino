@@ -9,6 +9,8 @@ import { useDocumentTitle } from "@lib/utils.js";
 import { recupererBouteille } from "@lib/requetes.js";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import BoiteModaleAjoutBouteilleCellier from "@components/boiteModaleAjoutBouteilleCellier/boiteModaleAjoutBouteilleCellier";
+
 function Bouteille() {
   const navigate = useNavigate();
   //Recuperer id dans l'url
@@ -29,6 +31,21 @@ function Bouteille() {
   });
 
   useDocumentTitle(bouteille.nom || "Bouteille");
+
+  // État pour contrôler l'ouverture de la modale
+  const [modaleOuverte, setModaleOuverte] = useState(false);
+
+  // Scroller vers la section Historique Notes si le hash est présent dans l'URL
+  useEffect(() => {
+    if (window.location.hash === "#historique-notes") {
+      setTimeout(() => {
+        const element = document.getElementById("historique-notes");
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    }
+  }, [id]);
 
   /**
    * Recuperer les informations d'une bouteille' cote backend.
@@ -64,7 +81,7 @@ function Bouteille() {
         {/* Menu haut fixe */}
         <MenuEnHaut />
       </header>
-      <main className="py-(--rythme-base) px-(--rythme-serre) bg-fond overflow-y-auto">
+      <main className="p-(--rythme-base) bg-fond overflow-y-auto">
         <article className=" font-body">
           <header>
             <BoutonRetour />
@@ -127,15 +144,15 @@ function Bouteille() {
                   </h3>
                   <p className="flex-1">{bouteille.description}</p>
                 </section>
-                {/* Bouton pour ajouter une bouteille dans le cellier */}
+                {/* Bouton pour ajouter/modifier une bouteille dans le cellier */}
                 <div className="mb-(--rythme-base) pt-(--rythme-base)">
                   <Bouton
                     taille="moyen"
-                    texte="Ajouter cette bouteille"
+                    texte="Ajouter au cellier"
                     type="primaire"
                     typeHtml="button"
                     action={() => {
-                      navigate("/catalogue");
+                      setModaleOuverte(true);
                     }}
                   />
                 </div>
@@ -149,6 +166,14 @@ function Bouteille() {
       </main>
 
       <MenuEnBas />
+
+      {/* Modale pour ajouter/modifier la bouteille au cellier */}
+      <BoiteModaleAjoutBouteilleCellier
+        id_bouteille={id}
+        nom_bouteille={bouteille.nom}
+        estOuverte={modaleOuverte}
+        onFermer={() => setModaleOuverte(false)}
+      />
     </div>
   );
 }

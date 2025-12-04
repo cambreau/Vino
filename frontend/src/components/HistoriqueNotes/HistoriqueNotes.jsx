@@ -2,14 +2,11 @@ import { useState, useEffect } from "react";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import Message from "@components/components-partages/Message/Message";
 import Spinner from "@components/components-partages/Spinner/Spinner";
-import MoyenneNotes from "@components/components-partages/MoyenneNotes/MoyenneNotes";
+import MoyenneEtCompteurNotes from "@components/HistoriqueNotes/MoyenneEtCompteurNotes/MoyenneEtCompteurNotes";
 import CarteNoteDegustation from "@components/HistoriqueNotes/CarteNoteDegustation/CarteNoteDegustation";
-import {
-  recupererNotes,
-  modifierNote,
-  supprimerNote,
-  traiterNotes,
-} from "@lib/requetes";
+import BoiteModaleNotes from "@components/boiteModaleNotes/boiteModaleNotes";
+import iconNotez from "@assets/images/evaluation.svg";
+import { recupererNotes, supprimerNote, traiterNotes } from "@lib/requetes";
 import authentificationStore from "@store/authentificationStore";
 
 function HistoriqueNotes({ id_bouteille }) {
@@ -21,6 +18,10 @@ function HistoriqueNotes({ id_bouteille }) {
   const [chargement, setChargement] = useState(true);
   // On affiche seulement 5 notes au chargement de la page.
   const [nombreNotesAffichees, setNombreNotesAffichees] = useState(5);
+  // État pour contrôler l'ouverture de la modale note
+  const [estModaleNotezOuverte, setEstModaleNotezOuverte] = useState(false);
+  // Compteur pour forcer la régénération du composant MoyenneEtCompteurNotes
+  const [reactualiserComponent, setReactualiserComponent] = useState(0);
 
   // On recupere les notes et on gere l'afichage durant le chargement.
   useEffect(() => {
@@ -57,6 +58,10 @@ function HistoriqueNotes({ id_bouteille }) {
   // L'API est gérée directement dans BoiteModaleNotes
   const gererModifierNote = async () => {
     await rechargerNotes();
+    // Petit délai pour s'assurer que les données sont mises à jour avant de régénérer
+    setTimeout(() => {
+      setReactualiserComponent((prev) => prev + 1);
+    }, 100);
   };
 
   // Fonction pour supprimer une note
@@ -68,6 +73,10 @@ function HistoriqueNotes({ id_bouteille }) {
     if (resultat.succes) {
       // Recharger les notes après suppression
       await rechargerNotes();
+      // Petit délai pour s'assurer que les données sont mises à jour avant de régénérer
+      setTimeout(() => {
+        setReactualiserComponent((prev) => prev + 1);
+      }, 100);
     } else {
       console.error("Erreur lors de la suppression:", resultat.erreur);
     }
@@ -76,6 +85,22 @@ function HistoriqueNotes({ id_bouteille }) {
   // Fonction pour afficher plus de notes
   const afficherPlus = () => {
     setNombreNotesAffichees((prev) => prev + 5);
+  };
+
+  // Fonction pour ouvrir la modale de notation
+  const ouvrirBoiteModaleNotez = () => {
+    setEstModaleNotezOuverte(true);
+  };
+
+  // Fonction pour fermer la modale et recharger les notes (ajout d'une note)
+  const fermerBoiteModaleNotez = async () => {
+    setEstModaleNotezOuverte(false);
+    // Recharger les notes après fermeture pour vérifier si l'utilisateur a maintenant une note
+    await rechargerNotes();
+    // Petit délai pour s'assurer que les données sont mises à jour avant de régénérer
+    setTimeout(() => {
+      setReactualiserComponent((prev) => prev + 1);
+    }, 100);
   };
 
   // Limite l'affichage aux N premières notes selon nombreNotesAffichees
@@ -90,27 +115,51 @@ function HistoriqueNotes({ id_bouteille }) {
   const toutesNotesAffichees = nombreNotesAffichees >= notes.length;
 
   return (
-    <section className="border border-principal-100 rounded-(--arrondi-grand) shadow-md p-(--rythme-base)">
-      <h2 className="mb-2 text-(length:--taille-normal) font-semibold text-texte-premier">
-        Historique Notes
-      </h2>
-      {!chargement && (
-        <div className="inline-block mb-(--rythme-base)">
-          <p className="inline-block">
-            <MoyenneNotes id_bouteille={id_bouteille} />
-          </p>
-          <p className="inline-block text-(length:--taille-petit) italic text-texte-secondaire mb-(--rythme-base) ml-(--rythme-base)">
-            ({notes.length} {notes.length === 1 ? "note" : "notes"})
-          </p>
+    <section
+      id="historique-notes"
+      className="border border-principal-100 rounded-(--arrondi-grand) shadow-md p-(--rythme-base)"
+    >
+      <header className="flex justify-between wrap">
+        <div>
+          <h2 className="mb-2 text-(length:--taille-normal) font-semibold text-texte-premier">
+            Historique Notes
+          </h2>
+          <div className="mb-(--rythme-base)">
+            <MoyenneEtCompteurNotes
+              id_bouteille={id_bouteille}
+              reactualiser={reactualiserComponent}
+            />
+          </div>
         </div>
-      )}
+        {/* Bouton "Notez" si l'utilisateur n'a pas encore de note */}
+        {!chargement && !noteUtilisateur && utilisateur?.id && (
+          <div className="mb-(--rythme-base)">
+            <Bouton
+              texte={
+                <span className="flex items-center gap-(--rythme-tres-serre)">
+                  Notez
+                  <img
+                    src={iconNotez}
+                    alt="Icône évaluation"
+                    className="w-5 h-5"
+                  />
+                </span>
+              }
+              type="secondaire"
+              action={ouvrirBoiteModaleNotez}
+              typeHtml="button"
+              disabled={false}
+            />
+          </div>
+        )}
+      </header>
       {chargement ? (
         <Spinner />
       ) : noteUtilisateur || notes.length > 0 ? (
         <>
           {/* Note de l'utilisateur actuel en premier avec fond pâle */}
           {noteUtilisateur && (
-            <div className="mb-(--rythme-base) bg-principal-50 rounded-(--arrondi-grand) p-(--rythme-base)">
+            <div className="mb-(--rythme-base) bg-principal-100 rounded-(--arrondi-grand) p-(--rythme-base)">
               <CarteNoteDegustation
                 note={noteUtilisateur}
                 estNoteUtilisateur={true}
@@ -139,6 +188,14 @@ function HistoriqueNotes({ id_bouteille }) {
         </>
       ) : (
         <Message type="information" texte="Aucune note disponible" />
+      )}
+      {/* Modale pour ajouter une note */}
+      {estModaleNotezOuverte && (
+        <BoiteModaleNotes
+          id_bouteille={id_bouteille}
+          noteInitiale={null}
+          onFermer={fermerBoiteModaleNotez}
+        />
       )}
     </section>
   );

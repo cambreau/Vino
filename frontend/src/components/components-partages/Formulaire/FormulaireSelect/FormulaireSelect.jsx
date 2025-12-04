@@ -51,11 +51,17 @@ function FormulaireSelect({
         <option value="" disabled hidden>
           -- Choisir {genre} {nom} --
         </option>
-        {arrayOptions.map((option) => (
-          <option key={option} value={formatString(option)}>
-            {option}
-          </option>
-        ))}
+        {arrayOptions.map((option) => {
+          // Support pour les objets {valeur, texte} ou les strings simples
+          const valeur =
+            typeof option === "object" ? option.valeur : formatString(option);
+          const texte = typeof option === "object" ? option.texte : option;
+          return (
+            <option key={valeur} value={valeur}>
+              {texte}
+            </option>
+          );
+        })}
       </select>
     </div>
   );

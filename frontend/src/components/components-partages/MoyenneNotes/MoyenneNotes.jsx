@@ -39,7 +39,7 @@ function MoyenneNotes({ id_bouteille }) {
   // Afficher "Aucune note" si en chargement ou si pas de moyenne
   if (chargement || moyenne === null) {
     return (
-      <p className="inline-block bg-principal-100 text-texte-principal px-(--rythme-serre) py-(--rythme-tres-serre) rounded-(--arrondi-grand) font-semibold">
+      <p className="inline-block bg-principal-100 text-texte-principal px-(--rythme-serre) py-(--rythme-tres-serre) rounded-(--arrondi-grand) font-semibold text-(length:--taille-petit)">
         Aucune note
       </p>
     );
@@ -47,7 +47,7 @@ function MoyenneNotes({ id_bouteille }) {
 
   return (
     <Link to={`/bouteilles/${id_bouteille}`}>
-      <p className="inline-block bg-principal-100 text-texte-principal px-(--rythme-serre) py-(--rythme-tres-serre) rounded-(--arrondi-grand) font-semibold">
+      <p className="inline-block bg-principal-100 text-texte-principal px-(--rythme-serre) py-(--rythme-tres-serre) rounded-(--arrondi-grand) font-semibold text-(length:--taille-petit)">
         {moyenne}
       </p>
     </Link>

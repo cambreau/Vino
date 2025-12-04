@@ -64,15 +64,20 @@ function BoiteModaleNotes({ id_bouteille, noteInitiale = null, onFermer }) {
       notes: note,
     };
 
-    // Appelle les fonctions de requetes.js qui gèrent les appels au backend
-    if (estModeModification) {
-      modifierNote(donneesDegustation);
-    } else {
-      creerNoteDegustations(donneesDegustation);
-    }
+    try {
+      // Appelle les fonctions de requetes.js qui gèrent les appels au backend
+      if (estModeModification) {
+        await modifierNote(donneesDegustation);
+      } else {
+        await creerNoteDegustations(donneesDegustation);
+      }
 
-    //On ferme la boite modale
-    onFermer();
+      // On ferme la boite modale après succès
+      onFermer();
+    } catch (err) {
+      console.error(err);
+      setErreur("Une erreur est survenue lors de l'enregistrement de la note.");
+    }
   };
 
   /**

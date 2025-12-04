@@ -12,7 +12,7 @@ import {
 } from "../controllers/controller.degustation.js";
 
 // Récupérer les dégustations d'une bouteille par son id
-router.get("/bouteille/:id_bouteille", recupererDegustationsBouteille);
+router.get("/:id_bouteille", recupererDegustationsBouteille);
 
 // Récupérer les dégustations d'un utilisateur par son id
 router.get("/utilisateur/:id_utilisateur", recupererDegustationsUtilisateur);
@@ -20,8 +20,8 @@ router.get("/utilisateur/:id_utilisateur", recupererDegustationsUtilisateur);
 // Ajouter une dégustation
 router.post("/", ajouterDegustation);
 
-// Modifier une dégustastion
-router.put("/", modifierDegustation);
+// Modifier une dégustation (id_utilisateur et id_bouteille dans l'URL)
+router.put("/:id_utilisateur/:id_bouteille", modifierDegustation);
 
-// Supprimer une dégustation
-router.delete("/:id_bouteille/:id_utilisateur", supprimerDegustation);
+// Supprimer une dégustation (id_utilisateur et id_bouteille dans l'URL)
+router.delete("/:id_utilisateur/:id_bouteille", supprimerDegustation);
