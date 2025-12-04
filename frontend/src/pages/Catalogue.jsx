@@ -8,12 +8,15 @@ import Spinner from "@components/components-partages/Spinner/Spinner";
 import FiltresCatalogue from "@components/components-partages/Filtre/FiltresCatalogue";
 
 import authentificationStore from "@store/authentificationStore";
-import { useDocumentTitle } from "@lib/utils.js";
+import { useDocumentTitle, useListeAchat } from "@lib/utils.js";
 import { useCatalogue } from "@lib/useCatalogue";
 
 function Catalogue() {
   useDocumentTitle("Catalogue");
   const utilisateur = authentificationStore((state) => state.utilisateur);
+
+  //============  Hook pour gérer l'état et les messages de la liste d'achat
+  const {etat: etatListeAchat, dispatch, ACTIONS } = useListeAchat();
 
   const {
     mainRef,
@@ -28,7 +31,6 @@ function Catalogue() {
     handleTri,
     handleSupprimerFiltre,
     handleReinitialiserFiltres,
-    ajouterALaListe,
   } = useCatalogue(utilisateur?.id);
 
   const { chargementInitial, message, scrollLoading, hasMore, bouteilles, total } = etat;
@@ -68,6 +70,17 @@ function Catalogue() {
         </h1>
 
         <section className="pt-(--rythme-espace) px-(--rythme-serre)">
+
+        {/* Message d'ajout/suppression de la liste d'achat */}
+          {etatListeAchat.message.texte && (
+            <div className="mb-(--rythme-base)">
+              <Message
+                type={etatListeAchat.message.type}
+                texte={etatListeAchat.message.texte}
+              />
+            </div>
+        )}
+
           {message.texte && <Message texte={message.texte} type={message.type} />}
 
           {/* Filtres - centrés sur mobile et tablette, en colonne jusqu'à xl */}
@@ -96,6 +109,7 @@ function Catalogue() {
 
           {/* Grille des bouteilles */}
           <div>
+
               {chargementInitial ? (
                 <div className="flex justify-center items-center py-(--rythme-espace)">
                   <Spinner size={220} ariaLabel="Chargement du catalogue de bouteilles" />
@@ -108,7 +122,8 @@ function Catalogue() {
                         <CarteBouteille
                           bouteille={b}
                           type="catalogue"
-                          onAjouterListe={ajouterALaListe}
+                          dispatch={dispatch}
+                          ACTIONS={ACTIONS}
                         />
                       </Link>
                     ))}
