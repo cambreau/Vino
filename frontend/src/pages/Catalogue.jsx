@@ -1,54 +1,39 @@
-import { useEffect, useCallback, useRef, useMemo, useState } from "react";
+import { useEffect, useCallback, useRef, useMemo, useState, useReducer } from "react";
 import { Link } from "react-router-dom";
 import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
 import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
 import CarteBouteille from "@components/carte/CarteBouteille";
 import Message from "@components/components-partages/Message/Message";
-import Filtres from "@components/components-partages/Filtre/Filtre";
 import NonTrouver from "@components/components-partages/NonTrouver/NonTrouver";
 import Spinner from "@components/components-partages/Spinner/Spinner";
-import InfiniteScrollGrid from "@components/components-partages/InfiniteScrollGrid/InfiniteScrollGrid";
 import FiltresCatalogue from "@components/components-partages/Filtre/FiltresCatalogue";
 
-import { recupererBouteilles, ajouterBouteilleListe } from "@lib/requetes";
+import { ajouterBouteilleListe } from "@lib/requetes";
 
 import authentificationStore from "@store/authentificationStore";
-import {
-  useDocumentTitle,
-  filtrerBouteilles,
-  rechercherBouteilles,
-} from "@lib/utils.js";
+import { useDocumentTitle } from "@lib/utils.js";
 import filtresStore from "@store/filtresStore";
 
 /*
  * Constante: nombre d'éléments à charger par page lors de la pagination.
  */
-const LIMITE_BOUTEILLES = 10;
-const LIMITE_CHARGEMENT_CATALOGUE = 250;
+const LIMITE_BOUTEILLES = 20;
 
 /*
- * Crée l'état initial du catalogue. Propriété par propriété :
- *  - chargementInitial: indique si l'écran affiche un chargement initial.
- *  - scrollLoading: indique si un chargement lors du scroll est en cours.
- *  - bouteilles: liste des bouteilles chargées pour l'affichage.
- *  - celliers: liste des celliers de l'utilisateur.
- *  - cellierSelectionne: id du cellier sélectionné par défaut pour l'ajout.
- *  - page: numéro de page actuellement chargé (utilisé pour la pagination).
- *  - hasMore: indique si la ressource a d'autres pages disponibles.
- *  - message: objet contenant un message global à afficher (texte, type).
- *  - modale: état de la modale d'ajout (ouverte, bouteille, quantité, existe si déjà là).
+ * Crée l'état initial du catalogue.
  */
 const creerEtatInitial = () => ({
   chargementInitial: true,
   scrollLoading: false,
   bouteilles: [],
   page: 1,
+  total: 0,
   hasMore: true,
   message: { texte: "", type: "" },
 });
 
 /*
- * Actions pour le reducer — utilisation pour manipuler l'état local du catalogue.
+ * Actions pour le reducer
  */
 const ACTIONS = {
   RESET: "reset",
@@ -61,27 +46,24 @@ const ACTIONS = {
 };
 
 /*
- * Reducer central de la page Catalogue :
- * - Permet d'appliquer des mutations immuables à l'état en fonction d'actions.
+ * Reducer central de la page Catalogue
  */
 const catalogueReducer = (state, action) => {
   switch (action.type) {
     case ACTIONS.RESET:
-      // Réinitialise tout l'état (comme si l'utilisateur venait d'ouvrir la page).
       return creerEtatInitial();
     case ACTIONS.INIT_SUCCESS:
-      // Chargement initial réussi : on enregistre les bouteilles et les celliers reçus.
       return {
         ...state,
         chargementInitial: false,
         scrollLoading: false,
         bouteilles: action.payload.bouteilles,
         page: 1,
+        total: action.payload.total,
         hasMore: action.payload.hasMore,
         message: action.payload.message ?? { texte: "", type: "" },
       };
     case ACTIONS.INIT_ERROR:
-      // Échec du chargement initial : on affiche un message d'erreur.
       return {
         ...state,
         chargementInitial: false,
@@ -89,10 +71,8 @@ const catalogueReducer = (state, action) => {
         message: action.payload,
       };
     case ACTIONS.LOAD_MORE_START:
-      // Début d'un chargement additionnel (pagination par scroll)
       return { ...state, scrollLoading: true };
     case ACTIONS.LOAD_MORE_SUCCESS: {
-      // Succès d'un chargement additionnel : on concatène les nouvelles bouteilles.
       const nouvelles = action.payload.bouteilles ?? [];
       if (!nouvelles.length) {
         return { ...state, scrollLoading: false, hasMore: false };
@@ -101,22 +81,53 @@ const catalogueReducer = (state, action) => {
         ...state,
         bouteilles: [...state.bouteilles, ...nouvelles],
         page: action.payload.page,
+        total: action.payload.total,
         hasMore: action.payload.hasMore,
         scrollLoading: false,
       };
     }
     case ACTIONS.LOAD_MORE_ERROR:
-      // Erreur lors du chargement additionnel : on stoppe l'indicateur.
       return {
         ...state,
         scrollLoading: false,
         message: action.payload,
       };
     case ACTIONS.SET_MESSAGE:
-      // Permet d'afficher un message global à l'utilisateur (succès / erreur / info).
       return { ...state, message: action.payload };
     default:
       return state;
+  }
+};
+
+/**
+ * Fonction pour récupérer les bouteilles avec filtres côté serveur
+ */
+const recupererBouteillesAvecFiltres = async (page, limit, filtres = {}, tri = "nom_asc") => {
+  try {
+    const params = new URLSearchParams();
+    params.set("page", page);
+    params.set("limit", limit);
+    params.set("tri", tri);
+
+    // Ajouter les filtres à la requête
+    if (filtres.type) params.set("type", filtres.type);
+    if (filtres.pays) params.set("pays", filtres.pays);
+    if (filtres.region) params.set("region", filtres.region);
+    if (filtres.annee) params.set("annee", filtres.annee);
+    if (filtres.recherche) params.set("recherche", filtres.recherche);
+
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_BOUTEILLES_URL}?${params.toString()}`
+    );
+
+    if (!reponse.ok) {
+      throw new Error(`Erreur HTTP: ${reponse.status}`);
+    }
+
+    return await reponse.json();
+  } catch (error) {
+    console.error("Erreur lors de la récupération des bouteilles:", error);
+    return null;
   }
 };
 
@@ -133,100 +144,55 @@ function Catalogue() {
     setCriteres: setCriteresStore,
     setModeRecherche: setModeRechercheStore,
     desactiverModeRecherche: desactiverModeRechercheStore,
-    setModeTri: setModeTriStore,
     toggleModeTri: toggleModeTriStore,
     supprimerCritere: supprimerCritereStore,
     reinitialiserFiltres: reinitialiserFiltresStore,
   } = filtresStore();
-  // Référence vers le conteneur scrollable principal (utilisé pour l'observer et le fallback).
+
+  // Références
   const mainRef = useRef(null);
   const sentinelRef = useRef(null);
   const scrollStateRef = useRef({ hasMore: true, scrollLoading: false });
-  const [etat, dispatch] = useReducer(
-    catalogueReducer,
-    undefined,
-    creerEtatInitial
-  );
+
+  // État du catalogue
+  const [etat, dispatch] = useReducer(catalogueReducer, undefined, creerEtatInitial);
   const etatRef = useRef(etat);
-  const sentinelPretRef = useRef(true);
-  // Référence de contrôle pour éviter les réponses asynchrones obsolètes lors des vérifications
-  // (incrémentée à chaque requête pour s'assurer que la réponse correspond à la dernière requête).
-  const [resultatsFiltres, setResultatsFiltres] = useState(null);
-  const [catalogueComplet, setCatalogueComplet] = useState([]);
-  const [chargementCatalogueComplet, setChargementCatalogueComplet] =
-    useState(false);
-  const [erreurCatalogueComplet, setErreurCatalogueComplet] = useState(null);
 
-  // Callbacks pour les filtres
-  const handleFiltrer = useCallback(
-    (criteres) => {
-      appliquerFiltres(criteres);
-    },
-    [appliquerFiltres]
-  );
+  // Référence pour le debounce du chargement
+  const loadTimeoutRef = useRef(null);
 
-  const handleRecherche = useCallback(
-    (texte) => {
-      appliquerRecherche(texte);
-    },
-    [appliquerRecherche]
-  );
+  // Variables dérivées
+  const modeTri = modeTriStore;
+  const modeRecherche = modeRechercheStore;
 
-  const handleTri = useCallback(() => {
-    toggleTri();
-  }, [toggleTri]);
+  // Construire les filtres pour l'API
+  const filtresAPI = useMemo(() => {
+    if (modeRecherche && criteresRechercheStore) {
+      // En mode recherche, on utilise le champ "recherche" de l'API
+      const texteRecherche = typeof criteresRechercheStore === 'string' 
+        ? criteresRechercheStore 
+        : criteresRechercheStore.nom || '';
+      return { recherche: texteRecherche };
+    }
+    // En mode filtres, on utilise les critères du store
+    const filtres = {};
+    if (criteresFiltresStore?.type) filtres.type = criteresFiltresStore.type;
+    if (criteresFiltresStore?.pays) filtres.pays = criteresFiltresStore.pays;
+    if (criteresFiltresStore?.region) filtres.region = criteresFiltresStore.region;
+    if (criteresFiltresStore?.annee) filtres.annee = criteresFiltresStore.annee;
+    return filtres;
+  }, [modeRecherche, criteresRechercheStore, criteresFiltresStore]);
 
-  const handleSupprimerFiltre = useCallback(
-    (cle) => {
-      supprimerFiltre(cle);
-    },
-    [supprimerFiltre]
-  );
-
-  const handleReinitialiserFiltres = useCallback(() => {
-    reinitialiserFiltresStore();
-    setResultatsFiltres(null);
-  }, [reinitialiserFiltresStore]);
-
-  const trierBouteilles = useCallback((liste = [], mode = "nom_asc") => {
-    if (!Array.isArray(liste)) return [];
-    const copie = [...liste];
-    const direction = mode === "nom_desc" ? -1 : 1;
-    return copie.sort((a = {}, b = {}) => {
-      const nomA = a?.nom ?? "";
-      const nomB = b?.nom ?? "";
-      return (
-        nomA.localeCompare(nomB, "fr", { sensitivity: "base" }) * direction
-      );
-    });
-  }, []);
-
-  const bouteillesAffichees = useMemo(
-    () => trierBouteilles(resultatsFiltres ?? etat.bouteilles, modeTri),
-    [resultatsFiltres, etat.bouteilles, modeTri, trierBouteilles]
-  );
+  const filtresActifs = useMemo(() => {
+    return Object.values(filtresAPI).some((v) => Boolean(v));
+  }, [filtresAPI]);
 
   const etiquetteTri = modeTri === "nom_asc" ? "A → Z" : "Z → A";
 
-  // Effet principal: charge les bouteilles et les celliers de l'utilisateur au montage
-  // et à chaque changement d'id d'utilisateur.
+  // Synchroniser l'état avec la ref
   useEffect(() => {
     etatRef.current = etat;
   }, [etat]);
-
-  useEffect(() => {
-    if (!filtresActifs) return;
-    // Réappliquer les filtres ou la recherche selon le mode actif
-    if (modeRecherche) {
-      setResultatsFiltres(
-        rechercherBouteilles(donneesFiltres ?? [], criteresFiltres)
-      );
-    } else {
-      setResultatsFiltres(
-        filtrerBouteilles(donneesFiltres ?? [], criteresFiltres)
-      );
-    }
-  }, [donneesFiltres, filtresActifs, criteresFiltres, modeRecherche]);
 
   useEffect(() => {
     scrollStateRef.current = {
@@ -235,144 +201,74 @@ function Catalogue() {
     };
   }, [etat.hasMore, etat.scrollLoading]);
 
-  useEffect(() => {
-    if (!filtresActifs) {
-      sentinelPretRef.current = true;
-    }
-  }, [filtresActifs]);
+  // Fonction pour charger les bouteilles (initiales ou après changement de filtres)
+  const chargerBouteilles = useCallback(async () => {
+    if (!utilisateur?.id) return;
 
-  useEffect(() => {
-    if (!utilisateur?.id) {
-      dispatch({ type: ACTIONS.RESET });
-      setCatalogueComplet([]);
-      return;
-    }
+    dispatch({ type: ACTIONS.RESET });
 
-    let ignore = false;
+    try {
+      const data = await recupererBouteillesAvecFiltres(
+        1,
+        LIMITE_BOUTEILLES,
+        filtresAPI,
+        modeTri
+      );
 
-    // Fonction asynchrone interne qui effectue toutes les requêtes initiales.
-    const charger = async () => {
-      dispatch({ type: ACTIONS.RESET });
-
-      try {
-        const dataBouteilles = await recupererBouteilles(1, LIMITE_BOUTEILLES);
-
-        if (ignore) return;
-
-        // `dataBouteilles` et `dataCelliers` proviennent des endpoints API :
-        // - `donnees` contient la liste des éléments si le format de la réponse est normalisé.
-        const bouteilles = dataBouteilles?.donnees ?? [];
-        const hasMore = dataBouteilles?.meta?.hasMore ?? false;
-        const message = { texte: "", type: "" };
-
-        dispatch({
-          type: ACTIONS.INIT_SUCCESS,
-          payload: {
-            bouteilles,
-            hasMore,
-            message,
-          },
-        });
-      } catch (error) {
-        console.error(error);
-        if (ignore) return;
-
+      if (!data) {
         dispatch({
           type: ACTIONS.INIT_ERROR,
-          payload: {
-            texte: "Erreur lors du chargement",
-            type: "erreur",
-          },
+          payload: { texte: "Erreur lors du chargement", type: "erreur" },
         });
+        return;
       }
-    };
 
-    // Lance le chargement initial de la page.
-    charger();
-    return () => {
-      ignore = true;
-    };
-  }, [utilisateur?.id]);
+      const bouteilles = data?.donnees ?? [];
+      const hasMore = data?.meta?.hasMore ?? false;
+      const total = data?.meta?.total ?? 0;
 
-  useEffect(() => {
-    if (!utilisateur?.id) {
-      setCatalogueComplet([]);
-      setChargementCatalogueComplet(false);
-      setErreurCatalogueComplet(null);
-      return;
+      dispatch({
+        type: ACTIONS.INIT_SUCCESS,
+        payload: { bouteilles, hasMore, total, message: { texte: "", type: "" } },
+      });
+    } catch (error) {
+      console.error(error);
+      dispatch({
+        type: ACTIONS.INIT_ERROR,
+        payload: { texte: "Erreur lors du chargement", type: "erreur" },
+      });
     }
+  }, [utilisateur?.id, filtresAPI, modeTri]);
 
-    let ignore = false;
+  // Charger les bouteilles au montage et lors de changements de filtres/tri
+  useEffect(() => {
+    chargerBouteilles();
+  }, [chargerBouteilles]);
 
-    const chargerCatalogueComplet = async () => {
-      setChargementCatalogueComplet(true);
-      setErreurCatalogueComplet(null);
-      const toutesLesBouteilles = [];
-      let page = 1;
-      let continuer = true;
-
-      while (continuer && !ignore) {
-        try {
-          const reponse = await recupererBouteilles(
-            page,
-            LIMITE_CHARGEMENT_CATALOGUE
-          );
-          const lot = Array.isArray(reponse?.donnees) ? reponse.donnees : [];
-          toutesLesBouteilles.push(...lot);
-
-          const metaHasMore = reponse?.meta?.hasMore;
-          const aEncore =
-            typeof metaHasMore === "boolean"
-              ? metaHasMore
-              : lot.length === LIMITE_CHARGEMENT_CATALOGUE;
-
-          continuer = aEncore && lot.length > 0;
-          page += 1;
-        } catch (error) {
-          console.error(
-            "Erreur lors du chargement complet du catalogue",
-            error
-          );
-          setErreurCatalogueComplet(
-            "Impossible de charger toutes les bouteilles"
-          );
-          continuer = false;
-        }
-      }
-
-      if (!ignore) {
-        setCatalogueComplet(toutesLesBouteilles);
-        setChargementCatalogueComplet(false);
-      }
-    };
-
-    chargerCatalogueComplet();
-    return () => {
-      ignore = true;
-    };
-  }, [utilisateur?.id]);
-
-  // Paginer — charger la page suivante de bouteilles.
-  // Appelée par l'IntersectionObserver ou par le fallback du scroll.
+  // Charger plus de bouteilles (pagination)
   const chargerPlus = useCallback(async () => {
     const { scrollLoading, hasMore, page } = etatRef.current;
     if (scrollLoading || !hasMore) return;
 
     dispatch({ type: ACTIONS.LOAD_MORE_START });
     scrollStateRef.current = { hasMore, scrollLoading: true };
+
     const pageToLoad = page + 1;
 
     try {
-      const res = await recupererBouteilles(pageToLoad, LIMITE_BOUTEILLES);
+      const res = await recupererBouteillesAvecFiltres(
+        pageToLoad,
+        LIMITE_BOUTEILLES,
+        filtresAPI,
+        modeTri
+      );
+
       const nouvelles = Array.isArray(res?.donnees) ? res.donnees : [];
-      const metaHasMore = res?.meta?.hasMore;
-      const aEncoreDesPages =
-        typeof metaHasMore === "boolean"
-          ? metaHasMore
-          : nouvelles.length === LIMITE_BOUTEILLES;
+      const hasMorePages = res?.meta?.hasMore ?? false;
+      const total = res?.meta?.total ?? etatRef.current.total;
 
       scrollStateRef.current = {
-        hasMore: nouvelles.length ? aEncoreDesPages : false,
+        hasMore: nouvelles.length ? hasMorePages : false,
         scrollLoading: false,
       };
 
@@ -381,7 +277,8 @@ function Catalogue() {
         payload: {
           bouteilles: nouvelles,
           page: pageToLoad,
-          hasMore: aEncoreDesPages,
+          total,
+          hasMore: hasMorePages,
         },
       });
     } catch (error) {
@@ -398,36 +295,21 @@ function Catalogue() {
         },
       });
     }
-  }, []);
+  }, [filtresAPI, modeTri]);
 
+  // Debounce pour éviter les chargements multiples rapides
   const demanderChargement = useCallback(() => {
-    if (!sentinelPretRef.current) return;
-    sentinelPretRef.current = false;
-    chargerPlus();
+    if (loadTimeoutRef.current) {
+      clearTimeout(loadTimeoutRef.current);
+    }
+    loadTimeoutRef.current = setTimeout(() => {
+      chargerPlus();
+    }, 150);
   }, [chargerPlus]);
 
-  // Fallback pour les environnements où l'IntersectionObserver manque le sentinel
-  const verifierScrollEtCharger = useCallback(() => {
-    if (filtresActifs) return;
-    const node = mainRef.current;
-    if (!node) return;
-
-    const { scrollTop, clientHeight, scrollHeight } = node;
-    const distanceRestante = scrollHeight - (scrollTop + clientHeight);
-    if (distanceRestante > 400) {
-      sentinelPretRef.current = true;
-    }
-    const { hasMore, scrollLoading } = scrollStateRef.current;
-    if (distanceRestante <= 200 && hasMore && !scrollLoading) {
-      demanderChargement();
-    }
-  }, [demanderChargement, filtresActifs]);
-
-  // Effet de mise en place d'un IntersectionObserver pour détecter quand le sentinel
-  // (élément placé en bas de la liste) devient visible, déclenchant alors le chargement
-  // additionnel (pagination).
+  // IntersectionObserver pour le scroll infini
   useEffect(() => {
-    if (etat.chargementInitial || filtresActifs) return;
+    if (etat.chargementInitial) return;
 
     const root = mainRef.current;
     const sentinel = sentinelRef.current;
@@ -436,46 +318,55 @@ function Catalogue() {
     const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
-        if (!entry) return;
-
-        if (!entry.isIntersecting) {
-          sentinelPretRef.current = true;
-          return;
-        }
+        if (!entry?.isIntersecting) return;
 
         const { hasMore, scrollLoading } = scrollStateRef.current;
         if (!hasMore || scrollLoading) return;
 
         demanderChargement();
       },
-      { root, rootMargin: "0px 0px 200px 0px", threshold: 0.1 }
+      { root, rootMargin: "0px 0px 100px 0px", threshold: 0.1 }
     );
 
     observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [
-    demanderChargement,
-    etat.bouteilles.length,
-    etat.chargementInitial,
-    filtresActifs,
-  ]);
-
-  // Effet qui installe le fallback du scroll sur le conteneur principal pour
-  // déclencher `verifierScrollEtCharger` quand l'utilisateur scroll.
-  useEffect(() => {
-    if (etat.chargementInitial || filtresActifs) return;
-
-    const node = mainRef.current;
-    if (!node) return;
-
-    node.addEventListener("scroll", verifierScrollEtCharger, {
-      passive: true,
-    });
-    verifierScrollEtCharger();
     return () => {
-      node.removeEventListener("scroll", verifierScrollEtCharger);
+      observer.disconnect();
+      if (loadTimeoutRef.current) {
+        clearTimeout(loadTimeoutRef.current);
+      }
     };
-  }, [verifierScrollEtCharger, etat.chargementInitial, filtresActifs]);
+  }, [demanderChargement, etat.chargementInitial]);
+
+  // Handlers pour les filtres
+  const handleFiltrer = useCallback(
+    (criteres) => {
+      setCriteresStore(criteres);
+      desactiverModeRechercheStore();
+    },
+    [setCriteresStore, desactiverModeRechercheStore]
+  );
+
+  const handleRecherche = useCallback(
+    (texte) => {
+      setModeRechercheStore({ nom: texte });
+    },
+    [setModeRechercheStore]
+  );
+
+  const handleTri = useCallback(() => {
+    toggleModeTriStore();
+  }, [toggleModeTriStore]);
+
+  const handleSupprimerFiltre = useCallback(
+    (cle) => {
+      supprimerCritereStore(cle);
+    },
+    [supprimerCritereStore]
+  );
+
+  const handleReinitialiserFiltres = useCallback(() => {
+    reinitialiserFiltresStore();
+  }, [reinitialiserFiltresStore]);
 
   // Ajouter à la liste d'achat
   const ajouterALaListe = useCallback(
@@ -486,47 +377,41 @@ function Catalogue() {
         });
 
         if (resultat?.succes) {
-          setMessage({
-            texte: `${bouteille.nom} a été ajouté à votre liste avec succès`,
-            type: "succes",
+          dispatch({
+            type: ACTIONS.SET_MESSAGE,
+            payload: {
+              texte: `${bouteille.nom} a été ajouté à votre liste avec succès`,
+              type: "succes",
+            },
           });
         } else {
-          setMessage({
-            texte: resultat?.erreur || "Erreur lors de l'ajout à la liste",
-            type: "erreur",
+          dispatch({
+            type: ACTIONS.SET_MESSAGE,
+            payload: {
+              texte: resultat?.erreur || "Erreur lors de l'ajout à la liste",
+              type: "erreur",
+            },
           });
         }
       } catch (error) {
         console.error(error);
-        setMessage({
-          texte: "Erreur lors de l'ajout à la liste",
-          type: "erreur",
+        dispatch({
+          type: ACTIONS.SET_MESSAGE,
+          payload: {
+            texte: "Erreur lors de l'ajout à la liste",
+            type: "erreur",
+          },
         });
       }
     },
     [utilisateur?.id]
   );
-  /*================================= */
 
-  const { chargementInitial, message, scrollLoading, hasMore } = etat;
+  // Extraire les valeurs de l'état
+  const { chargementInitial, message, scrollLoading, hasMore, bouteilles, total } = etat;
   const messageListeVide = filtresActifs
-    ? "Aucune bouteille ne correspond à vos filtres"
+    ? "Aucune bouteille ne correspond à vos critères"
     : "Aucune bouteille disponible";
-
-  // Rendu d'une carte bouteille
-  const renderBouteille = useCallback(
-    (bouteille) => (
-      <Link key={bouteille.id} to={`/bouteilles/${bouteille.id}`}>
-        <CarteBouteille
-          bouteille={bouteille}
-          type="catalogue"
-          onAjouter={ouvrirModale}
-          onAjouterListe={ajouterALaListe}
-        />
-      </Link>
-    ),
-    [ouvrirModale, ajouterALaListe]
-  );
 
   // Si l'utilisateur n'est pas connecté
   if (!utilisateur?.id) {
@@ -549,89 +434,98 @@ function Catalogue() {
   }
 
   return (
-    <>
-      <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
-        <header>
-          <MenuEnHaut />
-        </header>
+    <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
+      <header>
+        <MenuEnHaut />
+      </header>
 
-        <main ref={mainRef} className="bg-fond overflow-y-auto">
-          <h1 className="text-(length:--taille-grand)  mt-(--rythme-base) text-center font-display font-semibold text-principal-300">
-            Catalogue des vins
-          </h1>
+      <main ref={mainRef} className="bg-fond overflow-y-auto">
+        <h1 className="text-(length:--taille-grand) mt-(--rythme-base) text-center font-display font-semibold text-principal-300">
+          Catalogue des vins
+        </h1>
 
-          <section className="pt-(--rythme-espace) px-(--rythme-serre)">
-            {message.texte && (
-              <Message texte={message.texte} type={message.type} />
-            )}
+        <section className="pt-(--rythme-espace) px-(--rythme-serre)">
+          {message.texte && (
+            <Message texte={message.texte} type={message.type} />
+          )}
 
-            {erreur && <Message texte={erreur} type="erreur" />}
-
-            <div className="flex flex-col gap-(--rythme-espace) lg:flex-row">
-              <div className="space-y-(--rythme-base)">
-                <FiltresCatalogue
-                  filtresActuels={filtres}
-                  rechercheActuelle={recherche}
-                  onFiltrer={handleFiltrer}
-                  onRecherche={handleRecherche}
-                  onTri={handleTri}
-                  onSupprimerFiltre={handleSupprimerFiltre}
-                  onReinitialiserFiltres={handleReinitialiserFiltres}
-                  titreTri={etiquetteTri}
-                  className="shrink-0"
-                />
-                {total > 0 && (
-                  <p className="text-(length:--taille-petit) text-texte-secondaire">
-                    {total} bouteille{total > 1 ? "s" : ""} trouvée
-                    {total > 1 ? "s" : ""}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex-1">
-                {chargementInitial ? (
-                  <div className="flex justify-center items-center py-(--rythme-espace)">
-                    <Spinner
-                      size={220}
-                      ariaLabel="Chargement du catalogue de bouteilles"
-                    />
-                  </div>
-                ) : bouteillesAffichees.length > 0 ? (
-                  <>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {bouteillesAffichees.map((b) => (
-                        <Link key={b.id} to={`/bouteilles/${b.id}`}>
-                          <CarteBouteille
-                            key={b.id}
-                            bouteille={b}
-                            type="catalogue"
-                            onAjouterListe={ajouterALaListe}
-                          />
-                        </Link>
-                      ))}
-                    </div>
-                    {!filtresActifs && scrollLoading && hasMore && (
-                      <div className="flex justify-center py-(--rythme-base)">
-                        <Spinner
-                          size={140}
-                          ariaLabel="Chargement de nouvelles bouteilles"
-                        />
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="flex justify-center py-(--rythme-espace)">
-                    <NonTrouver size={180} message={messageListeVide} />
-                  </div>
-                )}
-              </div>
+          <div className="flex flex-col gap-(--rythme-espace) lg:flex-row">
+            <div className="space-y-(--rythme-base)">
+              <FiltresCatalogue
+                filtresActuels={criteresFiltresStore}
+                rechercheActuelle={
+                  typeof criteresRechercheStore === 'string'
+                    ? criteresRechercheStore
+                    : criteresRechercheStore?.nom || ''
+                }
+                onFiltrer={handleFiltrer}
+                onRecherche={handleRecherche}
+                onTri={handleTri}
+                onSupprimerFiltre={handleSupprimerFiltre}
+                onReinitialiserFiltres={handleReinitialiserFiltres}
+                titreTri={etiquetteTri}
+                className="shrink-0"
+              />
+              {total > 0 && (
+                <p className="text-(length:--taille-petit) text-texte-secondaire">
+                  {total} bouteille{total > 1 ? "s" : ""} trouvée
+                  {total > 1 ? "s" : ""}
+                </p>
+              )}
             </div>
-          </section>
-        </main>
 
-        <MenuEnBas />
-      </div>
-    </>
+            <div className="flex-1">
+              {chargementInitial ? (
+                <div className="flex justify-center items-center py-(--rythme-espace)">
+                  <Spinner
+                    size={220}
+                    ariaLabel="Chargement du catalogue de bouteilles"
+                  />
+                </div>
+              ) : bouteilles.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {bouteilles.map((b) => (
+                      <Link key={b.id} to={`/bouteilles/${b.id}`}>
+                        <CarteBouteille
+                          bouteille={b}
+                          type="catalogue"
+                          onAjouterListe={ajouterALaListe}
+                        />
+                      </Link>
+                    ))}
+                  </div>
+
+                  {/* Sentinel pour le scroll infini */}
+                  {hasMore && (
+                    <div
+                      ref={sentinelRef}
+                      className="h-4 w-full"
+                      aria-hidden="true"
+                    />
+                  )}
+
+                  {scrollLoading && (
+                    <div className="flex justify-center py-(--rythme-base)">
+                      <Spinner
+                        size={140}
+                        ariaLabel="Chargement de nouvelles bouteilles"
+                      />
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="flex justify-center py-(--rythme-espace)">
+                  <NonTrouver size={180} message={messageListeVide} />
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <MenuEnBas />
+    </div>
   );
 }
 
