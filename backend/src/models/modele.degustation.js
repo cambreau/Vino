@@ -33,12 +33,45 @@ export default class ModeleDegustation {
     return rows;
   }
 
+  /**
+   * Vérifie si une dégustation (note) existe pour un couple
+   * (id_utilisateur, id_bouteille).
+   * Retourne l'enregistrement trouvé ou null.
+   */
+  static async existePourUtilisateurEtBouteille(id_utilisateur, id_bouteille) {
+    const idUtilisateur = Number.parseInt(id_utilisateur, 10);
+    const idBouteille = Number.parseInt(id_bouteille, 10);
+
+    if (!Number.isInteger(idUtilisateur) || idUtilisateur <= 0) {
+      throw new Error("ID utilisateur invalide");
+    }
+
+    if (!Number.isInteger(idBouteille) || idBouteille <= 0) {
+      throw new Error("ID bouteille invalide");
+    }
+
+    const sql = `
+      SELECT
+        d.*
+      FROM degustation d
+      WHERE d.id_utilisateur = ? AND d.id_bouteille = ?
+      LIMIT 1
+    `;
+
+    const [rows] = await connexion.query(sql, [idUtilisateur, idBouteille]);
+    return rows.length > 0 ? rows[0] : null;
+  }
+
   // Requête pour ajouter une dégustation
   static async ajouter(id_bouteille, id_utilisateur, note, commentaire) {
     // Validation des entrées
     const idBouteille = Number.parseInt(id_bouteille, 10);
     const idUtilisateur = Number.parseInt(id_utilisateur, 10);
     const noteNombre = Number(note);
+    const existe = await this.existePourUtilisateurEtBouteille(
+      idUtilisateur,
+      idBouteille
+    );
     if (!Number.isInteger(idBouteille) || idBouteille <= 0) {
       throw new Error("ID bouteille invalide");
     }
@@ -61,6 +94,12 @@ export default class ModeleDegustation {
 
     if (typeof commentaire !== "string" || commentaire.trim() === "") {
       throw new Error("Commentaire ne peut pas être vide");
+    }
+
+    if (existe) {
+      throw new Error(
+        "Une dégustation pour cette bouteille et cet utilisateur existe déjà"
+      );
     }
 
     // Insertion dans la base de données
