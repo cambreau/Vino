@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
+import { Link } from "react-router-dom";
 import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuantite";
 import { GiNotebook } from "react-icons/gi";
 import iconNotez from "@assets/images/evaluation.svg";
@@ -14,6 +15,7 @@ const CarteBouteille = ({
   onAjouter = () => {},
   onAjouterListe = () => {},
   disabled = false, //désactiver le bouton
+  aNote = false, //indique si l'utilisateur a déjà noté la bouteille
 }) => {
   const [estModaleNotezOuverte, setEstModaleNotezOuverte] = useState(false);
 
@@ -96,22 +98,48 @@ const CarteBouteille = ({
               disabled={disabled}
             />
           </div>
-          <Bouton
-            texte={
-              <span className="flex items-center gap-(--rythme-tres-serre)">
-                Notez
-                <img
-                  src={iconNotez}
-                  alt="Icône évaluation"
-                  className="w-5 h-5"
-                />
-              </span>
-            }
-            type="secondaire"
-            action={(e) => ouvrirBoiteModaleNotez(e, bouteille.id)}
-            typeHtml="button"
-            disabled={false}
-          />
+          {aNote ? (
+            <Link
+              to={`/bouteilles/${bouteille.id}#historique-notes`}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              className="block no-underline "
+            >
+              <Bouton
+                texte={
+                  <span className="flex items-center gap-(--rythme-tres-serre)">
+                    Voir
+                    <img
+                      src={iconNotez}
+                      alt="Icône évaluation"
+                      className="w-5 h-5"
+                    />
+                  </span>
+                }
+                type="secondaire"
+                typeHtml="button"
+                disabled={false}
+              />
+            </Link>
+          ) : (
+            <Bouton
+              texte={
+                <span className="flex items-center gap-(--rythme-tres-serre)">
+                  Notez
+                  <img
+                    src={iconNotez}
+                    alt="Icône évaluation"
+                    className="w-5 h-5"
+                  />
+                </span>
+              }
+              type="secondaire"
+              action={(e) => ouvrirBoiteModaleNotez(e, bouteille.id)}
+              typeHtml="button"
+              disabled={false}
+            />
+          )}
         </div>
       );
     }

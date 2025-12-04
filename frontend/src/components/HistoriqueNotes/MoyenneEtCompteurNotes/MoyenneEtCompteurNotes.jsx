@@ -5,8 +5,9 @@ import { recupererNotes } from "@lib/requetes";
 /**
  * Composant qui affiche la moyenne et le nombre total de notes d'une bouteille.
  * @param {string|number} id_bouteille - L'identifiant unique de la bouteille
+ * @param {number} reactualiser - Compteur pour forcer le rechargement
  */
-function MoyenneEtCompteurNotes({ id_bouteille }) {
+function MoyenneEtCompteurNotes({ id_bouteille, reactualiser = 0 }) {
   const [moyenne, setMoyenne] = useState(null);
   const [nombreNotes, setNombreNotes] = useState(0);
   const [chargement, setChargement] = useState(true);
@@ -51,7 +52,7 @@ function MoyenneEtCompteurNotes({ id_bouteille }) {
     };
 
     calculerMoyenneEtCompteur();
-  }, [id_bouteille]);
+  }, [id_bouteille, reactualiser]);
 
   // Afficher un spinner pendant le chargement (taille petit)
   if (chargement) {

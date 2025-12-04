@@ -115,7 +115,10 @@ function HistoriqueNotes({ id_bouteille }) {
   const toutesNotesAffichees = nombreNotesAffichees >= notes.length;
 
   return (
-    <section className="border border-principal-100 rounded-(--arrondi-grand) shadow-md p-(--rythme-base)">
+    <section
+      id="historique-notes"
+      className="border border-principal-100 rounded-(--arrondi-grand) shadow-md p-(--rythme-base)"
+    >
       <header className="flex justify-between wrap">
         <div>
           <h2 className="mb-2 text-(length:--taille-normal) font-semibold text-texte-premier">
@@ -123,8 +126,8 @@ function HistoriqueNotes({ id_bouteille }) {
           </h2>
           <div className="mb-(--rythme-base)">
             <MoyenneEtCompteurNotes
-              key={reactualiserComponent}
               id_bouteille={id_bouteille}
+              reactualiser={reactualiserComponent}
             />
           </div>
         </div>

@@ -669,60 +669,62 @@ export const recupererBouteilles = async (page = 1, limit = 10) => {
 /**
  * Récupère la liste d'achat complète avec infos bouteilles
  * @param {number} id_utilisateur - L'ID de l'utilisateur
- * @returns {Promise<Array>} - La liste des bouteilles 
+ * @returns {Promise<Array>} - La liste des bouteilles
  */
 export const recupererListeAchatComplete = async (id_utilisateur) => {
   try {
-	const reponse = await fetch(
-	  `${import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL}/${id_utilisateur}`
-	);
-	
-	if (!reponse.ok) {
-	  throw new Error(`Erreur HTTP: ${reponse.status}`);
-	}
-	
-	const data = await reponse.json();
-	const bouteillesListe = data.data || [];
-	
-	if (!bouteillesListe.length) {
-	  return [];
-	}
-	
-	const celliersData = await recupererTousCellier(id_utilisateur);
-	const celliers = celliersData.data || celliersData.donnees || celliersData || [];
-	
-	const bouteillesCompletes = await Promise.all(
-	  bouteillesListe.map(async (item) => {
-		const quantitesParCellier = await Promise.all(
-		  celliers.map(async (cellier) => {
-			const bouteillesCellier = await recupererBouteillesCellier(cellier.id_cellier);
-			const bouteilleExistante = bouteillesCellier.find(
-			  (b) => b.id === item.id_bouteille
-			);
-			
-			return {
-			  idCellier: cellier.id_cellier,
-			  nomCellier: cellier.nom,
-			  quantite: bouteilleExistante ? bouteilleExistante.quantite : 0,
-			};
-		  })
-		);
-		
-		return {
-		  ...item.bouteille,
-		  id: item.id_bouteille,
-		  celliers: quantitesParCellier,
-		};
-	  })
-	);
-	
-	return bouteillesCompletes.filter(Boolean);
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL}/${id_utilisateur}`
+    );
+
+    if (!reponse.ok) {
+      throw new Error(`Erreur HTTP: ${reponse.status}`);
+    }
+
+    const data = await reponse.json();
+    const bouteillesListe = data.data || [];
+
+    if (!bouteillesListe.length) {
+      return [];
+    }
+
+    const celliersData = await recupererTousCellier(id_utilisateur);
+    const celliers =
+      celliersData.data || celliersData.donnees || celliersData || [];
+
+    const bouteillesCompletes = await Promise.all(
+      bouteillesListe.map(async (item) => {
+        const quantitesParCellier = await Promise.all(
+          celliers.map(async (cellier) => {
+            const bouteillesCellier = await recupererBouteillesCellier(
+              cellier.id_cellier
+            );
+            const bouteilleExistante = bouteillesCellier.find(
+              (b) => b.id === item.id_bouteille
+            );
+
+            return {
+              idCellier: cellier.id_cellier,
+              nomCellier: cellier.nom,
+              quantite: bouteilleExistante ? bouteilleExistante.quantite : 0,
+            };
+          })
+        );
+
+        return {
+          ...item.bouteille,
+          id: item.id_bouteille,
+          celliers: quantitesParCellier,
+        };
+      })
+    );
+
+    return bouteillesCompletes.filter(Boolean);
   } catch (error) {
-	console.error("Erreur lors de la récupération de la liste d'achat:", error);
-	return [];
+    console.error("Erreur lors de la récupération de la liste d'achat:", error);
+    return [];
   }
 };
-
 
 /**
  * Ajoute une bouteille à la liste d'achat d'un utilisateur
@@ -773,13 +775,15 @@ export const ajouterBouteilleListe = async (id_utilisateur, donnees) => {
 export const supprimerBouteilleListe = async (id_utilisateur, id_bouteille) => {
   try {
     const reponse = await fetch(
-      `${import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL}/${id_utilisateur}/${id_bouteille}`,
+      `${
+        import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL
+      }/${id_utilisateur}/${id_bouteille}`,
       {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       }
     );
-    
+
     if (reponse.ok) {
       return { succes: true };
     }
@@ -799,7 +803,6 @@ export const supprimerBouteilleListe = async (id_utilisateur, id_bouteille) => {
     };
   }
 };
-
 
 // *************************** Notes degustations
 /**
@@ -903,6 +906,42 @@ export const recupererNotes = async (id_bouteille) => {
     // Pour debug
     console.error("Erreur lors de la récupération des notes :", error);
     return null;
+  }
+};
+
+/**
+ * Récupère toutes les notes de dégustation d'un utilisateur par son identifiant via l'API backend.
+ * @param {string|number} id_utilisateur - L'identifiant unique de l'utilisateur
+ * @returns {Promise<Array>} Les données des notes de dégustation (tableau vide en cas d'erreur)
+ */
+export const recupererNotesUtilisateur = async (id_utilisateur) => {
+  try {
+    const reponse = await fetch(
+      `${
+        import.meta.env.VITE_BACKEND_DEGUSTATION_URL
+      }/utilisateur/${id_utilisateur}`
+    );
+
+    if (!reponse.ok) {
+      // Pour debug
+      console.error("Erreur HTTP:", reponse.status);
+      return [];
+    }
+
+    const resultat = await reponse.json();
+    // Gérer différents formats de réponse
+    const notes =
+      resultat?.donnees ||
+      resultat?.data ||
+      (Array.isArray(resultat) ? resultat : []);
+    return Array.isArray(notes) ? notes : [];
+  } catch (error) {
+    // Pour debug
+    console.error(
+      "Erreur lors de la récupération des notes de l'utilisateur :",
+      error
+    );
+    return [];
   }
 };
 

@@ -35,6 +35,18 @@ function Bouteille() {
   // État pour contrôler l'ouverture de la modale
   const [modaleOuverte, setModaleOuverte] = useState(false);
 
+  // Scroller vers la section Historique Notes si le hash est présent dans l'URL
+  useEffect(() => {
+    if (window.location.hash === "#historique-notes") {
+      setTimeout(() => {
+        const element = document.getElementById("historique-notes");
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    }
+  }, [id]);
+
   /**
    * Recuperer les informations d'une bouteille' cote backend.
    */
