@@ -99,7 +99,55 @@ export const ajouterDegustation = async (req, res) => {
   }
 };
 
-export const modifierDegustation = async (req, res) => {};
+export const modifierDegustation = async (req, res) => {
+  try {
+    const { id_utilisateur } = req.params;
+    const idUtilisateurNombre = parseInt(id_utilisateur, 10);
+
+    const { id_bouteille } = req.params;
+    const idBouteilleNombre = parseInt(id_bouteille, 10);
+
+    // Récupération des données du corps de la requête
+    const { notes, commentaire } = req.body;
+
+    // Récupération de la date du jour au format MySQL DATETIME
+    const date_degustation = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    // Appel du modèle pour verifier si existe la dégustation
+    const resultat = await ModeleDegustation.existePourUtilisateurEtBouteille(
+      idUtilisateurNombre,
+      idBouteilleNombre,
+    );
+
+    if (resultat) {
+      // return res.status(201).json({
+      //   message: { date_degustation },
+      // });
+      // Appel du modèle pour modifier la dégustation
+      const modifier = await ModeleDegustation.modifier(
+        idBouteilleNombre,
+        idUtilisateurNombre,
+        date_degustation,
+        notes,
+        commentaire || ""
+      );
+
+      // Retour de succès
+      return res.status(201).json({
+        message: "Dégustation modifie",
+        data: modifier,
+      });
+    } else {
+      // Retour en cas d'erreur
+      return res.status(500).json({ message: "Erreur lors de la modification de la dégustation" });
+    }
+
+  } catch (error) {
+    // Retour en cas d'erreur
+    console.error("Erreur lors de la modification de la dégustation", error);
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
+};
 
 export const supprimerDegustation = async (req, res) => {
   try {

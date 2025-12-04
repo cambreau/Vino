@@ -41,12 +41,45 @@ export default class ModeleDegustation {
     return rows;
   }
 
+  /**
+   * Vérifie si une dégustation (note) existe pour un couple
+   * (id_utilisateur, id_bouteille).
+   * Retourne l'enregistrement trouvé ou null.
+   */
+  static async existePourUtilisateurEtBouteille(id_utilisateur, id_bouteille) {
+    const idUtilisateur = Number.parseInt(id_utilisateur, 10);
+    const idBouteille = Number.parseInt(id_bouteille, 10);
+
+    if (!Number.isInteger(idUtilisateur) || idUtilisateur <= 0) {
+      throw new Error("ID utilisateur invalide");
+    }
+
+    if (!Number.isInteger(idBouteille) || idBouteille <= 0) {
+      throw new Error("ID bouteille invalide");
+    }
+
+    const sql = `
+      SELECT
+        d.*
+      FROM degustation d
+      WHERE d.id_utilisateur = ? AND d.id_bouteille = ?
+      LIMIT 1
+    `;
+
+    const [rows] = await connexion.query(sql, [idUtilisateur, idBouteille]);
+    return rows.length > 0 ? rows[0] : null;
+  }
+
   // Requête pour ajouter une dégustation
   static async ajouter(id_bouteille, id_utilisateur, note, commentaire) {
     // Validation des entrées
     const idBouteille = Number.parseInt(id_bouteille, 10);
     const idUtilisateur = Number.parseInt(id_utilisateur, 10);
     const noteNombre = Number(note);
+    const existe = await this.existePourUtilisateurEtBouteille(
+      idUtilisateur,
+      idBouteille
+    );
     if (!Number.isInteger(idBouteille) || idBouteille <= 0) {
       throw new Error("ID bouteille invalide");
     }
@@ -71,6 +104,12 @@ export default class ModeleDegustation {
       throw new Error("Commentaire ne peut pas être vide");
     }
 
+    if (existe) {
+      throw new Error(
+        "Une dégustation pour cette bouteille et cet utilisateur existe déjà"
+      );
+    }
+
     // Insertion dans la base de données
     const sql = `INSERT INTO degustation (id_bouteille, id_utilisateur, notes, commentaire) VALUES (?, ?, ?, ?)`;
     const [result] = await connexion.query(sql, [
@@ -85,12 +124,36 @@ export default class ModeleDegustation {
 
   // Requête pour modifier une dégustation
   static async modifier(
-    id_bouteille,
-    id_utilisateur,
-    date,
-    note,
+    idBouteilleNombre,
+    idUtilisateurNombre,
+    date_degustation,
+    notes,
     commentaire
-  ) {}
+  ) {
+
+    const sql = `
+      UPDATE degustation
+      SET date_degustation = ? , notes = ? , commentaire = ?
+      WHERE id_utilisateur = ? AND id_bouteille = ?
+    `;
+
+    const [resultat] = await connexion.query(sql, [
+      date_degustation,
+      notes,
+      commentaire,
+      idUtilisateurNombre,
+      idBouteilleNombre
+    ]);
+
+    return {
+      date_degustation,
+      notes,
+      commentaire,
+      idUtilisateurNombre,
+      idBouteilleNombre,
+      lignesAffectees: resultat.affectedRows,
+    };
+  }
 
   // Requête pour suprimmer une dégustation
   static async supprimer(id_utilisateur, id_bouteille) {

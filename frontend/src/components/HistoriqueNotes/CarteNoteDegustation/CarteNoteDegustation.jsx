@@ -80,11 +80,11 @@ const CarteNoteDegustation = ({
         className="
         flex gap-(--rythme-serre)
         bg-fond-secondaire p-(--rythme-base) 
-        mb-(--rythme-serre)
+        
         rounded-(--arrondi-grand) shadow-md"
       >
         {/* Section INFORMATIONS de la bouteille */}
-        <div className="flex-1 flex flex-col gap-(--rythme-serre)">
+        <div className="flex-1 flex flex-col gap-(--rythme-serre) max-w-full">
           {/* Nom */}
           <div>
             <header className="flex justify-between items-center mb-(--rythme-tres-serre)">
@@ -102,7 +102,7 @@ const CarteNoteDegustation = ({
           {/* Commentaire et date */}
           <div className="flex flex-col gap-(--rythme-serre)">
             {commentaire && (
-              <p className="text-(length:--taille-petit) text-texte-secondaire">
+              <p className="text-(length:--taille-petit) text-texte-secondaire ">
                 Commentaire:{" "}
                 <strong className="font-semibold text-principal-300">
                   {commentaire}
