@@ -115,6 +115,140 @@ class ModeleBouteille {
     return rows.map(mapper);
   }
 
+  /**
+   * Récupère les bouteilles avec filtres, recherche, tri et pagination côté SQL.
+   * Optimisé pour ne charger que les données nécessaires.
+   * @param {Object} options - Options de requête
+   * @param {number} options.page - Numéro de page (1-indexed)
+   * @param {number} options.limit - Nombre d'éléments par page
+   * @param {Object} options.filtres - Filtres à appliquer (type, pays, region, annee, recherche)
+   * @param {string} options.tri - Mode de tri (nom_asc ou nom_desc)
+   * @returns {Promise<{donnees: Array, total: number, hasMore: boolean}>}
+   */
+  static async trouverAvecFiltres({ page = 1, limit = 10, filtres = {}, tri = "nom_asc" }) {
+    const clauses = [];
+    const valeurs = [];
+
+    // Filtres par type, pays, région
+    if (filtres.type) {
+      clauses.push("LOWER(t.couleur) = LOWER(?)");
+      valeurs.push(filtres.type);
+    }
+
+    if (filtres.pays) {
+      clauses.push("LOWER(p.nom) = LOWER(?)");
+      valeurs.push(filtres.pays);
+    }
+
+    if (filtres.region) {
+      clauses.push("LOWER(b.region) LIKE LOWER(?)");
+      valeurs.push(`%${filtres.region}%`);
+    }
+
+    if (filtres.annee) {
+      clauses.push("b.millenisme = ?");
+      valeurs.push(filtres.annee);
+    }
+
+    // Recherche textuelle (cherche dans nom, pays, région, cépage)
+    if (filtres.recherche) {
+      const recherche = `%${filtres.recherche}%`;
+      clauses.push(`(
+        LOWER(b.nom) LIKE LOWER(?) OR
+        LOWER(p.nom) LIKE LOWER(?) OR
+        LOWER(b.region) LIKE LOWER(?) OR
+        LOWER(b.cepage) LIKE LOWER(?)
+      )`);
+      valeurs.push(recherche, recherche, recherche, recherche);
+    }
+
+    // Construction de la clause WHERE
+    const whereClause = clauses.length > 0 ? `WHERE ${clauses.join(" AND ")}` : "";
+
+    // Tri
+    const orderDirection = tri === "nom_desc" ? "DESC" : "ASC";
+    const orderClause = `ORDER BY b.nom ${orderDirection}`;
+
+    // Requête pour compter le total
+    const countSql = `
+      SELECT COUNT(*) as total
+      FROM bouteille b
+      LEFT JOIN pays p ON p.id_pays = b.id_pays
+      LEFT JOIN type t ON t.id_type = b.id_type
+      ${whereClause}
+    `;
+    const [countResult] = await connexion.query(countSql, valeurs);
+    const total = countResult[0]?.total || 0;
+
+    // Pagination
+    const offset = (page - 1) * limit;
+
+    // Requête principale avec pagination
+    const sql = `
+      ${BASE_SELECT}
+      ${whereClause}
+      ${orderClause}
+      LIMIT ? OFFSET ?
+    `;
+    const [rows] = await connexion.query(sql, [...valeurs, limit, offset]);
+
+    return {
+      donnees: rows.map(mapper),
+      total,
+      hasMore: offset + rows.length < total,
+    };
+  }
+
+  /**
+   * Récupère les options de filtres disponibles (types, pays, régions, années).
+   * Optimisé avec des requêtes distinctes pour éviter de charger toutes les bouteilles.
+   * @returns {Promise<{types: Array, pays: Array, regions: Array, annees: Array}>}
+   */
+  static async recupererOptionsFiltres() {
+    // Récupérer les types distincts
+    const [typesRows] = await connexion.query(`
+      SELECT DISTINCT t.couleur as type
+      FROM type t
+      INNER JOIN bouteille b ON b.id_type = t.id_type
+      WHERE t.couleur IS NOT NULL AND t.couleur != ''
+      ORDER BY t.couleur ASC
+    `);
+    const types = typesRows.map((r) => r.type);
+
+    // Récupérer les pays distincts
+    const [paysRows] = await connexion.query(`
+      SELECT DISTINCT p.nom as pays
+      FROM pays p
+      INNER JOIN bouteille b ON b.id_pays = p.id_pays
+      WHERE p.nom IS NOT NULL AND p.nom != ''
+      ORDER BY p.nom ASC
+    `);
+    const pays = paysRows.map((r) => r.pays);
+
+    // Récupérer les régions distinctes
+    const [regionsRows] = await connexion.query(`
+      SELECT DISTINCT b.region
+      FROM bouteille b
+      WHERE b.region IS NOT NULL AND b.region != ''
+      ORDER BY b.region ASC
+    `);
+    const regions = regionsRows.map((r) => r.region);
+
+    // Récupérer les années distinctes (millésimes)
+    const [anneesRows] = await connexion.query(`
+      SELECT DISTINCT b.millenisme as annee
+      FROM bouteille b
+      WHERE b.millenisme IS NOT NULL 
+        AND b.millenisme != '' 
+        AND b.millenisme != 'Millésime non disponible'
+        AND b.millenisme REGEXP '^[0-9]+$'
+      ORDER BY b.millenisme DESC
+    `);
+    const annees = anneesRows.map((r) => r.annee);
+
+    return { types, pays, regions, annees };
+  }
+
   // Crée une nouvelle bouteille avec les données fournies.
   static async creer(donnees) {
     if (!donnees || !donnees.nom || !donnees.code_saq) {

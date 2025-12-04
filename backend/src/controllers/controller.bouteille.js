@@ -9,9 +9,10 @@ import modeleBouteille from "../models/modele.bouteille.js";
 
 export const listerBouteilles = async (req, res) => {
   try {
-    // 1) Lire les paramètres depuis l’URL ?page=1&limit=10
+    // 1) Lire les paramètres depuis l'URL ?page=1&limit=10&type=rouge&pays=France&recherche=merlot&tri=nom_asc
     const page = Number.parseInt(req.query.page, 10) || 1;
     const limit = Number.parseInt(req.query.limit, 10) || 10;
+    const tri = req.query.tri || "nom_asc"; // nom_asc ou nom_desc
 
     // 2) Valider qu'ils sont corrects
     if (
@@ -25,28 +26,50 @@ export const listerBouteilles = async (req, res) => {
         .json({ success: false, message: "Paramètres page/limit invalides" });
     }
 
-    // 3) Calculer à partir d’où récupérer dans la liste
-    const offset = (page - 1) * limit;
+    // 3) Construire les filtres à partir des query params
+    const filtres = {};
+    if (req.query.type) filtres.type = req.query.type;
+    if (req.query.pays) filtres.pays = req.query.pays;
+    if (req.query.region) filtres.region = req.query.region;
+    if (req.query.annee) filtres.annee = req.query.annee;
+    if (req.query.recherche) filtres.recherche = req.query.recherche;
 
-    // 4) Récupérer toutes les bouteilles, mais découper seulement une portion
-    const toutes = await modeleBouteille.trouverTout();
-    const portion = toutes.slice(offset, offset + limit);
-
-    // 5) Dire au frontend s’il en reste d'autres
-    const hasMore = offset + portion.length < toutes.length;
+    // 4) Utiliser la méthode optimisée avec filtres et pagination côté SQL
+    const resultat = await modeleBouteille.trouverAvecFiltres({
+      page,
+      limit,
+      filtres,
+      tri,
+    });
 
     return res.status(200).json({
       success: true,
-      donnees: portion,
+      donnees: resultat.donnees,
       meta: {
         page,
         limit,
-        total: toutes.length,
-        hasMore,
+        total: resultat.total,
+        hasMore: resultat.hasMore,
       },
     });
   } catch (error) {
     console.error("Erreur lors de la récupération des bouteilles", error);
+    return res.status(500).json({ success: false, message: "Erreur serveur" });
+  }
+};
+
+/**
+ * Récupère les options de filtres disponibles (types, pays, régions, années)
+ */
+export const recupererOptionsFiltres = async (req, res) => {
+  try {
+    const options = await modeleBouteille.recupererOptionsFiltres();
+    return res.status(200).json({
+      success: true,
+      ...options,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la récupération des options de filtres", error);
     return res.status(500).json({ success: false, message: "Erreur serveur" });
   }
 };
