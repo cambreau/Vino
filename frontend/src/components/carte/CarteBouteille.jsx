@@ -6,18 +6,19 @@ import { GiNotebook } from "react-icons/gi";
 import iconNotez from "@assets/images/evaluation.svg";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import BoiteModaleNotes from "@components/boiteModaleNotes/boiteModaleNotes";
+import BoiteModaleAjoutBouteilleCellier from "@components/boiteModaleAjoutBouteilleCellier/boiteModaleAjoutBouteilleCellier";
 
 const CarteBouteille = ({
   bouteille,
   type = "catalogue",
   onAugmenter = () => {},
   onDiminuer = () => {},
-  onAjouter = () => {},
   onAjouterListe = () => {},
   disabled = false, //désactiver le bouton
   aNote = false, //indique si l'utilisateur a déjà noté la bouteille
 }) => {
   const [estModaleNotezOuverte, setEstModaleNotezOuverte] = useState(false);
+  const [estModaleAjoutOuverte, setEstModaleAjoutOuverte] = useState(false);
 
   const ouvrirBoiteModaleNotez = (e, idBouteille) => {
     if (e) {
@@ -29,6 +30,19 @@ const CarteBouteille = ({
 
   const fermerBoiteModaleNotez = () => {
     setEstModaleNotezOuverte(false);
+  };
+
+  const ouvrirBoiteModaleAjout = (e) => {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    if (disabled) return;
+    setEstModaleAjoutOuverte(true);
+  };
+
+  const fermerBoiteModaleAjout = () => {
+    setEstModaleAjoutOuverte(false);
   };
 
   /**
@@ -46,7 +60,7 @@ const CarteBouteille = ({
           <Bouton
             texte={disabled ? "Déjà dans le cellier" : "Ajouter au cellier"}
             type="secondaire"
-            action={handleAjouter}
+            action={ouvrirBoiteModaleAjout}
             disabled={disabled}
           />
 
@@ -145,13 +159,6 @@ const CarteBouteille = ({
     }
   };
 
-  // Arreter la propagation et afficher le modale pour ajouter la bouteille
-  const handleAjouter = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    onAjouter(bouteille);
-  };
-
   const gererAjouterListe = (e) => {
     if (e && typeof e.stopPropagation === "function") {
       e.stopPropagation();
@@ -169,6 +176,15 @@ const CarteBouteille = ({
     <BoiteModaleNotes
       id_bouteille={bouteille.id}
       onFermer={fermerBoiteModaleNotez}
+    />
+  ) : null;
+
+  const modaleAjoutContent = estModaleAjoutOuverte ? (
+    <BoiteModaleAjoutBouteilleCellier
+      id_bouteille={bouteille.id}
+      nom_bouteille={bouteille.nom}
+      estOuverte={estModaleAjoutOuverte}
+      onFermer={fermerBoiteModaleAjout}
     />
   ) : null;
 
@@ -209,6 +225,8 @@ const CarteBouteille = ({
       </div>
       {/* Boîte modale pour noter la bouteille */}
       {modaleContent && createPortal(modaleContent, document.body)}
+      {/* Boîte modale pour ajouter la bouteille au cellier (catalogue) */}
+      {modaleAjoutContent && createPortal(modaleAjoutContent, document.body)}
     </div>
   );
 };
