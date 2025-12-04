@@ -81,7 +81,7 @@ function Bouteille() {
         {/* Menu haut fixe */}
         <MenuEnHaut />
       </header>
-      <main className="py-(--rythme-base) px-(--rythme-serre) bg-fond overflow-y-auto">
+      <main className="p-(--rythme-base) bg-fond overflow-y-auto">
         <article className=" font-body">
           <header>
             <BoutonRetour />
