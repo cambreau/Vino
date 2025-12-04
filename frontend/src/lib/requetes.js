@@ -297,7 +297,9 @@ export const recupererBouteillesCellier = async (idCellier) => {
       }
     });
 
-    const bouteillesCompletes = (await Promise.all(bouteillesPromises)).filter(Boolean);
+    const bouteillesCompletes = (await Promise.all(bouteillesPromises)).filter(
+      Boolean
+    );
     return bouteillesCompletes;
   } catch (error) {
     console.error(
