@@ -5,7 +5,7 @@ import bouteillesStore from "@store/bouteillesStore";
 // *************************** Utilisateur
 /**
  * Crée un nouvel utilisateur dans la base de données via l'API backend.
- * Redirige vers la page de connexion en cas de succès ou vers la page d'inscription en cas d'erreur.
+ * Connecte automatiquement l'utilisateur et le redirige vers le catalogue en cas de succès.
  * @param {Object} datas - Les données de l'utilisateur à créer
  * @param {Function} navigate - Fonction de navigation de react-router-dom pour rediriger l'utilisateur
  * @returns {Promise<{succes: boolean, erreur?: Object|string}>} Un objet indiquant le succès de l'opération et l'erreur éventuelle
@@ -22,8 +22,23 @@ export const creerUtilisateur = async (datas, navigate) => {
     );
 
     if (reponse.ok) {
-      navigate("/connexion?inscriptionSucces=true");
-      return { succes: true };
+      const data = await reponse.json();
+      const utilisateurCree = data?.utilisateur; // renverra simplement undefined
+      //ref https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Operators/Optional_chaining
+
+      if (utilisateurCree) {
+        const datasUtilisateur = {
+          id: utilisateurCree.id_utilisateur,
+          nom: utilisateurCree.nom,
+          courriel: utilisateurCree.courriel,
+        };
+
+        authentificationStore.getState().connexion(datasUtilisateur);
+        bouteillesStore.getState().chargerBouteilles();
+      }
+
+      navigate("/catalogue");
+      return { succes: true, utilisateur: utilisateurCree };
     }
 
     // Gestion des erreurs HTTP (400, 500, etc.)
@@ -141,7 +156,7 @@ export const supprimerUtilisateur = async (id, navigate) => {
     if (reponse.ok) {
       // Déconnecter l'utilisateur du store
       authentificationStore.getState().deconnexion();
-      navigate(`/connexion?supprimerSucces=true`);
+      navigate(`/?supprimerSucces=true`);
       return { succes: true };
     } else {
       // Gestion des erreurs HTTP
@@ -296,6 +311,122 @@ export const recupererBouteillesCellier = async (idCellier) => {
       error
     );
     return [];
+  }
+};
+
+/**
+ * Modifie les informations d'un cellier existant dans la base de données.
+ * Redirige vers la page de sommaire celliers.
+ * @param {string|number} id_bouteille - Id bouteille
+ * @param {string|number} id_cellier - Id du cellier à modifier
+ * @param {string|number} nouvelleQuantite - quantite e bouteille a modifier
+ * @param {Function} navigate - Fonction de navigation de react-router-dom pour rediriger l'utilisateur
+ * @returns {Promise<>} Un objet indiquant le succès de l'opération et l'erreur éventuelle
+ */
+export const modifierBouteilleCellier = async (
+  id_cellier,
+  id_bouteille,
+  nouvelleQuantite
+) => {
+  try {
+    const quantiteCible = Math.max(
+      0,
+      Number.parseInt(nouvelleQuantite, 10) || 0
+    );
+
+    if (quantiteCible === 0) {
+      const reponse = await fetch(
+        `${
+          import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
+        }/${id_cellier}/${id_bouteille}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (reponse.ok) {
+        return { succes: true, supprime: true };
+      }
+
+      const erreurData = await reponse.json().catch(() => ({}));
+      console.error(
+        "Erreur HTTP lors de la suppression:",
+        reponse.status,
+        erreurData
+      );
+      return {
+        succes: false,
+        erreur:
+          erreurData?.message ||
+          "Erreur lors de la suppression de la bouteille du cellier",
+      };
+    }
+
+    const reponse = await fetch(
+      `${
+        import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
+      }/${id_cellier}/${id_bouteille}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nouvelleQuantite: quantiteCible }),
+      }
+    );
+
+    if (reponse.ok) {
+      return { succes: true, supprime: false, quantite: quantiteCible };
+    }
+
+    const erreurData = await reponse.json().catch(() => ({}));
+    console.error("Erreur HTTP:", reponse.status, erreurData);
+
+    return {
+      succes: false,
+      erreur:
+        erreurData?.message ||
+        "Erreur lors de la modification de la bouteille dans le cellier",
+    };
+  } catch (error) {
+    console.error(
+      "Erreur lors de la modification de la bouteille dans le cellier :",
+      error
+    );
+    return { succes: false, erreur: error.message };
+  }
+};
+
+/**
+ * Vérifie si une bouteille existe déjà dans un cellier spécifique
+ * @param {string|number} idCellier - L'identifiant du cellier
+ * @param {string|number} idBouteille - L'identifiant de la bouteille
+ * @returns {Promise<{existe: boolean, quantite: number}>} Objet indiquant si la bouteille existe et sa quantité
+ */
+export const verifierBouteilleCellier = async (idCellier, idBouteille) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL}/${idCellier}`
+    );
+
+    if (reponse.ok) {
+      const data = await reponse.json();
+      const bouteilles = data?.donnees || data || [];
+      const bouteilleExistante = bouteilles.find(
+        (b) => String(b.id_bouteille) === String(idBouteille)
+      );
+
+      if (bouteilleExistante) {
+        return {
+          existe: true,
+          quantite: bouteilleExistante.quantite || 0,
+        };
+      }
+    }
+
+    return { existe: false, quantite: 0 };
+  } catch (error) {
+    console.error("Erreur lors de la vérification:", error);
+    return { existe: false, quantite: 0 };
   }
 };
 
@@ -491,7 +622,7 @@ export const supprimerCellier = async (
   }
 };
 
-// BOUTEILLE
+// *************************** Bouteille
 
 /**
  * Récupère les informations d'une bouteille par son identifiant via l'API backend.
@@ -534,120 +665,362 @@ export const recupererBouteilles = async (page = 1, limit = 10) => {
   }
 };
 
+// **********************************************************  Liste achat
 /**
- * Vérifie si une bouteille existe déjà dans un cellier spécifique
- * @param {string|number} idCellier - L'identifiant du cellier
- * @param {string|number} idBouteille - L'identifiant de la bouteille
- * @returns {Promise<{existe: boolean, quantite: number}>} Objet indiquant si la bouteille existe et sa quantité
+ * Récupère la liste d'achat complète avec infos bouteilles
+ * @param {number} id_utilisateur - L'ID de l'utilisateur
+ * @returns {Promise<Array>} - La liste des bouteilles
  */
-export const verifierBouteilleCellier = async (idCellier, idBouteille) => {
+export const recupererListeAchatComplete = async (id_utilisateur) => {
   try {
     const reponse = await fetch(
-      `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL}/${idCellier}`
+      `${import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL}/${id_utilisateur}`
+    );
+
+    if (!reponse.ok) {
+      throw new Error(`Erreur HTTP: ${reponse.status}`);
+    }
+
+    const data = await reponse.json();
+    const bouteillesListe = data.data || [];
+
+    if (!bouteillesListe.length) {
+      return [];
+    }
+
+    const celliersData = await recupererTousCellier(id_utilisateur);
+    const celliers =
+      celliersData.data || celliersData.donnees || celliersData || [];
+
+    const bouteillesCompletes = await Promise.all(
+      bouteillesListe.map(async (item) => {
+        const quantitesParCellier = await Promise.all(
+          celliers.map(async (cellier) => {
+            const bouteillesCellier = await recupererBouteillesCellier(
+              cellier.id_cellier
+            );
+            const bouteilleExistante = bouteillesCellier.find(
+              (b) => b.id === item.id_bouteille
+            );
+
+            return {
+              idCellier: cellier.id_cellier,
+              nomCellier: cellier.nom,
+              quantite: bouteilleExistante ? bouteilleExistante.quantite : 0,
+            };
+          })
+        );
+
+        return {
+          ...item.bouteille,
+          id: item.id_bouteille,
+          celliers: quantitesParCellier,
+        };
+      })
+    );
+
+    return bouteillesCompletes.filter(Boolean);
+  } catch (error) {
+    console.error("Erreur lors de la récupération de la liste d'achat:", error);
+    return [];
+  }
+};
+
+/**
+ * Ajoute une bouteille à la liste d'achat d'un utilisateur
+ * @param {number} id_utilisateur - L'ID de l'utilisateur
+ * @param {Object} donnees - Les données de la bouteille à ajouter (id_bouteille)
+ * @returns {Promise<Object>} - Résultat de l'opération
+ */
+export const ajouterBouteilleListe = async (id_utilisateur, donnees) => {
+  try {
+    const reponse = await fetch(
+      `${
+        import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL
+      }/${id_utilisateur}/bouteilles/${donnees.id_bouteille}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      }
     );
 
     if (reponse.ok) {
       const data = await reponse.json();
-      const bouteilles = data?.donnees || data || [];
-      const bouteilleExistante = bouteilles.find(
-        (b) => String(b.id_bouteille) === String(idBouteille)
-      );
-
-      if (bouteilleExistante) {
-        return {
-          existe: true,
-          quantite: bouteilleExistante.quantite || 0,
-        };
-      }
+      return { succes: true, donnees: data };
     }
 
-    return { existe: false, quantite: 0 };
+    const erreurData = await reponse.json().catch(() => ({}));
+    console.error("Erreur HTTP:", reponse.status, erreurData);
+
+    return {
+      succes: false,
+      erreur: erreurData.message || "Erreur lors de l'ajout à la liste",
+    };
   } catch (error) {
-    console.error("Erreur lors de la vérification:", error);
-    return { existe: false, quantite: 0 };
+    console.error("Erreur lors de l'ajout à la liste:", error);
+    return {
+      succes: false,
+      erreur: "Le serveur ne répond pas.",
+    };
   }
 };
 
-// -----------------BOUTEILLE_CELLIER
+/**
+ * Supprime une bouteille de la liste d'achat
+ * @param {number} id_utilisateur - L'ID de l'utilisateur
+ * @param {number} id_bouteille - L'ID de la bouteille à supprimer
+ * @returns {Promise<Object>} - Résultat de l'opération
+ */
+export const supprimerBouteilleListe = async (id_utilisateur, id_bouteille) => {
+  try {
+    const reponse = await fetch(
+      `${
+        import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL
+      }/${id_utilisateur}/${id_bouteille}`,
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    if (reponse.ok) {
+      return { succes: true };
+    }
+
+    const erreurData = await reponse.json().catch(() => ({}));
+    console.error("Erreur HTTP:", reponse.status, erreurData);
+
+    return {
+      succes: false,
+      erreur: erreurData.message || "Erreur lors de la suppression",
+    };
+  } catch (error) {
+    console.error("Erreur lors de la suppression:", error);
+    return {
+      succes: false,
+      erreur: "Le serveur ne répond pas.",
+    };
+  }
+};
+
+// *************************** Notes degustations
+/**
+ * Créer une nouvelle note degustation dans la base de données via l'API backend.
+ * @param {Object} datas - Les données de de la note de
+ * @param {Function} navigate - Fonction de navigation de react-router-dom pour rediriger l'utilisateur
+ * @returns {Promise<{succes: boolean, erreur?: Object|string}>} Un objet indiquant le succès de l'opération et l'erreur éventuelle
+ */
+export const creerNoteDegustations = async (datas, navigate) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_DEGUSTATION_URL}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datas),
+      }
+    );
+
+    if (reponse.ok) {
+      const noteAjout = await reponse.json();
+      // Naviguer seulement si navigate est fourni
+      if (navigate) {
+        navigate(`/bouteilles/${datas.id_bouteille}`);
+      }
+      return { succes: true, data: noteAjout };
+    }
+
+    // Gestion des erreurs HTTP (400, 500, etc.)
+    const erreurData = await reponse.json().catch(() => ({}));
+    console.error("Erreur HTTP:", reponse.status, erreurData);
+
+    // Retourner l'erreur sans naviguer (rester sur la page actuelle)
+    return { succes: false, erreur: "Erreur lors de l'ajout de la note" };
+  } catch (error) {
+    // Gestion des erreurs pour debug (exemple: pas de connexion) ou autres exceptions JavaScript
+    console.error("Erreur lors de l'ajout de la note :", error);
+    // Retourner l'erreur sans naviguer (rester sur la page actuelle)
+    return {
+      succes: false,
+      erreur: "Erreur lors de l'ajout de la note",
+    };
+  }
+};
 
 /**
- * Modifie les informations d'un cellier existant dans la base de données.
- * Redirige vers la page de sommaire celliers.
- * @param {string|number} id_bouteille - Id bouteille
- * @param {string|number} id_cellier - Id du cellier à modifier
- * @param {string|number} nouvelleQuantite - quantite e bouteille a modifier
- * @param {Function} navigate - Fonction de navigation de react-router-dom pour rediriger l'utilisateur
- * @returns {Promise<>} Un objet indiquant le succès de l'opération et l'erreur éventuelle
+ * Traite les notes recuperees pour separer la note de l'utilisateur des autres notes.
+ * Et trier les autres par date.
+ * @param {Object|Array} notesRecuperees - Les notes récupérées du backend (peut être un objet avec data ou un array)
+ * @param {string|number} idUtilisateurActuel - L'identifiant de l'utilisateur actuel
+ * @returns {{noteUtilisateur: Object|null, autresNotes: Array}} Un objet avec la note utilisateur et les autres notes triées
  */
-export const modifierBouteilleCellier = async (
-	id_cellier,
-	id_bouteille,
-	nouvelleQuantite,
-) => {
-	try {
-		const quantiteCible = Math.max(
-			0,
-			Number.parseInt(nouvelleQuantite, 10) || 0,
-		);
+export const traiterNotes = (notesRecuperees, idUtilisateurActuel) => {
+  // Extraire data si la réponse du backend est un objet avec une propriété data (les notes)
+  const notesData = notesRecuperees.data || notesRecuperees;
 
-		if (quantiteCible === 0) {
-			const reponse = await fetch(
-				`${
-					import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
-				}/${id_cellier}/${id_bouteille}`,
-				{
-					method: "DELETE",
-					headers: { "Content-Type": "application/json" },
-				},
-			);
+  // S'assurer que notesData est un tableau sinon on utilise un tableau vide
+  const notesArray = Array.isArray(notesData) ? notesData : [];
 
-			if (reponse.ok) {
-				return { succes: true, supprime: true };
-			}
+  // Séparer la note de l'utilisateur actuel des autres notes
+  const noteUtilisateurActuel = notesArray.find(
+    (note) => note.id_utilisateur === idUtilisateurActuel
+  );
+  const autresNotes = notesArray.filter(
+    (note) => note.id_utilisateur !== idUtilisateurActuel
+  );
 
-			const erreurData = await reponse.json().catch(() => ({}));
-			console.error(
-				"Erreur HTTP lors de la suppression:",
-				reponse.status,
-				erreurData,
-			);
-			return {
-				succes: false,
-				erreur:
-					erreurData?.message ||
-					"Erreur lors de la suppression de la bouteille du cellier",
-			};
-		}
+  // Trier les autres notes par date (les plus récentes en premier)
+  const notesTriees = autresNotes.sort((a, b) => {
+    const dateA = new Date(a.date_creation || a.date || a.created_at || 0);
+    const dateB = new Date(b.date_creation || b.date || b.created_at || 0);
+    return dateB - dateA; // Ordre décroissant (plus récent en premier)
+  });
 
-		const reponse = await fetch(
-			`${
-				import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
-			}/${id_cellier}/${id_bouteille}`,
-			{
-				method: "PUT",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ nouvelleQuantite: quantiteCible }),
-			},
-		);
+  return {
+    noteUtilisateur: noteUtilisateurActuel || null,
+    autresNotes: notesTriees,
+  };
+};
 
-		if (reponse.ok) {
-			return { succes: true, supprime: false, quantite: quantiteCible };
-		}
+/**
+ * Récupère les notes de dégustation d'une bouteille par son identifiant via l'API backend.
+ * @param {string|number} id_bouteille - L'identifiant unique de la bouteille
+ * @returns {Promise<Object|null>} Les données des notes de dégustation ou null en cas d'erreur
+ */
+export const recupererNotes = async (id_bouteille) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_DEGUSTATION_URL}/${id_bouteille}`
+    );
 
-		const erreurData = await reponse.json().catch(() => ({}));
-		console.error("Erreur HTTP:", reponse.status, erreurData);
+    if (!reponse.ok) {
+      // Pour debug
+      console.error("Erreur HTTP:", reponse.status);
+      return null;
+    }
 
-		return {
-			succes: false,
-			erreur:
-				erreurData?.message ||
-				"Erreur lors de la modification de la bouteille dans le cellier",
-		};
-	} catch (error) {
-		console.error(
-			"Erreur lors de la modification de la bouteille dans le cellier :",
-			error,
-		);
-		return { succes: false, erreur: error.message };
-	}
+    const notes = await reponse.json();
+    return notes;
+  } catch (error) {
+    // Pour debug
+    console.error("Erreur lors de la récupération des notes :", error);
+    return null;
+  }
+};
+
+/**
+ * Récupère toutes les notes de dégustation d'un utilisateur par son identifiant via l'API backend.
+ * @param {string|number} id_utilisateur - L'identifiant unique de l'utilisateur
+ * @returns {Promise<Array>} Les données des notes de dégustation (tableau vide en cas d'erreur)
+ */
+export const recupererNotesUtilisateur = async (id_utilisateur) => {
+  try {
+    const reponse = await fetch(
+      `${
+        import.meta.env.VITE_BACKEND_DEGUSTATION_URL
+      }/utilisateur/${id_utilisateur}`
+    );
+
+    if (!reponse.ok) {
+      // Pour debug
+      console.error("Erreur HTTP:", reponse.status);
+      return [];
+    }
+
+    const resultat = await reponse.json();
+    // Gérer différents formats de réponse
+    const notes =
+      resultat?.donnees ||
+      resultat?.data ||
+      (Array.isArray(resultat) ? resultat : []);
+    return Array.isArray(notes) ? notes : [];
+  } catch (error) {
+    // Pour debug
+    console.error(
+      "Erreur lors de la récupération des notes de l'utilisateur :",
+      error
+    );
+    return [];
+  }
+};
+
+/**
+ * Modifie une note de dégustation existante dans la base de données via l'API backend.
+ * @param {Object} datas - Les données de la note à modifier (id_bouteille, id_utilisateur, date, notes, commentaire)
+ * @returns {Promise<{succes: boolean, erreur?: Object|string}>} Un objet indiquant le succès de l'opération et l'erreur éventuelle
+ */
+export const modifierNote = async (datas) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_DEGUSTATION_URL}/${
+        datas.id_utilisateur
+      }/${datas.id_bouteille}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datas),
+      }
+    );
+
+    if (reponse.ok) {
+      const resultat = await reponse.json();
+      return { succes: true, data: resultat };
+    }
+
+    // Gestion des erreurs HTTP (400, 500, etc.)
+    const erreurData = await reponse.json().catch(() => ({}));
+    console.error("Erreur HTTP:", reponse.status, erreurData);
+
+    return {
+      succes: false,
+      erreur:
+        erreurData?.message || "Erreur lors de la modification de la note",
+    };
+  } catch (error) {
+    // Gestion des erreurs réseau (exemple: pas de connexion) ou autres exceptions JavaScript
+    console.error("Erreur lors de la modification de la note :", error);
+    return { succes: false, erreur: error.message };
+  }
+};
+
+/**
+ * Supprime une note de dégustation de la base de données via l'API backend.
+ * @param {Object} datas - Les données de la note à supprimer (id_utilisateur, id_bouteille, date)
+ * @returns {Promise<{succes: boolean, erreur?: Object|string}>} Un objet indiquant le succès de l'opération et l'erreur éventuelle
+ */
+export const supprimerNote = async (datas) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_DEGUSTATION_URL}/${
+        datas.id_utilisateur
+      }/${datas.id_bouteille}`,
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    if (reponse.ok) {
+      const resultat = await reponse.json();
+      return { succes: true, data: resultat };
+    }
+
+    // Gestion des erreurs HTTP
+    const erreurData = await reponse.json().catch(() => ({}));
+    console.error(
+      "Erreur HTTP lors de la suppression:",
+      reponse.status,
+      erreurData
+    );
+
+    return {
+      succes: false,
+      erreur: erreurData?.message || "Erreur lors de la suppression de la note",
+    };
+  } catch (error) {
+    // Gestion des erreurs réseau (exemple: pas de connexion) ou autres exceptions JavaScript
+    console.error("Erreur lors de la suppression de la note :", error);
+    return { succes: false, erreur: error.message };
+  }
 };
