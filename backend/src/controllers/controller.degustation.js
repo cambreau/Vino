@@ -65,14 +65,27 @@ export const recupererDegustationsBouteille = async (req, res) => {
 export const ajouterDegustation = async (req, res) => {
   try {
     // Récupération des données du corps de la requête
-    const { id_bouteille, id_utilisateur, note, commentaire } = req.body;
+    const { id_bouteille, id_utilisateur, notes, commentaire } = req.body;
+
+    // Validation
+    if (!notes || notes === 0) {
+      return res.status(400).json({ message: "Une note est requise" });
+    }
+
+    if (!id_bouteille) {
+      return res.status(400).json({ message: "ID bouteille requis" });
+    }
+
+    if (!id_utilisateur) {
+      return res.status(400).json({ message: "ID utilisateur requis" });
+    }
 
     // Appel du modèle pour ajouter la dégustation
     const resultat = await ModeleDegustation.ajouter(
       id_bouteille,
       id_utilisateur,
-      note,
-      commentaire
+      notes,
+      commentaire || ""
     );
     // Retour de succès
     return res.status(201).json({
@@ -88,4 +101,21 @@ export const ajouterDegustation = async (req, res) => {
 
 export const modifierDegustation = async (req, res) => {};
 
-export const supprimerDegustation = async (req, res) => {};
+export const supprimerDegustation = async (req, res) => {
+  try {
+    const { id_bouteille, id_utilisateur } = req.params;
+
+    const resultat = await ModeleDegustation.supprimer(
+      id_utilisateur,
+      id_bouteille
+    );
+
+    return res.status(200).json({
+      message: "Dégustation supprimée",
+      data: resultat,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la suppression de la dégustation", error);
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
+};

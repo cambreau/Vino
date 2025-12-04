@@ -1,123 +1,124 @@
+import Bouton from "@components/components-partages/Boutons/Bouton";
 import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuantite";
-import BoutonAction from "@components/components-partages/Boutons/BoutonAction";
-
 import { formatDetailsBouteille } from "@lib/utils.js";
+
 const CarteListeAchat = ({
   bouteille,
-  type = "catalogue",
-  onAugmenter = () => {},
-  onDiminuer = () => {},
-  onAjouter = () => {},
-  disabled = false, //désactiver le bouton
+  onSupprimer = () => {},
+  onAjouterCellier = () => {},
+  disabled = false,
 }) => {
-  /**
-   * Génère les contrôles (boutons) selon le type :
-   * - catalogue : bouton "Ajouter au cellier"
-   * - cellier : boutons + / - et quantité
-   */
-  const genererControles = () => {
-    /* ------------------------------
-     *         MODE CATALOGUE
-     * ------------------------------ */
-    if (type === "catalogue") {
-      return (
-        <BoutonAction
-          texte={disabled ? "Déjà dans le cellier" : "Ajouter au cellier"}
-          onClick={() => onAjouter(bouteille)}
-          type="secondaire"
-          disabled={disabled}
-        />
-      );
-    }
 
-    /* ------------------------------
-     *          MODE CELLIER
-     * ------------------------------ */
-    if (type === "cellier") {
-      return (
-        <div className="flex flex-row gap-2 items-center w-full justify-center">
-          {/* Contrôles de quantité */}
-          <div className="flex items-center gap-2">
-            {/* Bouton MOINS (-) */}
-            <BoutonQuantite
-              type="diminuer"
-              onClick={() => onDiminuer(bouteille.id)}
-              disabled={disabled || bouteille.quantite <= 0}
-            />
-
-            {/* Quantité affichée */}
-            <span
-              className="flex items-center justify-center min-w-8 px-2 
-                             text-texte-principal font-bold text-(length:--taille-normal)"
-            >
-              {bouteille.quantite || 0}
-            </span>
-
-            {/* Bouton PLUS (+) */}
-            <BoutonQuantite
-              type="augmenter"
-              onClick={() => onAugmenter(bouteille.id)}
-              disabled={disabled}
-            />
-          </div>
-        </div>
-      );
-    }
-  };
-
-  // Arreter la propagation et afficher le modale pour ajouter la bouteille
-  const handleAjouter = (e) => {
+  const gererSuppression = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    onAjouter(bouteille);
+    onSupprimer(bouteille.id);
+  };
+
+  const gererAugmentation = (e, idCellier) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onAjouterCellier(bouteille.id, idCellier);
+  };
+
+  const gererDiminution = (e, idCellier, quantiteActuelle) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (quantiteActuelle > 0) {
+      onAjouterCellier(bouteille.id, idCellier, -1);
+    }
   };
 
   return (
-    <div
-      className="
-      flex gap-(--rythme-serre)
-      bg-fond-secondaire p-(--rythme-base) 
-      rounded-(--arrondi-grand) shadow-md"
-    >
-      {/* Section IMAGE de la bouteille */}
-      <div>
-        <img
-          src={bouteille.image || "/placeholder-bottle.png"}
-          alt={`Photo de la bouteille ${bouteille.nom}`}
-          className="h-[200px] object-cover"
-        />
+    <div className="flex flex-col bg-fond-secondaire rounded-(--arrondi-grand) shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+      {/* Section superieure : Image + Info principale */}
+      <div className="flex gap-(--rythme-base) p-(--rythme-base)">
+        {/* Image */}
+        <div className="flex-shrink-0">
+          <img
+            src={bouteille.image || "/placeholder-bottle.png"}
+            alt={`Photo de la bouteille ${bouteille.nom}`}
+            className="h-[160px] w-auto object-cover rounded-(--arrondi-moyen)"
+          />
+        </div>
 
-        {/* Section des contrôles (catalogue ou cellier) */}
-        <div className="mt-(--rythme-base)" onClick={handleAjouter}>
-          {genererControles()}
+        {/* Informations principales */}
+        <div className="flex-1 flex flex-col gap-(--rythme-serre)">
+          <h2 className="text-(length:--taille-normal) font-semibold 
+          text-principal-300 line-clamp-2">
+            {bouteille.nom}
+          </h2>
+          
+          <div className="flex flex-col gap-1">
+            <p className="text-(length:--taille-petit) text-texte-secondaire">
+              <span className="font-medium">Couleur:</span>{" "}
+              <span className="text-principal-300">{bouteille.type || bouteille.couleur}</span>
+            </p>
+            <p className="text-(length:--taille-petit) text-texte-secondaire line-clamp-2">
+              {formatDetailsBouteille(bouteille.description)}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Section INFORMATIONS de la bouteille */}
-      <div className="flex-1 flex flex-col gap-(--rythme-serre) mb-4">
-        {/* Nom */}
-        <header>
-          <h2 className="mb-2 text-(length:--taille-normal) font-semibold text-principal-300">
-            {bouteille.nom}
-          </h2>
-          <hr />
-        </header>
+      {/* Separateur */}
+      <hr className="border-principal-100" />
 
-        {/* Type ou couleur et description */}
-        <div className="flex flex-col gap-(--rythme-serre)">
-          <p className="text-(length:--taille-petit) text-texte-secondaire">
-            Couleur:{" "}
-            <strong className="font-semibold text-principal-300">
-              {bouteille.type || bouteille.couleur}
-            </strong>
-          </p>
-          <p className="text-(length:--taille-petit) text-texte-secondaire">
-            Description:{" "}
-            <strong className="font-semibold text-principal-300">
-              {formatDetailsBouteille(bouteille.description)}
-            </strong>
-          </p>
+      {/* Section celliers */}
+      <div className="p-(--rythme-base) bg-principal-200">
+        <div className="flex items-center justify-between mb-(--rythme-serre)">
+          <h3 className="text-(length:--taille-petit) font-semibold text-fond-secondaire">
+            Dans vos celliers
+          </h3>
         </div>
+        
+        {bouteille.celliers && bouteille.celliers.length > 0 ? (
+          <div className="flex flex-col gap-2 mb-(--rythme-base)">
+            {bouteille.celliers.map((cellier) => (
+              <div 
+                key={cellier.idCellier} 
+                className="flex items-center justify-between p-(--rythme-serre)  bg-fond-secondaire rounded-(--arrondi-moyen) border border-principal-100"
+              >
+                <span className="text-(length:--taille-petit) font-medium text-principal-300">
+                  {cellier.nomCellier}
+                </span>
+                
+                {/* Controles de quantite */}
+                <div className="flex items-center gap-2">
+                  <BoutonQuantite
+                    type="diminuer"
+                    onClick={(e) => gererDiminution(e, cellier.idCellier, cellier.quantite)}
+                    disabled={disabled || cellier.quantite <= 0}
+                  />
+                  
+                  <span className="flex items-center justify-center min-w-8 px-2 text-texte-principal font-bold text-(length:--taille-normal)">
+                    {cellier.quantite || 0}
+                  </span>
+                  
+                  <BoutonQuantite
+                    type="augmenter"
+                    onClick={(e) => gererAugmentation(e, cellier.idCellier)}
+                    disabled={disabled}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-(length:--taille-petit) text-texte-secondaire italic mb-(--rythme-base)">
+            Cette bouteille n'est dans aucun cellier
+          </p>
+        )}
+
+        {/* Bouton Supprimer */}
+        <Bouton
+          texte="Retirer de ma liste"
+          type="secondaire"
+          typeHtml="button"
+          disabled={disabled}
+          action={gererSuppression}
+          className="w-full text-(length:--taille-petit)"
+        />
       </div>
     </div>
   );
