@@ -202,7 +202,7 @@ function BoiteModaleAjoutBouteilleCellier({
       quantite:
         action === "augmenter"
           ? prev.quantite + 1
-          : Math.max(1, prev.quantite - 1),
+          : Math.max(0, prev.quantite - 1),
     }));
   }, []);
 
@@ -288,7 +288,7 @@ function BoiteModaleAjoutBouteilleCellier({
                 <BoutonQuantite
                   type="diminuer"
                   onClick={() => modifierQuantite("diminuer")}
-                  disabled={bouteilleCellier.quantite <= 0}
+                  disabled={bouteilleCellier.quantite < 1}
                 />
                 <span className="min-w-8 px-2 text-texte-principal font-bold">
                   {bouteilleCellier.quantite}
