@@ -70,31 +70,32 @@ function Catalogue() {
         <section className="pt-(--rythme-espace) px-(--rythme-serre)">
           {message.texte && <Message texte={message.texte} type={message.type} />}
 
-          <div className="flex flex-col gap-(--rythme-espace) lg:flex-row">
-            <div className="space-y-(--rythme-base)">
-              <FiltresCatalogue
-                filtresActuels={criteresFiltresStore}
-                rechercheActuelle={
-                  typeof criteresRechercheStore === "string"
-                    ? criteresRechercheStore
-                    : criteresRechercheStore?.nom || ""
-                }
-                onFiltrer={handleFiltrer}
-                onRecherche={handleRecherche}
-                onTri={handleTri}
-                onSupprimerFiltre={handleSupprimerFiltre}
-                onReinitialiserFiltres={handleReinitialiserFiltres}
-                titreTri={etiquetteTri}
-                className="shrink-0"
-              />
-              {total > 0 && (
-                <p className="text-(length:--taille-petit) text-texte-secondaire">
-                  {total} bouteille{total > 1 ? "s" : ""} trouvée{total > 1 ? "s" : ""}
-                </p>
-              )}
-            </div>
+          {/* Filtres - centrés sur mobile et tablette, en colonne jusqu'à xl */}
+          <div className="flex flex-col items-center gap-(--rythme-base) mb-(--rythme-espace)">
+            <FiltresCatalogue
+              filtresActuels={criteresFiltresStore}
+              rechercheActuelle={
+                typeof criteresRechercheStore === "string"
+                  ? criteresRechercheStore
+                  : criteresRechercheStore?.nom || ""
+              }
+              onFiltrer={handleFiltrer}
+              onRecherche={handleRecherche}
+              onTri={handleTri}
+              onSupprimerFiltre={handleSupprimerFiltre}
+              onReinitialiserFiltres={handleReinitialiserFiltres}
+              titreTri={etiquetteTri}
+              className="shrink-0"
+            />
+            {total > 0 && (
+              <p className="text-(length:--taille-petit) text-texte-secondaire text-center">
+                {total} bouteille{total > 1 ? "s" : ""} trouvée{total > 1 ? "s" : ""}
+              </p>
+            )}
+          </div>
 
-            <div className="flex-1">
+          {/* Grille des bouteilles */}
+          <div>
               {chargementInitial ? (
                 <div className="flex justify-center items-center py-(--rythme-espace)">
                   <Spinner size={220} ariaLabel="Chargement du catalogue de bouteilles" />
@@ -129,7 +130,6 @@ function Catalogue() {
                 </div>
               )}
             </div>
-          </div>
         </section>
       </main>
 
