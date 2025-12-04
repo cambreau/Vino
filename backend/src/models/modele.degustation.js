@@ -12,7 +12,15 @@ export default class ModeleDegustation {
       throw new Error("Bouteille requise pour récupérer les dégustations");
     }
 
-    const sql = `SELECT * FROM degustation WHERE id_bouteille = ? ORDER BY date_degustation DESC`;
+    const sql = `
+      SELECT 
+        d.*,
+        u.nom AS nom_utilisateur
+      FROM degustation d
+      INNER JOIN utilisateur u ON u.id_utilisateur = d.id_utilisateur
+      WHERE d.id_bouteille = ?
+      ORDER BY d.date_degustation DESC
+    `;
     const [rows] = await connexion.query(sql, [idBouteille]);
     return rows;
   }

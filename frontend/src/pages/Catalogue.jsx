@@ -11,29 +11,19 @@ import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
 import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
 import CarteBouteille from "@components/carte/CarteBouteille";
 import Message from "@components/components-partages/Message/Message";
-import BoiteModale from "@components/components-partages/BoiteModale/BoiteModale";
 import Filtres from "@components/components-partages/Filtre/Filtre";
-
-import Bouton from "@components/components-partages/Boutons/Bouton";
-import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuantite";
-import FormulaireSelect from "@components/components-partages/Formulaire/FormulaireSelect/FormulaireSelect";
+import NonTrouver from "@components/components-partages/NonTrouver/NonTrouver";
 import Spinner from "@components/components-partages/Spinner/Spinner";
 
-import {
-  recupererBouteilles,
-  ajouterBouteilleCellier,
-  recupererTousCellier,
-  verifierBouteilleCellier,
-  ajouterBouteilleListe,
-} from "@lib/requetes";
+import { recupererBouteilles, ajouterBouteilleListe } from "@lib/requetes";
 
 import authentificationStore from "@store/authentificationStore";
-import filtresStore from "@store/filtresStore";
 import {
   useDocumentTitle,
   filtrerBouteilles,
   rechercherBouteilles,
 } from "@lib/utils.js";
+import filtresStore from "@store/filtresStore";
 
 /*
  * Constante: nombre d'éléments à charger par page lors de la pagination.
@@ -57,17 +47,9 @@ const creerEtatInitial = () => ({
   chargementInitial: true,
   scrollLoading: false,
   bouteilles: [],
-  celliers: [],
-  cellierSelectionne: "",
   page: 1,
   hasMore: true,
   message: { texte: "", type: "" },
-  modale: {
-    ouverte: false,
-    bouteille: null,
-    quantite: 1,
-    existe: false,
-  },
 });
 
 /*
@@ -80,11 +62,6 @@ const ACTIONS = {
   LOAD_MORE_START: "load_more_start",
   LOAD_MORE_SUCCESS: "load_more_success",
   LOAD_MORE_ERROR: "load_more_error",
-  OPEN_MODAL: "open_modal",
-  CLOSE_MODAL: "close_modal",
-  MODALE_EXISTE: "modale_existe",
-  MODIFIER_QUANTITE: "modifier_quantite",
-  CHANGER_CELLIER: "changer_cellier",
   SET_MESSAGE: "set_message",
 };
 
@@ -104,8 +81,6 @@ const catalogueReducer = (state, action) => {
         chargementInitial: false,
         scrollLoading: false,
         bouteilles: action.payload.bouteilles,
-        celliers: action.payload.celliers,
-        cellierSelectionne: action.payload.cellierSelectionne,
         page: 1,
         hasMore: action.payload.hasMore,
         message: action.payload.message ?? { texte: "", type: "" },
@@ -141,58 +116,6 @@ const catalogueReducer = (state, action) => {
         ...state,
         scrollLoading: false,
         message: action.payload,
-      };
-    case ACTIONS.OPEN_MODAL:
-      // Ouvre la modale et place la bouteille sélectionnée dans l'état local de la modale.
-      return {
-        ...state,
-        modale: {
-          ouverte: true,
-          bouteille: action.payload,
-          quantite: 1,
-          existe: false,
-        },
-      };
-    case ACTIONS.CLOSE_MODAL:
-      // Ferme la modale et réinitialise ses propriétés.
-      return {
-        ...state,
-        modale: {
-          ouverte: false,
-          bouteille: null,
-          quantite: 1,
-          existe: false,
-        },
-      };
-    case ACTIONS.MODALE_EXISTE:
-      // Indique qu'une bouteille existe déjà dans le cellier choisi (ex.: pour afficher la quantité actuelle).
-      return {
-        ...state,
-        modale: {
-          ...state.modale,
-          existe: true,
-          quantite: action.payload,
-        },
-      };
-    case ACTIONS.MODIFIER_QUANTITE:
-      // Met à jour la quantité voulue dans la modale.
-      return {
-        ...state,
-        modale: {
-          ...state.modale,
-          quantite: action.payload,
-        },
-      };
-    case ACTIONS.CHANGER_CELLIER:
-      // Change le cellier ciblé dans la modale et réinitialise le marqueur d'existence
-      return {
-        ...state,
-        cellierSelectionne: action.payload,
-        modale: {
-          ...state.modale,
-          existe: false,
-          quantite: 1,
-        },
       };
     case ACTIONS.SET_MESSAGE:
       // Permet d'afficher un message global à l'utilisateur (succès / erreur / info).
@@ -233,7 +156,6 @@ function Catalogue() {
   const sentinelPretRef = useRef(true);
   // Référence de contrôle pour éviter les réponses asynchrones obsolètes lors des vérifications
   // (incrémentée à chaque requête pour s'assurer que la réponse correspond à la dernière requête).
-  const verificationRef = useRef(0);
   const [resultatsFiltres, setResultatsFiltres] = useState(null);
   const [catalogueComplet, setCatalogueComplet] = useState([]);
   const [chargementCatalogueComplet, setChargementCatalogueComplet] =
@@ -369,35 +291,20 @@ function Catalogue() {
       dispatch({ type: ACTIONS.RESET });
 
       try {
-        const [dataBouteilles, dataCelliers] = await Promise.all([
-          recupererBouteilles(1, LIMITE_BOUTEILLES),
-          recupererTousCellier(utilisateur.id),
-        ]);
+        const dataBouteilles = await recupererBouteilles(1, LIMITE_BOUTEILLES);
 
         if (ignore) return;
 
         // `dataBouteilles` et `dataCelliers` proviennent des endpoints API :
         // - `donnees` contient la liste des éléments si le format de la réponse est normalisé.
         const bouteilles = dataBouteilles?.donnees ?? [];
-        const celliers = dataCelliers?.donnees ?? dataCelliers ?? [];
         const hasMore = dataBouteilles?.meta?.hasMore ?? false;
-        // Par défaut, on sélectionne le premier cellier disponible (si présent).
-        const premierCellier =
-          celliers.length > 0 ? String(celliers[0].id_cellier) : "";
-        const message =
-          celliers.length === 0
-            ? {
-                texte: "Vous devez d'abord créer un cellier",
-                type: "information",
-              }
-            : { texte: "", type: "" };
+        const message = { texte: "", type: "" };
 
         dispatch({
           type: ACTIONS.INIT_SUCCESS,
           payload: {
             bouteilles,
-            celliers,
-            cellierSelectionne: premierCellier,
             hasMore,
             message,
           },
@@ -606,138 +513,6 @@ function Catalogue() {
     };
   }, [verifierScrollEtCharger, etat.chargementInitial, filtresActifs]);
 
-  // Ouvre la modale d'ajout d'une bouteille pour permettre la sélection du cellier
-  // et l'ajout d'une quantité. Vérifie si la bouteille existe déjà dans le cellier.
-  const ouvrirModale = useCallback(
-    (bouteille) => {
-      dispatch({ type: ACTIONS.OPEN_MODAL, payload: bouteille });
-
-      if (!etat.cellierSelectionne) return;
-
-      const verificationId = ++verificationRef.current;
-      verifierBouteilleCellier(etat.cellierSelectionne, bouteille.id).then(
-        (res) => {
-          if (verificationRef.current !== verificationId) return;
-          if (res?.existe) {
-            dispatch({
-              type: ACTIONS.MODALE_EXISTE,
-              payload: res.quantite,
-            });
-          }
-        }
-      );
-    },
-    [etat.cellierSelectionne]
-  );
-
-  // Ferme la modale et réinitialise les informations associées.
-  const fermerModale = useCallback(() => {
-    dispatch({ type: ACTIONS.CLOSE_MODAL });
-  }, []);
-
-  // Incrémente ou décrémente la quantité affichée dans la modale.
-  const modifierQuantite = useCallback(
-    (action) => {
-      const quantiteActuelle = etat.modale.quantite;
-      const nouvelleQuantite =
-        action === "augmenter"
-          ? quantiteActuelle + 1
-          : Math.max(1, quantiteActuelle - 1);
-      dispatch({
-        type: ACTIONS.MODIFIER_QUANTITE,
-        payload: nouvelleQuantite,
-      });
-    },
-    [etat.modale.quantite]
-  );
-
-  // Change le cellier sélectionné dans la modale et vérifie si la bouteille y existe.
-  const changerCellier = useCallback(
-    (idCellier) => {
-      dispatch({ type: ACTIONS.CHANGER_CELLIER, payload: idCellier });
-
-      if (!etat.modale.bouteille) return;
-
-      const verificationId = ++verificationRef.current;
-      verifierBouteilleCellier(idCellier, etat.modale.bouteille.id).then(
-        (res) => {
-          if (verificationRef.current !== verificationId) return;
-          if (res?.existe) {
-            dispatch({
-              type: ACTIONS.MODALE_EXISTE,
-              payload: res.quantite,
-            });
-          }
-        }
-      );
-    },
-    [etat.modale.bouteille]
-  );
-
-  // Effectue l'appel API pour ajouter la bouteille au cellier sélectionné.
-  // Met à jour le message global et ferme la modale en cas de succès.
-  const confirmerAjout = useCallback(async () => {
-    const cellierSelectionne = etat.cellierSelectionne;
-    const bouteilleCourante = etat.modale.bouteille;
-    const quantiteCourante = etat.modale.quantite;
-
-    if (!cellierSelectionne || !bouteilleCourante) {
-      dispatch({
-        type: ACTIONS.SET_MESSAGE,
-        payload: {
-          texte: "Veuillez sélectionner un cellier",
-          type: "erreur",
-        },
-      });
-      return;
-    }
-
-    try {
-      const donnees = {
-        id_bouteille: bouteilleCourante.id,
-        quantite: quantiteCourante,
-      };
-
-      // Appel au service qui ajoute la bouteille dans le cellier ciblé.
-      const resultat = await ajouterBouteilleCellier(
-        cellierSelectionne,
-        donnees
-      );
-
-      if (resultat?.succes) {
-        const cellier =
-          etat.celliers.find(
-            (c) => String(c.id_cellier) === String(cellierSelectionne)
-          )?.nom ?? "";
-
-        dispatch({
-          type: ACTIONS.SET_MESSAGE,
-          payload: {
-            // Message succès affiché à l'utilisateur.
-            texte: `${bouteilleCourante.nom} a été ajouté au cellier ${cellier}`,
-            type: "succes",
-          },
-        });
-
-        fermerModale();
-      } else {
-        dispatch({
-          type: ACTIONS.SET_MESSAGE,
-          payload: {
-            texte: "Erreur lors de l'ajout",
-            type: "erreur",
-          },
-        });
-      }
-    } catch (error) {
-      console.error(error);
-      dispatch({
-        type: ACTIONS.SET_MESSAGE,
-        payload: { texte: "Erreur lors de l'ajout", type: "erreur" },
-      });
-    }
-  }, [etat.cellierSelectionne, etat.celliers, etat.modale, fermerModale]);
-
   /*================================= */
   //Ajouter a la liste
   const ajouterALaListe = useCallback(
@@ -779,23 +554,7 @@ function Catalogue() {
   );
   /*================================= */
 
-  const {
-    chargementInitial,
-    bouteilles,
-    message,
-    modale,
-    celliers,
-    cellierSelectionne,
-    scrollLoading,
-    hasMore,
-  } = etat;
-
-  const optionsCelliers = useMemo(() => celliers.map((c) => c.nom), [celliers]);
-  const cellierCourant = useMemo(
-    () =>
-      celliers.find((c) => String(c.id_cellier) === cellierSelectionne) ?? null,
-    [celliers, cellierSelectionne]
-  );
+  const { chargementInitial, message, scrollLoading, hasMore } = etat;
   const messageListeVide = filtresActifs
     ? "Aucune bouteille ne correspond à vos filtres"
     : "Aucune bouteille disponible";
@@ -807,7 +566,7 @@ function Catalogue() {
           <MenuEnHaut />
         </header>
         <main ref={mainRef} className="bg-fond overflow-y-auto">
-          <section className="pt-(--rythme-espace) px-(--rythme-serre)">
+          <section className="pt-(--rythme-base) px-(--rythme-serre)">
             <Message
               texte="Vous devez être connecté pour accéder au catalogue"
               type="erreur"
@@ -827,7 +586,7 @@ function Catalogue() {
         </header>
 
         <main ref={mainRef} className="bg-fond overflow-y-auto">
-          <h1 className="text-(length:--taille-moyen)  my-(--rythme-espace) text-center font-display font-semibold text-principal-300">
+          <h1 className="text-(length:--taille-grand)  mt-(--rythme-base) text-center font-display font-semibold text-principal-300">
             Catalogue des vins
           </h1>
           <section className="pt-(--rythme-espace) px-(--rythme-serre)">
@@ -875,7 +634,6 @@ function Catalogue() {
                             key={b.id}
                             bouteille={b}
                             type="catalogue"
-                            onAjouter={ouvrirModale}
                             onAjouterListe={ajouterALaListe}
                           />
                         </Link>
@@ -891,7 +649,9 @@ function Catalogue() {
                     )}
                   </>
                 ) : (
-                  <Message texte={messageListeVide} type="information" />
+                  <div className="flex justify-center py-(--rythme-espace)">
+                    <NonTrouver size={180} message={messageListeVide} />
+                  </div>
                 )}
               </div>
             </div>
@@ -908,82 +668,6 @@ function Catalogue() {
 
         <MenuEnBas />
       </div>
-
-      {modale.ouverte && modale.bouteille && (
-        <BoiteModale
-          texte="Confirmation d'ajout"
-          contenu={
-            <div className="w-full">
-              <p className="text-texte-principal font-bold text-center mb-(--rythme-base)">
-                {modale.bouteille.nom}
-              </p>
-
-              <div className="mb-(--rythme-base)">
-                <FormulaireSelect
-                  nom="Cellier"
-                  genre="un"
-                  estObligatoire={true}
-                  arrayOptions={optionsCelliers}
-                  value={cellierCourant?.nom || ""}
-                  onChange={(e) => {
-                    const cellierCible = celliers.find(
-                      (x) => x.nom === e.target.value
-                    );
-                    if (cellierCible) {
-                      changerCellier(String(cellierCible.id_cellier));
-                    }
-                  }}
-                  classCouleur="Clair"
-                  fullWidth={true}
-                />
-              </div>
-
-              {modale.existe ? (
-                <Message
-                  texte={`Cette bouteille est déjà dans ce cellier (quantité : ${modale.quantite})`}
-                  type="information"
-                />
-              ) : (
-                <div className="flex items-center justify-center gap-(--rythme-serre)">
-                  <span className="text-texte-secondaire">Quantité :</span>
-
-                  <BoutonQuantite
-                    type="diminuer"
-                    onClick={() => modifierQuantite("diminuer")}
-                    disabled={modale.quantite <= 1}
-                  />
-
-                  <span className="min-w-8 px-2 text-texte-principal font-bold">
-                    {modale.quantite}
-                  </span>
-
-                  <BoutonQuantite
-                    type="augmenter"
-                    onClick={() => modifierQuantite("augmenter")}
-                  />
-                </div>
-              )}
-            </div>
-          }
-          bouton={
-            <>
-              <Bouton
-                texte="Ajouter"
-                type="primaire"
-                typeHtml="button"
-                action={confirmerAjout}
-                disabled={modale.existe}
-              />
-              <Bouton
-                texte="Annuler"
-                type="secondaire"
-                typeHtml="button"
-                action={fermerModale}
-              />
-            </>
-          }
-        />
-      )}
     </>
   );
 }

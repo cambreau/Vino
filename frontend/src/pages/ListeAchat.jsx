@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
@@ -8,34 +8,20 @@ import Bouton from "@components/components-partages/Boutons/Bouton";
 import Message from "@components/components-partages/Message/Message";
 import CarteListeAchat from "@components/carte-liste-achat/CarteListeAchat";
 import {
-  recupererCellier,
-  recupererBouteillesCellier,
-  modifierBouteilleCellier,
+  recupererListeAchatComplete,
+  supprimerBouteilleListe,
+  ajouterBouteilleCellier,
+  modifierBouteilleCellier
 } from "@lib/requetes.js";
 import { useDocumentTitle } from "@lib/utils.js";
+import authentificationStore from "@store/authentificationStore";
 
 function ListeAchat() {
   const navigate = useNavigate();
-  // Récupérer id du cellier dans l'URL
-  const idCellier = 4;
+  const utilisateur = authentificationStore((state) => state.utilisateur);
 
-  // Etat pour le cellier : nom
-  const [cellier, setCellier] = useState({
-    nom: "",
-  });
-  useDocumentTitle(cellier.nom ? `Cellier - ${cellier.nom}` : "Cellier");
+  useDocumentTitle("Liste d'achat");
 
-  useEffect(() => {
-    const chargerCellier = async () => {
-      const donneesCellier = await recupererCellier(idCellier);
-      setCellier({
-        nom: donneesCellier.nom || "",
-      });
-    };
-    chargerCellier();
-  }, [idCellier]);
-
-  // Etat pour les bouteilles : récupérer les bouteilles complètes du cellier
   const [bouteillesCellier, setBouteillesCellier] = useState([]);
   const [chargementBouteilles, setChargementBouteilles] = useState(false);
   const [messageAction, setMessageAction] = useState({ texte: "", type: "" });
@@ -43,81 +29,163 @@ function ListeAchat() {
     () => new Set()
   );
 
+  // Charger la liste d'achat
   useEffect(() => {
-    const chargerBouteillesCellier = async () => {
+    const chargerListeAchat = async () => {
+      if (!utilisateur?.id) return;
       setChargementBouteilles(true);
-      const datas = await recupererBouteillesCellier(idCellier);
-      console.log("Bouteilles récupérées pour le cellier:", datas);
+      const datas = await recupererListeAchatComplete(utilisateur.id);
+
+      console.log("Données reçues:", datas);
+
+
       setBouteillesCellier(datas || []);
       setChargementBouteilles(false);
     };
-    chargerBouteillesCellier();
-  }, [idCellier]);
+    chargerListeAchat();
+  }, [utilisateur?.id]);
 
+   // Gestion du traitement
   const definirTraitement = (idBouteille, actif) => {
+
     setBouteillesEnTraitement((courant) => {
+
+      //On crée une copie de l'état actuel (Set) pour ne pas modifier directement l'état
       const prochain = new Set(courant);
+
+      //Si actif = true, on ajoute l'id de la bouteille dans le Set
       if (actif) {
         prochain.add(idBouteille);
       } else {
+        //Si actif = false, on retire l'id de la bouteille du Set
         prochain.delete(idBouteille);
       }
+
+      //On retourne le nouveau Set qui devient le nouvel état
       return prochain;
     });
   };
 
-  const mettreAJourQuantite = async (idBouteille, variation) => {
-    if (bouteillesEnTraitement.has(idBouteille)) {
-      return;
-    }
-
-    const bouteilleCible = bouteillesCellier.find((b) => b.id === idBouteille);
-
-    if (!bouteilleCible) {
-      return;
-    }
-
-    const prochaineQuantite = Math.max(
-      0,
-      (bouteilleCible.quantite || 0) + variation
-    );
+//  ************** Supprimer une bouteille de la liste
+  const gererSupprimer = async (idBouteille) => {
+    if (bouteillesEnTraitement.has(idBouteille)) return;
+    
+    // Marquer cette bouteille comme en cours de traitement
     definirTraitement(idBouteille, true);
-    const resultat = await modifierBouteilleCellier(
-      bouteilleCible.idCellier ?? Number.parseInt(idCellier, 10),
-      idBouteille,
-      prochaineQuantite
-    );
+
+    const resultat = await supprimerBouteilleListe(utilisateur.id, idBouteille);
+    //Retirer la bouteille de la liste des bouteilles en traitement
     definirTraitement(idBouteille, false);
 
     if (!resultat?.succes) {
       setMessageAction({
-        texte:
-          resultat?.erreur ||
-          "Impossible de mettre à jour la quantité pour cette bouteille.",
+        texte: resultat?.erreur || "Impossible de supprimer la bouteille.",
         type: "erreur",
       });
       return;
     }
 
-    // Nettoyer un éventuel ancien message d'erreur
-    setMessageAction({ texte: "", type: "" });
-
-    setBouteillesCellier((precedent) => {
-      if (prochaineQuantite === 0 || resultat.supprime) {
-        return precedent.filter((b) => b.id !== idBouteille);
-      }
-
-      return precedent.map((b) =>
-        b.id === idBouteille
-          ? { ...b, quantite: resultat.quantite ?? prochaineQuantite }
-          : b
-      );
-    });
+    setMessageAction({ texte: "Bouteille retirée de la liste", type: "succes" });
+    
+    // Mettre à jour l'état pour retirer la bouteille de l'affichage
+    setBouteillesCellier((precedent) =>
+      precedent.filter((b) => b.id !== idBouteille)
+    );
   };
 
-  const handleAugmenter = (idBouteille) => mettreAJourQuantite(idBouteille, 1);
-  const handleDiminuer = (idBouteille) => mettreAJourQuantite(idBouteille, -1);
 
+// ************** Ajouter/Modifier quantité au cellier**
+const gererAjouterCellier = async (idBouteille, idCellier, variation = 1) => {
+  const cleBouteille = `${idBouteille}-${idCellier}`;
+  if (bouteillesEnTraitement.has(cleBouteille)) return;
+  
+  const bouteilleCible = bouteillesCellier.find((b) => b.id === idBouteille);
+  if (!bouteilleCible) return;
+  
+  const cellierCible = bouteilleCible.celliers.find((c) => c.idCellier === idCellier);
+  if (!cellierCible) return;
+  
+  const nouvelleQuantite = (cellierCible.quantite || 0) + variation;
+  
+  if (nouvelleQuantite < 0) return;
+  
+  definirTraitement(cleBouteille, true);
+  
+  // Si la quantité est actuellement 0, on ajoute la bouteille
+  if (cellierCible.quantite === 0 && variation > 0) {
+    const resultat = await ajouterBouteilleCellier(idCellier, {
+      id_bouteille: idBouteille,
+      quantite: nouvelleQuantite  
+    });
+    
+    definirTraitement(cleBouteille, false);
+
+    if (!resultat?.succes) {
+      setMessageAction({
+        texte: resultat?.erreur || "Impossible d'ajouter la bouteille au cellier.",
+        type: "erreur",
+      });
+      return;
+    }
+
+    setMessageAction({ 
+      texte: "Bouteille ajoutée au cellier", 
+      type: "succes" 
+    });
+  } else {
+    const resultat = await modifierBouteilleCellier(idCellier, idBouteille, nouvelleQuantite);
+    
+    definirTraitement(cleBouteille, false);
+
+    if (!resultat?.succes) {
+      setMessageAction({
+        texte: resultat?.erreur || "Impossible de modifier la quantité.",
+        type: "erreur",
+      });
+      return;
+    }
+
+    setMessageAction({ 
+      texte: variation > 0 ? "Quantité augmentée" : "Quantité diminuée", 
+      type: "succes" 
+    });
+  }
+  
+  // Rafraîchir la liste après modification**
+  const datas = await recupererListeAchatComplete(utilisateur.id);
+  setBouteillesCellier(datas || []);
+};
+
+  // Gestion utilisateur non connecté
+  if (!utilisateur?.id) {
+    return (
+      <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
+        <header>
+          <MenuEnHaut />
+        </header>
+
+        <main className="bg-fond overflow-y-auto">
+          <div className="flex flex-col items-center justify-center min-h-[400px] gap-(--rythme-base) p-(--rythme-base)">
+            <Message
+              type="information"
+              texte="Veuillez vous connecter pour accéder à votre liste d'achat."
+            />
+            <Bouton
+              taille = ""
+              texte="Se connecter"
+              type="primaire"
+              typeHtml="button"
+              action={() => navigate("/")}
+            />
+          </div>
+        </main>
+
+        <MenuEnBas />
+      </div>
+    );
+  }
+
+  // Structure principale et affichage des bouteilles
   return (
     <div className="h-screen font-body grid grid-rows-[auto_1fr_auto] overflow-hidden">
       <header>
@@ -126,33 +194,34 @@ function ListeAchat() {
 
       <main className="bg-fond overflow-y-auto">
         <header className="pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)">
-          <h1 className="text-(length:--taille-moyen) text-center font-display font-semibold text-principal-300">
+          <h1 className="text-(length:--taille-grand) text-center font-display font-semibold text-principal-300">
             Votre Liste d'achat
           </h1>
         </header>
 
         <article className="mt-(--rythme-base) p-(--rythme-serre) min-h-[200px]">
+          {/* Affichage des messages d'action */}
           {messageAction.texte && (
             <div className="mb-(--rythme-base)">
               <Message type={messageAction.type} texte={messageAction.texte} />
             </div>
           )}
+
           {chargementBouteilles ? (
             <Message
               type="information"
               texte="Chargement des bouteilles de la liste..."
             />
           ) : bouteillesCellier.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
+              {/* Affichage des bouteilles */}
               {bouteillesCellier.map((bouteille) => (
                 <Link key={bouteille.id} to={`/bouteilles/${bouteille.id}`}>
                   <CarteListeAchat
                     key={bouteille.id}
                     bouteille={bouteille}
-                    type="cellier"
-                    onAugmenter={handleAugmenter}
-                    onDiminuer={handleDiminuer}
-                    disabled={bouteillesEnTraitement.has(bouteille.id)}
+                    onSupprimer={gererSupprimer}
+                    onAjouterCellier={gererAjouterCellier} 
                   />
                 </Link>
               ))}
