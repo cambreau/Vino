@@ -1,5 +1,4 @@
 // Recuperer les icons:
-import { FaUser, FaStar, FaRegStar } from "react-icons/fa"; // Profil, Etoile, Etoile vide
 import { formatMajDebut } from "@lib/utils";
 import catalogue from "@assets/images/catalogue.svg?react";
 import profil from "@assets/images/profil.svg";
