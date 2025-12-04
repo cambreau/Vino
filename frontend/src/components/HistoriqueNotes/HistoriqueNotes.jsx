@@ -4,12 +4,9 @@ import Message from "@components/components-partages/Message/Message";
 import Spinner from "@components/components-partages/Spinner/Spinner";
 import MoyenneNotes from "@components/components-partages/MoyenneNotes/MoyenneNotes";
 import CarteNoteDegustation from "@components/HistoriqueNotes/CarteNoteDegustation/CarteNoteDegustation";
-import {
-  recupererNotes,
-  modifierNote,
-  supprimerNote,
-  traiterNotes,
-} from "@lib/requetes";
+import BoiteModaleNotes from "@components/boiteModaleNotes/boiteModaleNotes";
+import iconNotez from "@assets/images/evaluation.svg";
+import { recupererNotes, supprimerNote, traiterNotes } from "@lib/requetes";
 import authentificationStore from "@store/authentificationStore";
 
 function HistoriqueNotes({ id_bouteille }) {
@@ -21,6 +18,8 @@ function HistoriqueNotes({ id_bouteille }) {
   const [chargement, setChargement] = useState(true);
   // On affiche seulement 5 notes au chargement de la page.
   const [nombreNotesAffichees, setNombreNotesAffichees] = useState(5);
+  // État pour contrôler l'ouverture de la modale note
+  const [estModaleNotezOuverte, setEstModaleNotezOuverte] = useState(false);
 
   // On recupere les notes et on gere l'afichage durant le chargement.
   useEffect(() => {
@@ -78,6 +77,18 @@ function HistoriqueNotes({ id_bouteille }) {
     setNombreNotesAffichees((prev) => prev + 5);
   };
 
+  // Fonction pour ouvrir la modale de notation
+  const ouvrirBoiteModaleNotez = () => {
+    setEstModaleNotezOuverte(true);
+  };
+
+  // Fonction pour fermer la modale et recharger les notes
+  const fermerBoiteModaleNotez = async () => {
+    setEstModaleNotezOuverte(false);
+    // Recharger les notes après fermeture pour vérifier si l'utilisateur a maintenant une note
+    await rechargerNotes();
+  };
+
   // Limite l'affichage aux N premières notes selon nombreNotesAffichees
   // Si nombreNotesAffichees = 5, on obtient les 5 premieres notes.
   // Si nombreNotesAffichees = 10, on obtient les 10 premieres notes.
@@ -91,19 +102,44 @@ function HistoriqueNotes({ id_bouteille }) {
 
   return (
     <section className="border border-principal-100 rounded-(--arrondi-grand) shadow-md p-(--rythme-base)">
-      <h2 className="mb-2 text-(length:--taille-normal) font-semibold text-texte-premier">
-        Historique Notes
-      </h2>
-      {!chargement && (
-        <div className="flex items-center gap-(--rythme-serre) mb-(--rythme-base)">
-          <div className="text-(length:--taille-petit)">
-            <MoyenneNotes id_bouteille={id_bouteille} />
-          </div>
-          <p className="text-(length:--taille-petit) italic text-texte-secondaire">
-            ({notes.length} {notes.length === 1 ? "note" : "notes"})
-          </p>
+      <header className="flex justify-between wrap">
+        <div>
+          <h2 className="mb-2 text-(length:--taille-normal) font-semibold text-texte-premier">
+            Historique Notes
+          </h2>
+          {!chargement && (
+            <div className="flex items-center gap-(--rythme-serre) mb-(--rythme-base)">
+              <div className="text-(length:--taille-petit)">
+                <MoyenneNotes id_bouteille={id_bouteille} />
+              </div>
+              <p className="text-(length:--taille-petit) italic text-texte-secondaire">
+                ({notes.length} {notes.length === 1 ? "note" : "notes"})
+              </p>
+            </div>
+          )}
         </div>
-      )}
+        {/* Bouton "Notez" si l'utilisateur n'a pas encore de note */}
+        {!chargement && !noteUtilisateur && utilisateur?.id && (
+          <div className="mb-(--rythme-base)">
+            <Bouton
+              texte={
+                <span className="flex items-center gap-(--rythme-tres-serre)">
+                  Notez
+                  <img
+                    src={iconNotez}
+                    alt="Icône évaluation"
+                    className="w-5 h-5"
+                  />
+                </span>
+              }
+              type="secondaire"
+              action={ouvrirBoiteModaleNotez}
+              typeHtml="button"
+              disabled={false}
+            />
+          </div>
+        )}
+      </header>
       {chargement ? (
         <Spinner />
       ) : noteUtilisateur || notes.length > 0 ? (
@@ -139,6 +175,14 @@ function HistoriqueNotes({ id_bouteille }) {
         </>
       ) : (
         <Message type="information" texte="Aucune note disponible" />
+      )}
+      {/* Modale pour ajouter une note */}
+      {estModaleNotezOuverte && (
+        <BoiteModaleNotes
+          id_bouteille={id_bouteille}
+          noteInitiale={null}
+          onFermer={fermerBoiteModaleNotez}
+        />
       )}
     </section>
   );
