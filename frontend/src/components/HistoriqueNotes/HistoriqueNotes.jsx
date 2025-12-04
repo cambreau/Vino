@@ -159,7 +159,7 @@ function HistoriqueNotes({ id_bouteille }) {
         <>
           {/* Note de l'utilisateur actuel en premier avec fond pâle */}
           {noteUtilisateur && (
-            <div className="mb-(--rythme-base) bg-principal-100 rounded-(--arrondi-grand) p-(--rythme-base)">
+            <div className="mb-(--rythme-base) bg-principal-100 rounded-(--arrondi-grand) p-(--rythme-tres-serre)">
               <CarteNoteDegustation
                 note={noteUtilisateur}
                 estNoteUtilisateur={true}
