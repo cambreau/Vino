@@ -8,15 +8,18 @@ import Bouton from "@components/components-partages/Boutons/Bouton";
 import BoiteModaleNotes from "@components/boiteModaleNotes/boiteModaleNotes";
 import BoiteModaleAjoutBouteilleCellier from "@components/boiteModaleAjoutBouteilleCellier/boiteModaleAjoutBouteilleCellier";
 import MoyenneEtCompteurNotes from "@components/HistoriqueNotes/MoyenneEtCompteurNotes/MoyenneEtCompteurNotes";
+import GestionListeAchat from "@components/components-partages/ListeAchat/GestionListeAchat";
+
 
 const CarteBouteille = ({
   bouteille,
   type = "catalogue",
   onAugmenter = () => {},
   onDiminuer = () => {},
-  onAjouterListe = () => {},
   disabled = false, //désactiver le bouton
   aNote = false, //indique si l'utilisateur a déjà noté la bouteille
+  dispatch, 
+  ACTIONS,
 }) => {
   const [estModaleNotezOuverte, setEstModaleNotezOuverte] = useState(false);
   const [estModaleAjoutOuverte, setEstModaleAjoutOuverte] = useState(false);
@@ -46,6 +49,8 @@ const CarteBouteille = ({
     setEstModaleAjoutOuverte(false);
   };
 
+
+
   /**
    * Génère les contrôles (boutons) selon le type :
    * - catalogue : bouton "Ajouter au cellier"
@@ -65,12 +70,26 @@ const CarteBouteille = ({
             disabled={disabled}
           />
 
-          <Bouton
-            variante="icone"
-            icone={<GiNotebook size={20} />}
-            action={gererAjouterListe}
-            disabled={disabled}
-          />
+          <GestionListeAchat
+            bouteille={bouteille}
+            dispatch={dispatch}
+            ACTIONS={ACTIONS}
+          >
+              {({ gererAjouterListe, dansListe }) => (
+                <Bouton
+                  variante="icone"
+                  icone={<GiNotebook size={20} />}
+                  action={gererAjouterListe}
+                  disabled={disabled}
+                  className={
+                    "transition-colors " +
+                    (dansListe
+                      ? "bg-principal-200 text-principal-100"
+                      : "bg-principal-100 text-principal-300")
+                  }
+                />
+              )}
+          </GestionListeAchat>
         </div>
       );
     }
@@ -158,14 +177,6 @@ const CarteBouteille = ({
         </div>
       );
     }
-  };
-
-  const gererAjouterListe = (e) => {
-    if (e && typeof e.stopPropagation === "function") {
-      e.stopPropagation();
-      e.preventDefault();
-    }
-    onAjouterListe(bouteille);
   };
 
   /**

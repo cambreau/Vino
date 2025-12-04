@@ -21,7 +21,7 @@ function Bouton({
   // Classes pour le bouton avec icône
   const classesIcone = `
 	flex items-center gap-2
-	p-2 rounded-full text-principal-200 
+	p-2 rounded-full
 	border-1 border-(--color-principal-200) 
 	shadow-md hover:bg-principal-200 hover:text-principal-100 
 	transition-all cursor-pointer

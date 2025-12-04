@@ -15,7 +15,7 @@ import Filtres from "@components/components-partages/Filtre/Filtre";
 import NonTrouver from "@components/components-partages/NonTrouver/NonTrouver";
 import Spinner from "@components/components-partages/Spinner/Spinner";
 
-import { recupererBouteilles, ajouterBouteilleListe } from "@lib/requetes";
+import { recupererBouteilles } from "@lib/requetes";
 
 import authentificationStore from "@store/authentificationStore";
 import {
@@ -513,47 +513,6 @@ function Catalogue() {
     };
   }, [verifierScrollEtCharger, etat.chargementInitial, filtresActifs]);
 
-  /*================================= */
-  //Ajouter a la liste
-  const ajouterALaListe = useCallback(
-    async (bouteille) => {
-      try {
-        const resultat = await ajouterBouteilleListe(utilisateur.id, {
-          id_bouteille: bouteille.id,
-        });
-
-        if (resultat?.succes) {
-          dispatch({
-            type: ACTIONS.SET_MESSAGE,
-            payload: {
-              texte: `${bouteille.nom} a été ajouté à votre liste avec succès`,
-              type: "succes",
-            },
-          });
-        } else {
-          dispatch({
-            type: ACTIONS.SET_MESSAGE,
-            payload: {
-              texte: resultat?.erreur || "Erreur lors de l'ajout à la liste",
-              type: "erreur",
-            },
-          });
-        }
-      } catch (error) {
-        console.error(error);
-        dispatch({
-          type: ACTIONS.SET_MESSAGE,
-          payload: {
-            texte: "Erreur lors de l'ajout à la liste",
-            type: "erreur",
-          },
-        });
-      }
-    },
-    [utilisateur.id]
-  );
-  /*================================= */
-
   const { chargementInitial, message, scrollLoading, hasMore } = etat;
   const messageListeVide = filtresActifs
     ? "Aucune bouteille ne correspond à vos filtres"
@@ -634,7 +593,8 @@ function Catalogue() {
                             key={b.id}
                             bouteille={b}
                             type="catalogue"
-                            onAjouterListe={ajouterALaListe}
+                             dispatch={dispatch} 
+                            ACTIONS={ACTIONS}
                           />
                         </Link>
                       ))}
