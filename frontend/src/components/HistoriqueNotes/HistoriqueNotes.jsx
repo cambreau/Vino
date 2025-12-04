@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import Message from "@components/components-partages/Message/Message";
 import Spinner from "@components/components-partages/Spinner/Spinner";
-import MoyenneNotes from "@components/components-partages/MoyenneNotes/MoyenneNotes";
+import MoyenneEtCompteurNotes from "@components/HistoriqueNotes/MoyenneEtCompteurNotes/MoyenneEtCompteurNotes";
 import CarteNoteDegustation from "@components/HistoriqueNotes/CarteNoteDegustation/CarteNoteDegustation";
 import BoiteModaleNotes from "@components/boiteModaleNotes/boiteModaleNotes";
 import iconNotez from "@assets/images/evaluation.svg";
@@ -20,6 +20,8 @@ function HistoriqueNotes({ id_bouteille }) {
   const [nombreNotesAffichees, setNombreNotesAffichees] = useState(5);
   // État pour contrôler l'ouverture de la modale note
   const [estModaleNotezOuverte, setEstModaleNotezOuverte] = useState(false);
+  // Compteur pour forcer la régénération du composant MoyenneEtCompteurNotes
+  const [reactualiserComponent, setReactualiserComponent] = useState(0);
 
   // On recupere les notes et on gere l'afichage durant le chargement.
   useEffect(() => {
@@ -56,6 +58,10 @@ function HistoriqueNotes({ id_bouteille }) {
   // L'API est gérée directement dans BoiteModaleNotes
   const gererModifierNote = async () => {
     await rechargerNotes();
+    // Petit délai pour s'assurer que les données sont mises à jour avant de régénérer
+    setTimeout(() => {
+      setReactualiserComponent((prev) => prev + 1);
+    }, 100);
   };
 
   // Fonction pour supprimer une note
@@ -67,6 +73,10 @@ function HistoriqueNotes({ id_bouteille }) {
     if (resultat.succes) {
       // Recharger les notes après suppression
       await rechargerNotes();
+      // Petit délai pour s'assurer que les données sont mises à jour avant de régénérer
+      setTimeout(() => {
+        setReactualiserComponent((prev) => prev + 1);
+      }, 100);
     } else {
       console.error("Erreur lors de la suppression:", resultat.erreur);
     }
@@ -82,11 +92,15 @@ function HistoriqueNotes({ id_bouteille }) {
     setEstModaleNotezOuverte(true);
   };
 
-  // Fonction pour fermer la modale et recharger les notes
+  // Fonction pour fermer la modale et recharger les notes (ajout d'une note)
   const fermerBoiteModaleNotez = async () => {
     setEstModaleNotezOuverte(false);
     // Recharger les notes après fermeture pour vérifier si l'utilisateur a maintenant une note
     await rechargerNotes();
+    // Petit délai pour s'assurer que les données sont mises à jour avant de régénérer
+    setTimeout(() => {
+      setReactualiserComponent((prev) => prev + 1);
+    }, 100);
   };
 
   // Limite l'affichage aux N premières notes selon nombreNotesAffichees
@@ -107,16 +121,12 @@ function HistoriqueNotes({ id_bouteille }) {
           <h2 className="mb-2 text-(length:--taille-normal) font-semibold text-texte-premier">
             Historique Notes
           </h2>
-          {!chargement && (
-            <div className="flex items-center gap-(--rythme-serre) mb-(--rythme-base)">
-              <div className="text-(length:--taille-petit)">
-                <MoyenneNotes id_bouteille={id_bouteille} />
-              </div>
-              <p className="text-(length:--taille-petit) italic text-texte-secondaire">
-                ({notes.length} {notes.length === 1 ? "note" : "notes"})
-              </p>
-            </div>
-          )}
+          <div className="mb-(--rythme-base)">
+            <MoyenneEtCompteurNotes
+              key={reactualiserComponent}
+              id_bouteille={id_bouteille}
+            />
+          </div>
         </div>
         {/* Bouton "Notez" si l'utilisateur n'a pas encore de note */}
         {!chargement && !noteUtilisateur && utilisateur?.id && (
@@ -146,7 +156,7 @@ function HistoriqueNotes({ id_bouteille }) {
         <>
           {/* Note de l'utilisateur actuel en premier avec fond pâle */}
           {noteUtilisateur && (
-            <div className="mb-(--rythme-base) bg-principal-50 rounded-(--arrondi-grand) p-(--rythme-base)">
+            <div className="mb-(--rythme-base) bg-principal-100 rounded-(--arrondi-grand) p-(--rythme-base)">
               <CarteNoteDegustation
                 note={noteUtilisateur}
                 estNoteUtilisateur={true}
