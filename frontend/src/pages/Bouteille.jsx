@@ -9,6 +9,8 @@ import { useDocumentTitle } from "@lib/utils.js";
 import { recupererBouteille } from "@lib/requetes.js";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import BoiteModaleAjoutBouteilleCellier from "@components/boiteModaleAjoutBouteilleCellier/boiteModaleAjoutBouteilleCellier";
+
 function Bouteille() {
   const navigate = useNavigate();
   //Recuperer id dans l'url
@@ -29,6 +31,9 @@ function Bouteille() {
   });
 
   useDocumentTitle(bouteille.nom || "Bouteille");
+
+  // État pour contrôler l'ouverture de la modale
+  const [modaleOuverte, setModaleOuverte] = useState(false);
 
   /**
    * Recuperer les informations d'une bouteille' cote backend.
@@ -127,15 +132,15 @@ function Bouteille() {
                   </h3>
                   <p className="flex-1">{bouteille.description}</p>
                 </section>
-                {/* Bouton pour ajouter une bouteille dans le cellier */}
+                {/* Bouton pour ajouter/modifier une bouteille dans le cellier */}
                 <div className="mb-(--rythme-base) pt-(--rythme-base)">
                   <Bouton
                     taille="moyen"
-                    texte="Ajouter cette bouteille"
+                    texte="Ajouter au cellier"
                     type="primaire"
                     typeHtml="button"
                     action={() => {
-                      navigate("/catalogue");
+                      setModaleOuverte(true);
                     }}
                   />
                 </div>
@@ -149,6 +154,14 @@ function Bouteille() {
       </main>
 
       <MenuEnBas />
+
+      {/* Modale pour ajouter/modifier la bouteille au cellier */}
+      <BoiteModaleAjoutBouteilleCellier
+        id_bouteille={id}
+        nom_bouteille={bouteille.nom}
+        estOuverte={modaleOuverte}
+        onFermer={() => setModaleOuverte(false)}
+      />
     </div>
   );
 }
