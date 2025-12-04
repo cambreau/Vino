@@ -201,7 +201,32 @@ const CarteBouteille = ({
   ) : null;
 
   return (
-    <div className="relative flex flex-col justify-between bg-fond-secondaire p-(--rythme-serre) rounded-(--arrondi-grand) shadow-md min-h-[320px]">
+  <div className="relative flex flex-col justify-between bg-fond-secondaire p-(--rythme-serre) rounded-(--arrondi-grand) shadow-md min-h-[320px]">
+      {type === "cellier" && (
+        <div className="absolute top-(--rythme-tres-serre) left-(--rythme-tres-serre) z-10">
+          <GestionListeAchat
+            bouteille={bouteille}
+            dispatch={dispatch}
+            ACTIONS={ACTIONS}
+          >
+            {({ gererAjouterListe, dansListe }) => (
+              <Bouton
+                variante="icone"
+                icone={<GiNotebook size={20} />}
+                action={gererAjouterListe}
+                disabled={disabled}
+                className={
+                  "transition-colors " +
+                  (dansListe
+                    ? "bg-principal-200 text-principal-100"
+                    : "bg-principal-100 text-principal-300")
+                }
+              />
+            )}
+          </GestionListeAchat>
+        </div>
+      )}
+      
       {/* Badge moyenne + nombre de notes en haut à droite */}
       <div className="absolute top-(--rythme-tres-serre) right-(--rythme-tres-serre) z-10">
         <MoyenneEtCompteurNotes id_bouteille={bouteille.id} />
