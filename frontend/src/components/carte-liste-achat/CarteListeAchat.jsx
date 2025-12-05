@@ -8,7 +8,6 @@ const CarteListeAchat = ({
   onAjouterCellier = () => {},
   disabled = false,
 }) => {
-
   const gererSuppression = (e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -44,15 +43,19 @@ const CarteListeAchat = ({
 
         {/* Informations principales */}
         <div className="flex-1 flex flex-col gap-(--rythme-serre)">
-          <h2 className="text-(length:--taille-normal) font-semibold 
-          text-principal-300 line-clamp-2">
+          <h2
+            className="text-(length:--taille-normal) font-semibold 
+          text-principal-300 line-clamp-2"
+          >
             {bouteille.nom}
           </h2>
-          
+
           <div className="flex flex-col gap-1">
             <p className="text-(length:--taille-petit) text-texte-secondaire">
               <span className="font-medium">Couleur:</span>{" "}
-              <span className="text-principal-300">{bouteille.type || bouteille.couleur}</span>
+              <span className="text-principal-300">
+                {bouteille.type || bouteille.couleur}
+              </span>
             </p>
             <p className="text-(length:--taille-petit) text-texte-secondaire line-clamp-2">
               {formatDetailsBouteille(bouteille.description)}
@@ -68,33 +71,35 @@ const CarteListeAchat = ({
       <div className="p-(--rythme-base) bg-principal-200">
         <div className="flex items-center justify-between mb-(--rythme-serre)">
           <h3 className="text-(length:--taille-petit) font-semibold text-fond-secondaire">
-            Dans vos celliers
+            Mettre à jour les quantités de vos celliers ;
           </h3>
         </div>
-        
+
         {bouteille.celliers && bouteille.celliers.length > 0 ? (
           <div className="flex flex-col gap-2 mb-(--rythme-base)">
             {bouteille.celliers.map((cellier) => (
-              <div 
-                key={cellier.idCellier} 
+              <div
+                key={cellier.idCellier}
                 className="flex items-center justify-between p-(--rythme-serre)  bg-fond-secondaire rounded-(--arrondi-moyen) border border-principal-100"
               >
                 <span className="text-(length:--taille-petit) font-medium text-principal-300">
                   {cellier.nomCellier}
                 </span>
-                
+
                 {/* Controles de quantite */}
                 <div className="flex items-center gap-2">
                   <BoutonQuantite
                     type="diminuer"
-                    onClick={(e) => gererDiminution(e, cellier.idCellier, cellier.quantite)}
+                    onClick={(e) =>
+                      gererDiminution(e, cellier.idCellier, cellier.quantite)
+                    }
                     disabled={disabled || cellier.quantite <= 0}
                   />
-                  
+
                   <span className="flex items-center justify-center min-w-8 px-2 text-texte-principal font-bold text-(length:--taille-normal)">
                     {cellier.quantite || 0}
                   </span>
-                  
+
                   <BoutonQuantite
                     type="augmenter"
                     onClick={(e) => gererAugmentation(e, cellier.idCellier)}
