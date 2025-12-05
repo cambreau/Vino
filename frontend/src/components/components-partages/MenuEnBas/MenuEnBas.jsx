@@ -36,24 +36,21 @@ function MenuEnBas({}) {
         const actif = estActif(item.zonesActives);
         const baseClasses =
           "flex flex-col items-center gap-(--rythme-tres-serre)  py-(--rythme-serre) transition-all duration-200 ease-out transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fond-secondaire";
-        const actifClasses = "bg-fond-secondaire text-principal-300";
-        const inactifClasses =
-          "text-principal-100/80 hover:text-fond-secondaire hover:-translate-y-0.5";
+        const actifClasses = actif ? "bg-fond-secondaire" : "";
 
         return (
           <Link
             key={item.nom}
             to={item.to}
             aria-current={actif ? "page" : undefined}
-            className={`${baseClasses} ${
-              actif ? actifClasses : inactifClasses
-            }`}
+            className={`${baseClasses} ${actifClasses}`}
           >
             <Icon
               nom={item.nom}
+              actif={actif}
+              couleur={actif ? "principal-300" : "fond-secondaire"}
               typeMenu="bas"
               className="w-full"
-              couleur={actif ? "principal-300" : "principal-100"}
             />
           </Link>
         );
