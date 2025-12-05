@@ -8,15 +8,18 @@ import Bouton from "@components/components-partages/Boutons/Bouton";
 import BoiteModaleNotes from "@components/boiteModaleNotes/boiteModaleNotes";
 import BoiteModaleAjoutBouteilleCellier from "@components/boiteModaleAjoutBouteilleCellier/boiteModaleAjoutBouteilleCellier";
 import MoyenneEtCompteurNotes from "@components/HistoriqueNotes/MoyenneEtCompteurNotes/MoyenneEtCompteurNotes";
+import GestionListeAchat from "@components/components-partages/ListeAchat/GestionListeAchat";
+
 
 const CarteBouteille = ({
   bouteille,
   type = "catalogue",
   onAugmenter = () => {},
   onDiminuer = () => {},
-  onAjouterListe = () => {},
   disabled = false, //désactiver le bouton
   aNote = false, //indique si l'utilisateur a déjà noté la bouteille
+  dispatch, 
+  ACTIONS,
 }) => {
   const [estModaleNotezOuverte, setEstModaleNotezOuverte] = useState(false);
   const [estModaleAjoutOuverte, setEstModaleAjoutOuverte] = useState(false);
@@ -47,6 +50,8 @@ const CarteBouteille = ({
     setEstModaleAjoutOuverte(false);
   };
 
+
+
   /**
    * Génère les contrôles (boutons) selon le type :
    * - catalogue : bouton "Ajouter au cellier"
@@ -66,12 +71,26 @@ const CarteBouteille = ({
             disabled={disabled}
           />
 
-          <Bouton
-            variante="icone"
-            icone={<GiNotebook size={20} />}
-            action={gererAjouterListe}
-            disabled={disabled}
-          />
+          <GestionListeAchat
+            bouteille={bouteille}
+            dispatch={dispatch}
+            ACTIONS={ACTIONS}
+          >
+              {({ gererAjouterListe, dansListe }) => (
+                <Bouton
+                  variante="icone"
+                  icone={<GiNotebook size={20} />}
+                  action={gererAjouterListe}
+                  disabled={disabled}
+                  className={
+                    "transition-colors " +
+                    (dansListe
+                      ? "bg-principal-200 text-principal-100"
+                      : "bg-principal-100 text-principal-300")
+                  }
+                />
+              )}
+          </GestionListeAchat>
         </div>
       );
     }
@@ -161,14 +180,6 @@ const CarteBouteille = ({
     }
   };
 
-  const gererAjouterListe = (e) => {
-    if (e && typeof e.stopPropagation === "function") {
-      e.stopPropagation();
-      e.preventDefault();
-    }
-    onAjouterListe(bouteille);
-  };
-
   /**
    * Utilise createPortal pour rendre la modale directement dans le body
    * Cela garantit qu'elle est en dehors de la hiérarchie DOM (et donc du Link)
@@ -191,7 +202,32 @@ const CarteBouteille = ({
   ) : null;
 
   return (
-    <div className="relative flex flex-col justify-between bg-fond-secondaire p-(--rythme-serre) rounded-(--arrondi-grand) shadow-md min-h-[320px]">
+  <div className="relative flex flex-col justify-between bg-fond-secondaire p-(--rythme-serre) rounded-(--arrondi-grand) shadow-md min-h-[320px]">
+      {type === "cellier" && (
+        <div className="absolute top-(--rythme-tres-serre) left-(--rythme-tres-serre) z-10">
+          <GestionListeAchat
+            bouteille={bouteille}
+            dispatch={dispatch}
+            ACTIONS={ACTIONS}
+          >
+            {({ gererAjouterListe, dansListe }) => (
+              <Bouton
+                variante="icone"
+                icone={<GiNotebook size={20} />}
+                action={gererAjouterListe}
+                disabled={disabled}
+                className={
+                  "transition-colors " +
+                  (dansListe
+                    ? "bg-principal-200 text-principal-100"
+                    : "bg-principal-100 text-principal-300")
+                }
+              />
+            )}
+          </GestionListeAchat>
+        </div>
+      )}
+      
       {/* Badge moyenne + nombre de notes en haut à droite */}
       <div className="absolute top-(--rythme-tres-serre) right-(--rythme-tres-serre) z-10">
         <MoyenneEtCompteurNotes id_bouteille={bouteille.id} />

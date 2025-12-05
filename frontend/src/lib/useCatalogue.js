@@ -1,5 +1,4 @@
 import { useEffect, useCallback, useRef, useMemo, useReducer } from "react";
-import { ajouterBouteilleListe } from "@lib/requetes";
 import filtresStore from "@store/filtresStore";
 import {
   LIMITE_BOUTEILLES,
@@ -205,44 +204,6 @@ export function useCatalogue(utilisateurId) {
     };
   }, [demanderChargement, etat.chargementInitial]);
 
-  // Ajouter à la liste d'achat
-  const ajouterALaListe = useCallback(
-    async (bouteille) => {
-      try {
-        const resultat = await ajouterBouteilleListe(utilisateurId, {
-          id_bouteille: bouteille.id,
-        });
-
-        if (resultat?.succes) {
-          dispatch({
-            type: ACTIONS.SET_MESSAGE,
-            payload: {
-              texte: `${bouteille.nom} a été ajouté à votre liste avec succès`,
-              type: "succes",
-            },
-          });
-        } else {
-          dispatch({
-            type: ACTIONS.SET_MESSAGE,
-            payload: {
-              texte: resultat?.erreur || "Erreur lors de l'ajout à la liste",
-              type: "erreur",
-            },
-          });
-        }
-      } catch (error) {
-        console.error(error);
-        dispatch({
-          type: ACTIONS.SET_MESSAGE,
-          payload: {
-            texte: "Erreur lors de l'ajout à la liste",
-            type: "erreur",
-          },
-        });
-      }
-    },
-    [utilisateurId]
-  );
 
   return {
     // Références
@@ -285,7 +246,5 @@ export function useCatalogue(utilisateurId) {
       reinitialiserFiltresStore();
     }, [reinitialiserFiltresStore]),
 
-    // Actions
-    ajouterALaListe,
   };
 }
