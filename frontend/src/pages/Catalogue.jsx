@@ -5,7 +5,7 @@ import CarteBouteille from "@components/carte/CarteBouteille";
 import Message from "@components/components-partages/Message/Message";
 import NonTrouver from "@components/components-partages/NonTrouver/NonTrouver";
 import Spinner from "@components/components-partages/Spinner/Spinner";
-import FiltresCatalogue from "@components/components-partages/Filtre/FiltresCatalogue";
+import Filtres from "@components/components-partages/Filtre/Filtre";
 
 import authentificationStore from "@store/authentificationStore";
 import { useDocumentTitle } from "@lib/utils.js";
@@ -72,7 +72,7 @@ function Catalogue() {
 
           {/* Filtres - centrés sur mobile et tablette, en colonne jusqu'à xl */}
           <div className="flex flex-col items-center gap-(--rythme-base) mb-(--rythme-espace)">
-            <FiltresCatalogue
+            <Filtres
               filtresActuels={criteresFiltresStore}
               rechercheActuelle={
                 typeof criteresRechercheStore === "string"
