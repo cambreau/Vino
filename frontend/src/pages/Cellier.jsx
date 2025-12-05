@@ -176,7 +176,7 @@ function Cellier() {
   );
 
   // Handler pour le filtrage
-  const handleFiltrer = useCallback((resultats, criteres) => {
+  const handleFiltrer = useCallback((criteres, resultats) => {
     const actifs = Object.values(criteres ?? {}).some((valeur) =>
       Boolean(valeur)
     );
@@ -187,13 +187,16 @@ function Cellier() {
 
   // Handler pour la recherche
   const handleRecherche = useCallback(
-    (criteres) => {
+    (recherche) => {
+      const criteres =
+        typeof recherche === "string" ? { nom: recherche } : recherche ?? {};
       const actifs = Object.values(criteres ?? {}).some((valeur) =>
         Boolean(valeur)
       );
       if (!actifs) {
         setResultatsFiltres(null);
         setModeRecherche(false);
+        setCriteresFiltres(criteres);
         return;
       }
       setModeRecherche(true);
@@ -290,7 +293,8 @@ function Cellier() {
                 <div className="mb-(--rythme-base)">
                   <Filtres
                     bouteilles={bouteillesCellier}
-                    valeursInitiales={criteresFiltres}
+                    filtresActuels={criteresFiltres}
+                    rechercheActuelle={modeRecherche ? criteresFiltres.nom || "" : ""}
                     onFiltrer={handleFiltrer}
                     onRecherche={handleRecherche}
                     onTri={handleTri}
