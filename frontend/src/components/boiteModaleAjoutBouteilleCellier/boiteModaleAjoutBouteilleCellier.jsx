@@ -80,7 +80,7 @@ function BoiteModaleAjoutBouteilleCellier({
   const [bouteilleCellier, setBouteilleCellier] = useState({
     id_bouteille: "",
     id_cellier: "",
-    quantite: 1,
+    quantite: 0,
   });
 
   // La bouteille est déjà dans le cellier ?
@@ -121,11 +121,11 @@ function BoiteModaleAjoutBouteilleCellier({
           id_cellier: "",
           quantite: 0,
         });
-        // Réinitialiser la quantité à 1 si la bouteille n'existe pas (mode ajout)
+        // Réinitialiser la quantité à 0 si la bouteille n'existe pas (mode ajout)
         setBouteilleCellier((prev) => ({
           ...prev,
           id_bouteille: id_bouteille,
-          quantite: 1,
+          quantite: 0,
         }));
       }
       setChargementVerification(false);
@@ -149,7 +149,7 @@ function BoiteModaleAjoutBouteilleCellier({
       setBouteilleCellier({
         id_bouteille: id_bouteille,
         id_cellier: cellierSelectionne || "",
-        quantite: 1,
+        quantite: 0,
       });
       setBouteilleExiste({
         existe: false,
@@ -284,7 +284,9 @@ function BoiteModaleAjoutBouteilleCellier({
               </div>
 
               <div className="flex items-center justify-center gap-(--rythme-serre)">
-                <span className="text-texte-secondaire">Quantité :</span>
+                <span className="text-texte-secondaire">
+                  Quantité au cellier :
+                </span>
                 <BoutonQuantite
                   type="diminuer"
                   onClick={() => modifierQuantite("diminuer")}
