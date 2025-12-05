@@ -31,6 +31,38 @@ export const recupererDegustationsUtilisateur = async (req, res) => {
   }
 };
 
+export const recupererDegustationBouteille = async (req, res) => {
+  try {
+    const { id_utilisateur } = req.params;
+    const idUtilisateurNombre = parseInt(id_utilisateur, 10);
+
+    const { id_bouteille } = req.params;
+    const idBouteilleNombre = parseInt(id_bouteille, 10);
+
+    // Appel du modèle pour verifier si existe la dégustation
+    const resultat = await ModeleDegustation.existePourUtilisateurEtBouteille(
+      idUtilisateurNombre,
+      idBouteilleNombre,
+    );
+    if (resultat) {
+      // Retour de succès
+      return res.status(200).json({
+        message: "Dégustation récupérée",
+        data: resultat,
+      });
+    } else {
+      return res.status(500).json({ message: "Dégustation non trouvée" });
+    }
+
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des dégustations de l'utilisateur",
+      error
+    );
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
 export const recupererDegustationsBouteille = async (req, res) => {
   try {
     const { id_bouteille } = req.params;
