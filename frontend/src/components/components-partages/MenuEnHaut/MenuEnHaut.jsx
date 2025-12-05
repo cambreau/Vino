@@ -117,6 +117,7 @@ function MenuEnHaut({}) {
                   >
                     <Icon
                       nom={lien.nom}
+                      actif={true}
                       typeMenu="haut"
                       couleur={actif ? "principal-200" : "principal-300"}
                     />
