@@ -14,6 +14,23 @@ import fermer from "@assets/images/fermer.svg";
 import deconnection from "@assets/images/deconnection.svg";
 import etoile from "@assets/images/etoile.svg";
 import etoileVide from "@assets/images/etoileVide.svg";
+import filtre from "@assets/images/filtre.svg";
+import chevronBas from "@assets/images/chevronBas.svg";
+import raisins from "@assets/images/raisins.svg";
+import monde from "@assets/images/monde.svg";
+import calendrier from "@assets/images/calendrier.svg";
+import fermerX from "@assets/images/fermerX.svg";
+import echange from "@assets/images/echange.svg";
+import entrepot from "@assets/images/entrepot.svg";
+import vin from "@assets/images/vin.svg";
+import erreur from "@assets/images/erreur.svg";
+import succes from "@assets/images/succes.svg";
+import info from "@assets/images/info.svg";
+import flecheGauche from "@assets/images/flecheGauche.svg";
+import editer from "@assets/images/editer.svg";
+import poubelle from "@assets/images/poubelle.svg";
+import carnet from "@assets/images/carnet.svg";
+import utilisateur from "@assets/images/utilisateur.svg";
 
 // Objet qui mappe les noms aux icônes
 const icons = {
@@ -31,6 +48,23 @@ const icons = {
   fermer: fermer,
   etoile: etoile,
   etoileVide: etoileVide,
+  filtre: filtre,
+  chevronBas: chevronBas,
+  raisins: raisins,
+  monde: monde,
+  calendrier: calendrier,
+  fermerX: fermerX,
+  echange: echange,
+  entrepot: entrepot,
+  vin: vin,
+  erreur: erreur,
+  succes: succes,
+  info: info,
+  flecheGauche: flecheGauche,
+  editer: editer,
+  poubelle: poubelle,
+  carnet: carnet,
+  utilisateur: utilisateur,
 };
 
 function Icon({

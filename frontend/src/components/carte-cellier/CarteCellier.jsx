@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { IconEditer, IconPoubelle } from "@components/components-partages/Icon/SvgIcons";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 
 function CarteCellier({ titre, idCellier, onModifier, onSupprimer }) {
@@ -52,7 +52,7 @@ function CarteCellier({ titre, idCellier, onModifier, onSupprimer }) {
 			</h3>
 			<div className="flex flex-wrap gap-(--rythme-base) justify-center mt-(--rythme-espace)">
 				<Bouton
-					texte={<FaEdit size={tailleIcone} />}
+					texte={<IconEditer size={tailleIcone} />}
 					type="secondaire"
 					typeHtml="button"
 					action={(e) => {
@@ -62,7 +62,7 @@ function CarteCellier({ titre, idCellier, onModifier, onSupprimer }) {
 					}}
 				/>
 				<Bouton
-					texte={<FaTrash size={tailleIcone} />}
+					texte={<IconPoubelle size={tailleIcone} />}
 					type="primaire"
 					typeHtml="button"
 					action={(e) => {

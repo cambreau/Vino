@@ -2,14 +2,13 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuantite";
-import { GiNotebook } from "react-icons/gi";
+import { IconCarnet } from "@components/components-partages/Icon/SvgIcons";
 import iconNotez from "@assets/images/evaluation.svg";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import BoiteModaleNotes from "@components/boiteModaleNotes/boiteModaleNotes";
 import BoiteModaleAjoutBouteilleCellier from "@components/boiteModaleAjoutBouteilleCellier/boiteModaleAjoutBouteilleCellier";
 import MoyenneEtCompteurNotes from "@components/HistoriqueNotes/MoyenneEtCompteurNotes/MoyenneEtCompteurNotes";
 import GestionListeAchat from "@components/components-partages/ListeAchat/GestionListeAchat";
-
 
 const CarteBouteille = ({
   bouteille,
@@ -18,7 +17,7 @@ const CarteBouteille = ({
   onDiminuer = () => {},
   disabled = false, //désactiver le bouton
   aNote = false, //indique si l'utilisateur a déjà noté la bouteille
-  dispatch, 
+  dispatch,
   ACTIONS,
 }) => {
   const [estModaleNotezOuverte, setEstModaleNotezOuverte] = useState(false);
@@ -50,8 +49,6 @@ const CarteBouteille = ({
     setEstModaleAjoutOuverte(false);
   };
 
-
-
   /**
    * Génère les contrôles (boutons) selon le type :
    * - catalogue : bouton "Ajouter au cellier"
@@ -76,20 +73,20 @@ const CarteBouteille = ({
             dispatch={dispatch}
             ACTIONS={ACTIONS}
           >
-              {({ gererAjouterListe, dansListe }) => (
-                <Bouton
-                  variante="icone"
-                  icone={<GiNotebook size={20} />}
-                  action={gererAjouterListe}
-                  disabled={disabled}
-                  className={
-                    "transition-colors " +
-                    (dansListe
-                      ? "bg-principal-200 text-principal-100"
-                      : "bg-principal-100 text-principal-300")
-                  }
-                />
-              )}
+            {({ gererAjouterListe, dansListe }) => (
+              <Bouton
+                variante="icone"
+                icone={<IconCarnet size={20} />}
+                action={gererAjouterListe}
+                disabled={disabled}
+                className={
+                  "transition-colors " +
+                  (dansListe
+                    ? "bg-principal-200 text-principal-100"
+                    : "bg-principal-100 text-principal-300")
+                }
+              />
+            )}
           </GestionListeAchat>
         </div>
       );
@@ -202,7 +199,7 @@ const CarteBouteille = ({
   ) : null;
 
   return (
-  <div className="relative flex flex-col justify-between bg-fond-secondaire p-(--rythme-serre) rounded-(--arrondi-grand) shadow-md min-h-[320px]">
+    <div className="relative flex flex-col justify-between bg-fond-secondaire p-(--rythme-serre) rounded-(--arrondi-grand) shadow-md min-h-80">
       {type === "cellier" && (
         <div className="absolute top-(--rythme-tres-serre) left-(--rythme-tres-serre) z-10">
           <GestionListeAchat
@@ -213,7 +210,7 @@ const CarteBouteille = ({
             {({ gererAjouterListe, dansListe }) => (
               <Bouton
                 variante="icone"
-                icone={<GiNotebook size={20} />}
+                icone={<IconListeAchat size={20} />}
                 action={gererAjouterListe}
                 disabled={disabled}
                 className={
@@ -227,7 +224,7 @@ const CarteBouteille = ({
           </GestionListeAchat>
         </div>
       )}
-      
+
       {/* Badge moyenne + nombre de notes en haut à droite */}
       <div className="absolute top-(--rythme-tres-serre) right-(--rythme-tres-serre) z-10">
         <MoyenneEtCompteurNotes id_bouteille={bouteille.id} />
@@ -244,7 +241,9 @@ const CarteBouteille = ({
         <img
           src={bouteille.image || "/placeholder-bottle.png"}
           alt={`Photo de la bouteille ${bouteille.nom}`}
-          className={`h-40 w-auto object-contain transition-opacity duration-200 ${imageChargee ? 'opacity-100' : 'opacity-0'}`}
+          className={`h-40 w-auto object-contain transition-opacity duration-200 ${
+            imageChargee ? "opacity-100" : "opacity-0"
+          }`}
           loading="lazy"
           decoding="async"
           onLoad={() => setImageChargee(true)}
