@@ -4,7 +4,7 @@ import authentificationStore from "@store/authentificationStore";
 import autorisationStore from "@store/autorisationStore";
 import { recupererCellier } from "@lib/requetes";
 import Erreur from "@components/components-partages/Erreur/Erreur";
-import Spinner from "@components/components-partages/Spinner/SpinnerSimple";
+import Spinner from "@components/components-partages/Spinner/Spinner";
 
 /**
  * Composant pour proteger une route et verifier les autorisations

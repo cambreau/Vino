@@ -91,12 +91,13 @@ function Bouteille() {
             </h1>
           </header>
           <div className="flex flex-col gap-(--rythme-base) mt-(--rythme-base)">
-            <picture className="flex items-center justify-center">
+            <picture className="flex items-center justify-center min-h-[300px]">
               <ImageOptimisee
                 src={bouteille.image}
                 alt={bouteille.nom || "Bouteille de vin"}
                 width={200}
                 height={300}
+                priority={true}
                 className="h-auto w-auto max-h-[300px] object-contain"
               />
             </picture>

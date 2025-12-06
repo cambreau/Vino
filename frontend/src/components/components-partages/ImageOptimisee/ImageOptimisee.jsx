@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 /**
  * Composant d'image optimisée qui utilise wsrv.nl pour redimensionner
@@ -13,13 +13,27 @@ const ImageOptimisee = ({
   width,
   height,
   className = "",
-  placeholderSrc = "/placeholder-bottle.png",
+  placeholderSrc = null, // Placeholder désactivé par défaut (était "/placeholder-bottle.png")
   priority = false, // Si true, désactive lazy loading et ajoute fetchpriority="high" (pour LCP)
   onLoad,
   onError,
 }) => {
   const [imageChargee, setImageChargee] = useState(false);
   const [erreur, setErreur] = useState(false);
+  const imgRef = useRef(null);
+
+  // Réinitialiser l'état quand src change
+  useEffect(() => {
+    setImageChargee(false);
+    setErreur(false);
+  }, [src]);
+
+  // Vérifier si l'image est déjà chargée (depuis le cache)
+  useEffect(() => {
+    if (imgRef.current?.complete && imgRef.current?.naturalHeight > 0) {
+      setImageChargee(true);
+    }
+  }, [src]);
 
   /**
    * Génère une URL optimisée via le service wsrv.nl
@@ -109,24 +123,53 @@ const ImageOptimisee = ({
   const targetHeight = height;
 
   // URL finale (optimisée ou placeholder en cas d'erreur)
+  // Si pas de src, ne pas afficher d'image (évite les erreurs)
   const imageSrc = erreur
     ? placeholderSrc
     : src
-      ? getOptimizedUrl(src, targetWidth, targetHeight)
-      : placeholderSrc;
+    ? getOptimizedUrl(src, targetWidth, targetHeight)
+    : null;
 
   const srcSet =
     !erreur && src ? getSrcSet(src, targetWidth, targetHeight) : undefined;
 
+  // Si pas d'image source, afficher le skeleton
+  if (!imageSrc) {
+    return (
+      <div
+        className="relative flex items-center justify-center bg-principal-100/10 rounded"
+        style={{
+          width: width ? `${width}px` : "100%",
+          height: height ? `${height}px` : "100%",
+        }}
+      >
+        <div className="w-16 h-32 bg-principal-100/30 rounded animate-pulse" />
+      </div>
+    );
+  }
+
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      style={{
+        minWidth: width ? `${width}px` : undefined,
+        minHeight: height ? `${height}px` : undefined,
+      }}
+    >
       {/* Skeleton de chargement */}
       {!imageChargee && (
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div
+          className="absolute inset-0 flex items-center justify-center bg-principal-100/10 rounded"
+          style={{
+            width: width ? `${width}px` : "100%",
+            height: height ? `${height}px` : "100%",
+          }}
+        >
           <div className="w-16 h-32 bg-principal-100/30 rounded animate-pulse" />
         </div>
       )}
       <img
+        ref={imgRef}
         src={imageSrc}
         srcSet={srcSet}
         alt={alt}
