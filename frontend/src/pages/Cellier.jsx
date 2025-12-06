@@ -22,6 +22,7 @@ import {
   useListeAchat,
 } from "@lib/utils.js";
 import authentificationStore from "@store/authentificationStore";
+import listeAchatStore from "@store/listeAchatStore";
 
 
 function Cellier() {
@@ -29,6 +30,14 @@ function Cellier() {
   // Récupérer id du cellier dans l'URL
   const { idCellier } = useParams();
   const utilisateur = authentificationStore((state) => state.utilisateur);
+
+  // Charger la liste d'achat UNE SEULE FOIS au niveau du Cellier
+  const chargerListeAchat = listeAchatStore((state) => state.chargerListeAchat);
+  useEffect(() => {
+    if (utilisateur?.id) {
+      chargerListeAchat(utilisateur.id);
+    }
+  }, [utilisateur?.id, chargerListeAchat]);
 
   //============  Hook pour gérer l'état et les messages de la liste d'achat
   const { etat, dispatch, ACTIONS } = useListeAchat();

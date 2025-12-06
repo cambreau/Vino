@@ -17,6 +17,9 @@ const listeAchatStore = create((set, get) => ({
   // État de chargement initial
   chargementInitial: true,
 
+  // Flag pour indiquer qu'un chargement est en cours (évite les appels multiples)
+  chargementEnCours: false,
+
   // Erreur éventuelle
   erreur: null,
 
@@ -32,6 +35,11 @@ const listeAchatStore = create((set, get) => ({
   chargerListeAchat: async (utilisateurId, forceReload = false) => {
     const state = get();
 
+    // Éviter les appels multiples si un chargement est déjà en cours
+    if (state.chargementEnCours) {
+      return;
+    }
+
     // Éviter de recharger si déjà chargé pour cet utilisateur
     if (
       !forceReload &&
@@ -41,19 +49,21 @@ const listeAchatStore = create((set, get) => ({
       return;
     }
 
-    set({ chargementInitial: true, erreur: null, utilisateurId });
+    set({ chargementInitial: true, chargementEnCours: true, erreur: null, utilisateurId });
 
     try {
       const listeSimple = await recupererListeAchatSimple(utilisateurId);
       set({
         bouteilles: Array.isArray(listeSimple) ? listeSimple : [],
         chargementInitial: false,
+        chargementEnCours: false,
       });
     } catch (error) {
       console.error("Erreur lors du chargement de la liste d'achat:", error);
       set({
         bouteilles: [],
         chargementInitial: false,
+        chargementEnCours: false,
         erreur: error.message || "Erreur lors du chargement",
       });
     }
@@ -128,6 +138,7 @@ const listeAchatStore = create((set, get) => ({
     set({
       bouteilles: [],
       chargementInitial: true,
+      chargementEnCours: false,
       erreur: null,
       utilisateurId: null,
     });
