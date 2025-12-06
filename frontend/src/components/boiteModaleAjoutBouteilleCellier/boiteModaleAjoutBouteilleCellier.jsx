@@ -4,7 +4,7 @@ import FormulaireSelect from "@components/components-partages/Formulaire/Formula
 import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuantite";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import Message from "@components/components-partages/Message/Message";
-import Spinner from "@components/components-partages/Spinner/Spinner";
+import Spinner from "@components/components-partages/Spinner/SpinnerSimple";
 import {
   recupererTousCellier,
   verifierBouteilleCellier,

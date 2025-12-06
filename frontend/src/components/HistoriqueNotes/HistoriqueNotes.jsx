@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import Message from "@components/components-partages/Message/Message";
-import Spinner from "@components/components-partages/Spinner/Spinner";
+import Spinner from "@components/components-partages/Spinner/SpinnerSimple";
 import MoyenneEtCompteurNotes from "@components/HistoriqueNotes/MoyenneEtCompteurNotes/MoyenneEtCompteurNotes";
 import CarteNoteDegustation from "@components/HistoriqueNotes/CarteNoteDegustation/CarteNoteDegustation";
 import BoiteModaleNotes from "@components/boiteModaleNotes/boiteModaleNotes";

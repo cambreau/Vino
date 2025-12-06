@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Spinner from "@components/components-partages/Spinner/Spinner";
+import Spinner from "@components/components-partages/Spinner/SpinnerSimple";
 import { recupererNotes } from "@lib/requetes";
 
 /**

@@ -4,8 +4,8 @@ import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
 import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
 import CarteBouteille from "@components/carte/CarteBouteille";
 import Message from "@components/components-partages/Message/Message";
-import NonTrouver from "@components/components-partages/NonTrouver/NonTrouver";
-import Spinner from "@components/components-partages/Spinner/Spinner";
+import NonTrouver from "@components/components-partages/NonTrouver/NonTrouverLazy";
+import Spinner from "@components/components-partages/Spinner/SpinnerSimple";
 import Filtres from "@components/components-partages/Filtre/Filtre";
 
 import authentificationStore from "@store/authentificationStore";

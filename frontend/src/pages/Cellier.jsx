@@ -8,7 +8,7 @@ import Bouton from "@components/components-partages/Boutons/Bouton";
 import Message from "@components/components-partages/Message/Message";
 import CarteBouteille from "@components/carte/CarteBouteille";
 import Filtres from "@components/components-partages/Filtre/Filtre";
-import NonTrouver from "@components/components-partages/NonTrouver/NonTrouver";
+import NonTrouver from "@components/components-partages/NonTrouver/NonTrouverLazy";
 import {
   recupererCellier,
   recupererBouteillesCellier,
