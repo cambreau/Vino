@@ -9,6 +9,7 @@ import BoiteModaleNotes from "@components/boiteModaleNotes/boiteModaleNotes";
 import BoiteModaleAjoutBouteilleCellier from "@components/boiteModaleAjoutBouteilleCellier/boiteModaleAjoutBouteilleCellier";
 import MoyenneEtCompteurNotes from "@components/HistoriqueNotes/MoyenneEtCompteurNotes/MoyenneEtCompteurNotes";
 import GestionListeAchat from "@components/components-partages/ListeAchat/GestionListeAchat";
+import ImageOptimisee from "@components/components-partages/ImageOptimisee/ImageOptimisee";
 
 const CarteBouteille = ({
   bouteille,
@@ -22,7 +23,6 @@ const CarteBouteille = ({
 }) => {
   const [estModaleNotezOuverte, setEstModaleNotezOuverte] = useState(false);
   const [estModaleAjoutOuverte, setEstModaleAjoutOuverte] = useState(false);
-  const [imageChargee, setImageChargee] = useState(false);
 
   const ouvrirBoiteModaleNotez = (e, idBouteille) => {
     if (e) {
@@ -236,22 +236,12 @@ const CarteBouteille = ({
 
       {/* Section IMAGE de la bouteille */}
       <div className="flex items-center justify-center bg-fond-secondaire rounded-(--arrondi-grand) mb-(--rythme-tres-serre) h-40 relative">
-        {/* Skeleton de chargement */}
-        {!imageChargee && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-16 h-32 bg-principal-100/30 rounded animate-pulse" />
-          </div>
-        )}
-        <img
-          src={bouteille.image || "/placeholder-bottle.png"}
+        <ImageOptimisee
+          src={bouteille.image}
           alt={`Photo de la bouteille ${bouteille.nom}`}
-          className={`h-40 w-auto object-contain transition-opacity duration-200 ${
-            imageChargee ? "opacity-100" : "opacity-0"
-          }`}
-          loading="lazy"
-          decoding="async"
-          onLoad={() => setImageChargee(true)}
-          onError={() => setImageChargee(true)}
+          width={107}
+          height={160}
+          className="h-40 w-auto object-contain"
         />
       </div>
 
