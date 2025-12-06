@@ -210,7 +210,7 @@ const CarteBouteille = ({
             {({ gererAjouterListe, dansListe }) => (
               <Bouton
                 variante="icone"
-                icone={<IconListeAchat size={20} />}
+                icone={<IconCarnet size={20} />}
                 action={gererAjouterListe}
                 disabled={disabled}
                 className={
