@@ -1,58 +1,43 @@
-import { useState, useCallback, useEffect } from "react";
-import { ajouterBouteilleListe, supprimerBouteilleListe, recupererListeAchatComplete } from "@lib/requetes";
+import { useCallback, useEffect } from "react";
 import authentificationStore from "@store/authentificationStore";
+import listeAchatStore from "@store/listeAchatStore";
+
 /**
  * Composant permettant de gérer l'état d'une bouteille
  * dans la liste d'achat d'un utilisateur.
-*/
- 
-const GestionListeAchat = ({ 
-  bouteille, 
-  dispatch,  // Fonction pour afficher des messages
-  ACTIONS, 
-  children   // Fonction qui affiche le bouton (reçoit les données)
-}) => {
+ * Utilise un store centralisé pour éviter les appels API multiples.
+ */
 
+const GestionListeAchat = ({
+  bouteille,
+  dispatch, // Fonction pour afficher des messages
+  ACTIONS,
+  children, // Fonction qui affiche le bouton (reçoit les données)
+}) => {
   const utilisateur = authentificationStore((state) => state.utilisateur);
 
-// ========================================
-// Charger l'état initial du composant
-// ========================================
-  const [dansListe, setDansListe] = useState(false);
-  // Savoir si on est en train de charger les données au départ
-  const [chargementInitial, setChargementInitial] = useState(true);
+  // Utiliser le store centralisé pour la liste d'achat
+  const {
+    chargementInitial,
+    estDansListe,
+    ajouterBouteille,
+    supprimerBouteille,
+    chargerListeAchat,
+  } = listeAchatStore();
 
-  // Charger l'état initial de la liste au montage
+  // Charger la liste d'achat une seule fois au montage (le store gère la déduplication)
   useEffect(() => {
-    if (!utilisateur?.id) {
-      setChargementInitial(false);
-      return;
+    if (utilisateur?.id) {
+      chargerListeAchat(utilisateur.id);
     }
+  }, [utilisateur?.id, chargerListeAchat]);
 
-    // Créer une fonction asynchrone pour aller chercher les données du backend
-    const chargerEtat = async () => {
-      try {
-        const listeComplete = await recupererListeAchatComplete(utilisateur.id);
-        
-        const existe = listeComplete.some(b => b.id === bouteille.id);
+  // Vérifier si la bouteille est dans la liste via le store
+  const dansListe = estDansListe(bouteille.id);
 
-        //Mettre à jour l'état (setDansListe)
-        setDansListe(existe);
-      } catch (error) {
-        console.error("Erreur lors du chargement de la liste d'achat:", error);
-        setDansListe(false);
-      } finally {
-        setChargementInitial(false);
-      }
-    };
-
-    chargerEtat();
-  }, [utilisateur?.id, bouteille.id]);  // Se réexécute si l'utilisateur ou la bouteille change
-
-
-// ========================================
-// Ajouter ou supprimer de la liste
-// ========================================
+  // ========================================
+  // Ajouter ou supprimer de la liste
+  // ========================================
   const gererAjouterListe = useCallback(
     async (e) => {
       if (e && typeof e.stopPropagation === "function") {
@@ -65,12 +50,10 @@ const GestionListeAchat = ({
 
         // ===== SITUATION 1 : La bouteille EST déjà dans la liste =====
         if (dansListe) {
-
-          // Supprimer de la liste
-          resultat = await supprimerBouteilleListe(utilisateur.id, bouteille.id);
+          // Supprimer de la liste via le store
+          resultat = await supprimerBouteille(utilisateur.id, bouteille.id);
 
           if (resultat?.succes) {
-            setDansListe(false);
             dispatch({
               type: ACTIONS.SET_MESSAGE,
               payload: {
@@ -79,16 +62,13 @@ const GestionListeAchat = ({
               },
             });
           }
-        } 
+        }
         // ===== SITUATION 2 : La bouteille n'est pas dans la liste =====
         else {
-          // Ajouter à la liste
-          resultat = await ajouterBouteilleListe(utilisateur.id, {
-            id_bouteille: bouteille.id,
-          });
+          // Ajouter à la liste via le store
+          resultat = await ajouterBouteille(utilisateur.id, bouteille);
 
           if (resultat?.succes) {
-            setDansListe(true);
             dispatch({
               type: ACTIONS.SET_MESSAGE,
               payload: {
@@ -119,7 +99,7 @@ const GestionListeAchat = ({
         });
       }
     },
-    [utilisateur.id, bouteille, dansListe, dispatch, ACTIONS]
+    [utilisateur?.id, bouteille, dansListe, dispatch, ACTIONS, ajouterBouteille, supprimerBouteille]
   );
 
   if (chargementInitial) {

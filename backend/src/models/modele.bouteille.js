@@ -29,7 +29,9 @@ const BASE_SELECT = `
     b.taux_alcool,
     b.prix,
     p.nom AS pays,
-    t.couleur AS type
+    t.couleur AS type,
+    (SELECT AVG(d.notes) FROM degustation d WHERE d.id_bouteille = b.id_bouteille) AS moyenne_notes,
+    (SELECT COUNT(*) FROM degustation d WHERE d.id_bouteille = b.id_bouteille) AS nombre_notes
   FROM bouteille b
   LEFT JOIN pays p ON p.id_pays = b.id_pays
   LEFT JOIN type t ON t.id_type = b.id_type
@@ -50,6 +52,8 @@ const mapper = (row) => {
     prix: row.prix,
     pays: row.pays,
     type: row.type,
+    moyenneNotes: row.moyenne_notes ? parseFloat(row.moyenne_notes).toFixed(1) : null,
+    nombreNotes: row.nombre_notes || 0,
   };
 };
 

@@ -5,14 +5,33 @@ import { recupererNotes } from "@lib/requetes";
 /**
  * Composant qui affiche la moyenne et le nombre total de notes d'une bouteille.
  * @param {string|number} id_bouteille - L'identifiant unique de la bouteille
+ * @param {string|null} moyenneNotes - La moyenne des notes (si fournie, évite l'appel API)
+ * @param {number} nombreNotes - Le nombre de notes (si fourni, évite l'appel API)
  * @param {number} reactualiser - Compteur pour forcer le rechargement
  */
-function MoyenneEtCompteurNotes({ id_bouteille, reactualiser = 0 }) {
-  const [moyenne, setMoyenne] = useState(null);
-  const [nombreNotes, setNombreNotes] = useState(0);
-  const [chargement, setChargement] = useState(true);
+function MoyenneEtCompteurNotes({ 
+  id_bouteille, 
+  moyenneNotes: moyenneInitiale = null, 
+  nombreNotes: nombreInitial = null,
+  reactualiser = 0 
+}) {
+  // Si les données sont fournies en props, pas besoin de fetch
+  const donneesEnProps = moyenneInitiale !== null || nombreInitial !== null;
+  
+  const [moyenne, setMoyenne] = useState(moyenneInitiale);
+  const [nombreNotes, setNombreNotes] = useState(nombreInitial || 0);
+  const [chargement, setChargement] = useState(!donneesEnProps);
 
   useEffect(() => {
+    // Si les données sont fournies en props, les utiliser directement
+    if (donneesEnProps && reactualiser === 0) {
+      setMoyenne(moyenneInitiale);
+      setNombreNotes(nombreInitial || 0);
+      setChargement(false);
+      return;
+    }
+
+    // Sinon, faire un appel API (pour les pages détail ou après mise à jour)
     const calculerMoyenneEtCompteur = async () => {
       setChargement(true);
       try {
@@ -52,7 +71,7 @@ function MoyenneEtCompteurNotes({ id_bouteille, reactualiser = 0 }) {
     };
 
     calculerMoyenneEtCompteur();
-  }, [id_bouteille, reactualiser]);
+  }, [id_bouteille, reactualiser, donneesEnProps, moyenneInitiale, nombreInitial]);
 
   // Afficher un spinner pendant le chargement (taille petit)
   if (chargement) {

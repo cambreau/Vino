@@ -227,7 +227,11 @@ const CarteBouteille = ({
 
       {/* Badge moyenne + nombre de notes en haut à droite */}
       <div className="absolute top-(--rythme-tres-serre) right-(--rythme-tres-serre) z-10">
-        <MoyenneEtCompteurNotes id_bouteille={bouteille.id} />
+        <MoyenneEtCompteurNotes
+          id_bouteille={bouteille.id}
+          moyenneNotes={bouteille.moyenneNotes}
+          nombreNotes={bouteille.nombreNotes}
+        />
       </div>
 
       {/* Section IMAGE de la bouteille */}
