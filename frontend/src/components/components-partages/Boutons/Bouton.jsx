@@ -8,6 +8,7 @@ function Bouton({
   icone = null,
   variante = "normal", // 'normal' ou 'icone' pour le bouton avec icône
   className = "",
+  ariaLabel = null, // Label pour l'accessibilité (lecteurs d'écran)
 }) {
   // Classes de base pour les boutons normaux
   const classesBase = `
@@ -72,7 +73,7 @@ function Bouton({
       onClick={auClick}
       disabled={disabled}
       aria-label={
-        variante === "icone" && !texte ? "Ajouter à la liste" : undefined
+        ariaLabel || (variante === "icone" && !texte ? "Ajouter à la liste" : undefined)
       }
     >
       {variante === "icone" && icone}

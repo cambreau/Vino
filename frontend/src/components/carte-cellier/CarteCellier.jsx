@@ -47,14 +47,15 @@ function CarteCellier({ titre, idCellier, onModifier, onSupprimer }) {
         hover:border-principal-300
         transition
       ">
-			<h3 className="text-texte-premier text-(length:--taille-moyen) font-bold wrap-break-word">
+			<h2 className="text-texte-premier text-(length:--taille-moyen) font-bold wrap-break-word">
 				{titre}
-			</h3>
+			</h2>
 			<div className="flex flex-wrap gap-(--rythme-base) justify-center mt-(--rythme-espace)">
 				<Bouton
 					texte={<IconEditer size={tailleIcone} />}
 					type="secondaire"
 					typeHtml="button"
+					ariaLabel={`Modifier le cellier ${titre}`}
 					action={(e) => {
 						e.preventDefault();
 						e.stopPropagation();
@@ -65,6 +66,7 @@ function CarteCellier({ titre, idCellier, onModifier, onSupprimer }) {
 					texte={<IconPoubelle size={tailleIcone} />}
 					type="primaire"
 					typeHtml="button"
+					ariaLabel={`Supprimer le cellier ${titre}`}
 					action={(e) => {
 						e.preventDefault();
 						e.stopPropagation();
