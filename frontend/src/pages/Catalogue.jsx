@@ -127,11 +127,12 @@ function Catalogue() {
               ) : bouteilles.length > 0 ? (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {bouteilles.map((b) => (
+                    {bouteilles.map((b, index) => (
                       <Link key={b.id} to={`/bouteilles/${b.id}`}>
                         <CarteBouteille
                           bouteille={b}
                           type="catalogue"
+                          priority={index < 4} // Priorité pour les 4 premières images (LCP)
                           dispatch={dispatch}
                           ACTIONS={ACTIONS}
                         />

@@ -14,6 +14,7 @@ const ImageOptimisee = ({
   height,
   className = "",
   placeholderSrc = "/placeholder-bottle.png",
+  priority = false, // Si true, désactive lazy loading et ajoute fetchpriority="high" (pour LCP)
   onLoad,
   onError,
 }) => {
@@ -134,8 +135,9 @@ const ImageOptimisee = ({
         className={`transition-opacity duration-200 ${
           imageChargee ? "opacity-100" : "opacity-0"
         } ${className}`}
-        loading="lazy"
-        decoding="async"
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
+        decoding={priority ? "sync" : "async"}
         onLoad={handleLoad}
         onError={handleError}
       />

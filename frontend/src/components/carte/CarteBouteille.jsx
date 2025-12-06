@@ -18,6 +18,7 @@ const CarteBouteille = ({
   onDiminuer = () => {},
   disabled = false, //désactiver le bouton
   aNote = false, //indique si l'utilisateur a déjà noté la bouteille
+  priority = false, // Si true, charge l'image en priorité (pour LCP)
   dispatch,
   ACTIONS,
 }) => {
@@ -241,6 +242,7 @@ const CarteBouteille = ({
           alt={`Photo de la bouteille ${bouteille.nom}`}
           width={107}
           height={160}
+          priority={priority}
           className="h-40 w-auto object-contain"
         />
       </div>
