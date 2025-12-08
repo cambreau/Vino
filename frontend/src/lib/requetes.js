@@ -228,9 +228,8 @@ export const connexionUtilisateur = async (datas, navigate) => {
 // Fonction d'ajout d'une bouteille dans un cellier
 export const ajouterBouteilleCellier = async (idCellier, donnees) => {
   try {
-    const urlComplete = `${
-      import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
-    }/${idCellier}`;
+    const urlComplete = `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
+      }/${idCellier}`;
     const reponse = await fetch(urlComplete, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -332,8 +331,7 @@ export const modifierBouteilleCellier = async (
 
     if (quantiteCible === 0) {
       const reponse = await fetch(
-        `${
-          import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
+        `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
         }/${id_cellier}/${id_bouteille}`,
         {
           method: "DELETE",
@@ -360,8 +358,7 @@ export const modifierBouteilleCellier = async (
     }
 
     const reponse = await fetch(
-      `${
-        import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
+      `${import.meta.env.VITE_BACKEND_BOUTEILLES_CELLIER_URL
       }/${id_cellier}/${id_bouteille}`,
       {
         method: "PUT",
@@ -435,8 +432,7 @@ export const verifierBouteilleCellier = async (idCellier, idBouteille) => {
 export const recupererTousCellier = async (id_utilisateur) => {
   try {
     const reponse = await fetch(
-      `${
-        import.meta.env.VITE_BACKEND_CELLIER_URL
+      `${import.meta.env.VITE_BACKEND_CELLIER_URL
       }?id_utilisateur=${id_utilisateur}`
     );
     return reponse.json();
@@ -462,6 +458,35 @@ export const recupererCellier = async (id_cellier) => {
     }
 
     return await reponse.json();
+  } catch (error) {
+    console.error("Erreur lors de la récupération du cellier :", error);
+    return null;
+  }
+};
+
+/**
+ * Récupère un cellier par son nom 
+ * @param {string|number} id_utilisateur 
+ * @returns {Promise<Object|null>}
+ */
+export const recupererNomCellier = async (id_utilisateur, nom) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_CELLIER_URL}/${id_utilisateur}/cellierNom`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nom,
+        }),
+      }
+    );
+
+    if (reponse.ok) {
+      const data = await reponse.json();
+      return data.message;
+    }
+
   } catch (error) {
     console.error("Erreur lors de la récupération du cellier :", error);
     return null;
@@ -527,8 +552,7 @@ export const modifierCellier = async (
 ) => {
   try {
     const reponse = await fetch(
-      `${
-        import.meta.env.VITE_BACKEND_CELLIER_URL
+      `${import.meta.env.VITE_BACKEND_CELLIER_URL
       }/${id_utilisateur}/${id_cellier}`,
       {
         method: "PUT",
@@ -577,14 +601,12 @@ export const supprimerCellier = async (
   try {
     console.log(
       "Requête DELETE vers:",
-      `${
-        import.meta.env.VITE_BACKEND_CELLIER_URL
+      `${import.meta.env.VITE_BACKEND_CELLIER_URL
       }/${id_utilisateur}/${id_cellier}`
     );
 
     const reponse = await fetch(
-      `${
-        import.meta.env.VITE_BACKEND_CELLIER_URL
+      `${import.meta.env.VITE_BACKEND_CELLIER_URL
       }/${id_utilisateur}/${id_cellier}`,
       {
         method: "DELETE",
@@ -645,8 +667,7 @@ export const recupererBouteille = async (id) => {
 export const recupererBouteilles = async (page = 1, limit = 10) => {
   try {
     const reponse = await fetch(
-      `${
-        import.meta.env.VITE_BACKEND_BOUTEILLES_URL
+      `${import.meta.env.VITE_BACKEND_BOUTEILLES_URL
       }?page=${page}&limit=${limit}`
     );
 
@@ -762,8 +783,7 @@ export const recupererListeAchatComplete = async (id_utilisateur) => {
 export const ajouterBouteilleListe = async (id_utilisateur, donnees) => {
   try {
     const reponse = await fetch(
-      `${
-        import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL
+      `${import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL
       }/${id_utilisateur}/bouteilles/${donnees.id_bouteille}`,
       {
         method: "POST",
@@ -802,8 +822,7 @@ export const ajouterBouteilleListe = async (id_utilisateur, donnees) => {
 export const supprimerBouteilleListe = async (id_utilisateur, id_bouteille) => {
   try {
     const reponse = await fetch(
-      `${
-        import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL
+      `${import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL
       }/${id_utilisateur}/${id_bouteille}`,
       {
         method: "DELETE",
@@ -944,8 +963,7 @@ export const recupererNotes = async (id_bouteille) => {
 export const recupererNotesUtilisateur = async (id_utilisateur) => {
   try {
     const reponse = await fetch(
-      `${
-        import.meta.env.VITE_BACKEND_DEGUSTATION_URL
+      `${import.meta.env.VITE_BACKEND_DEGUSTATION_URL
       }/utilisateur/${id_utilisateur}`
     );
 
@@ -980,8 +998,7 @@ export const recupererNotesUtilisateur = async (id_utilisateur) => {
 export const modifierNote = async (datas) => {
   try {
     const reponse = await fetch(
-      `${import.meta.env.VITE_BACKEND_DEGUSTATION_URL}/${
-        datas.id_utilisateur
+      `${import.meta.env.VITE_BACKEND_DEGUSTATION_URL}/${datas.id_utilisateur
       }/${datas.id_bouteille}`,
       {
         method: "PUT",
@@ -1019,8 +1036,7 @@ export const modifierNote = async (datas) => {
 export const supprimerNote = async (datas) => {
   try {
     const reponse = await fetch(
-      `${import.meta.env.VITE_BACKEND_DEGUSTATION_URL}/${
-        datas.id_utilisateur
+      `${import.meta.env.VITE_BACKEND_DEGUSTATION_URL}/${datas.id_utilisateur
       }/${datas.id_bouteille}`,
       {
         method: "DELETE",
@@ -1064,8 +1080,7 @@ export const recupererNoteUtilisateur = async (
 ) => {
   try {
     const reponse = await fetch(
-      `${
-        import.meta.env.VITE_BACKEND_DEGUSTATION_URL
+      `${import.meta.env.VITE_BACKEND_DEGUSTATION_URL
       }/${id_utilisateur}/${id_bouteille}`
     );
 

@@ -37,7 +37,7 @@ export const ajouterCellier = async (req, res) => {
   }
 };
 
-/**
+/** 
  * Récupère un cellier par son id.
  */
 export const recupererCellier = async (req, res) => {
@@ -57,6 +57,34 @@ export const recupererCellier = async (req, res) => {
     }
 
     return res.status(200).json(cellier);
+  } catch (error) {
+    console.error("Erreur lors de la récupération du cellier :", error);
+    return res.status(500).json({
+      message: "Erreur serveur lors de la récupération du cellier.",
+    });
+  }
+};
+
+/** recupererCellier par nom
+ * Récupère un cellier par son id.
+ */
+export const recupererNomCellier = async (req, res) => {
+  try {
+    const { id_utilisateur } = req.params;
+    const { nom } = req.body;
+
+    const cellier = await ModeleCellier.recupererNomCellier(id_utilisateur, nom);
+
+    // Le cellier existe déjà
+    if (cellier.length > 0) {
+      return res.status(200).json({
+        message: "Un cellier avec ce nom existe déjà",
+      });
+    } else {
+      return res.status(200).json({
+        message: "Ce nom est disponible"
+      });
+    }
   } catch (error) {
     console.error("Erreur lors de la récupération du cellier :", error);
     return res.status(500).json({
