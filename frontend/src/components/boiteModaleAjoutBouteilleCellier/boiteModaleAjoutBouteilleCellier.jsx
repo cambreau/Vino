@@ -307,6 +307,13 @@ function BoiteModaleAjoutBouteilleCellier({
       bouton={
         <>
           <Bouton
+            texte="Annuler"
+            type="secondaire"
+            typeHtml="button"
+            action={onFermer}
+            disabled={chargementAjout}
+          />
+          <Bouton
             texte={bouteilleExiste.existe ? "Modifier" : "Ajouter"}
             type="primaire"
             typeHtml="button"
@@ -318,13 +325,6 @@ function BoiteModaleAjoutBouteilleCellier({
               chargementCelliers ||
               chargementVerification
             }
-          />
-          <Bouton
-            texte="Annuler"
-            type="secondaire"
-            typeHtml="button"
-            action={onFermer}
-            disabled={chargementAjout}
           />
         </>
       }
