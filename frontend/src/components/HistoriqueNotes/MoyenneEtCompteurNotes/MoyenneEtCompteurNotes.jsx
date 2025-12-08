@@ -9,15 +9,15 @@ import { recupererNotes } from "@lib/requetes";
  * @param {number} nombreNotes - Le nombre de notes (si fourni, évite l'appel API)
  * @param {number} reactualiser - Compteur pour forcer le rechargement
  */
-function MoyenneEtCompteurNotes({ 
-  id_bouteille, 
-  moyenneNotes: moyenneInitiale = null, 
+function MoyenneEtCompteurNotes({
+  id_bouteille,
+  moyenneNotes: moyenneInitiale = null,
   nombreNotes: nombreInitial = null,
-  reactualiser = 0 
+  reactualiser = 0,
 }) {
   // Si les données sont fournies en props, pas besoin de fetch
   const donneesEnProps = moyenneInitiale !== null || nombreInitial !== null;
-  
+
   const [moyenne, setMoyenne] = useState(moyenneInitiale);
   const [nombreNotes, setNombreNotes] = useState(nombreInitial || 0);
   const [chargement, setChargement] = useState(!donneesEnProps);
@@ -71,7 +71,13 @@ function MoyenneEtCompteurNotes({
     };
 
     calculerMoyenneEtCompteur();
-  }, [id_bouteille, reactualiser, donneesEnProps, moyenneInitiale, nombreInitial]);
+  }, [
+    id_bouteille,
+    reactualiser,
+    donneesEnProps,
+    moyenneInitiale,
+    nombreInitial,
+  ]);
 
   // Afficher un spinner pendant le chargement (taille petit)
   if (chargement) {

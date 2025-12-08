@@ -57,8 +57,6 @@ export default defineConfig({
   },
   // Optimiser les dépendances pour le dev
   optimizeDeps: {
-    include: ["react", "react-dom", "react-router-dom", "zustand"],
-    // Exclure lottie du pré-bundling pour le lazy loading
-    exclude: ["lottie-react"],
+    include: ["react", "react-dom", "react-router-dom", "zustand", "lottie-react"],
   },
 });
