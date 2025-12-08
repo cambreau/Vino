@@ -55,6 +55,20 @@ export default class ModeleCellier {
     return resultat;
   }
 
+  // Requête pour récupérer nom cellier d'un utilisateur
+  static async recupererNomCellier(id_utilisateur, nom) {
+    // Convertit l'id_utilisateur en nombre entier en base 10 decimal
+    const id = Number.parseInt(id_utilisateur, 10);
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new Error("ID utilisateur invalide");
+    }
+
+    const sql = `SELECT * FROM cellier WHERE id_utilisateur = ? AND nom = ?`;
+    const [resultat] = await connexion.query(sql, [id, nom]);
+
+    return resultat;
+  }
+
   // Requête pour modifier un cellier
   static async modifier(id_cellier, id_utilisateur, nom) {
     // S'assure que les ID sont des nombres valides
