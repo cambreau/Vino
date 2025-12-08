@@ -70,8 +70,8 @@ function BoiteModaleAjoutBouteilleCellier({
       setChargementCelliers(false);
     };
 
-    // Charger les celliers quand la modale s'ouvre ou quand l'utilisateur change
-    if (estOuverte || utilisateur?.id) {
+    // Charger les celliers SEULEMENT quand la modale s'ouvre
+    if (estOuverte && utilisateur?.id) {
       chargerCelliers();
     }
   }, [utilisateur?.id, estOuverte, cellierSelectionne]);

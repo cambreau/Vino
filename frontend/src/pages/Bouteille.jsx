@@ -3,6 +3,7 @@ import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import BoutonRetour from "@components/components-partages/Boutons/BoutonRetour";
 import HistoriqueNotes from "@components/HistoriqueNotes/HistoriqueNotes";
+import ImageOptimisee from "@components/components-partages/ImageOptimisee/ImageOptimisee";
 
 import { formatDetailsBouteille } from "@lib/utils.js";
 import { useDocumentTitle } from "@lib/utils.js";
@@ -90,13 +91,13 @@ function Bouteille() {
             </h1>
           </header>
           <div className="flex flex-col gap-(--rythme-base) mt-(--rythme-base)">
-            <picture className="flex items-center justify-center">
-              <img
-                src={
-                  bouteille.image ||
-                  "/Vino/frontend/src/assets/images/grape_logo.svg"
-                } // À remplacer par une image par défaut
+            <picture className="flex items-center justify-center min-h-[300px]">
+              <ImageOptimisee
+                src={bouteille.image}
                 alt={bouteille.nom || "Bouteille de vin"}
+                width={200}
+                height={300}
+                priority={true}
                 className="h-auto w-auto max-h-[300px] object-contain"
               />
             </picture>

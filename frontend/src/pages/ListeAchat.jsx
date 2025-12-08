@@ -15,10 +15,14 @@ import {
 } from "@lib/requetes.js";
 import { useDocumentTitle } from "@lib/utils.js";
 import authentificationStore from "@store/authentificationStore";
+import listeAchatStore from "@store/listeAchatStore";
 
 function ListeAchat() {
   const navigate = useNavigate();
   const utilisateur = authentificationStore((state) => state.utilisateur);
+
+  // Accéder au store pour garder la synchronisation
+  const chargerListeAchatStore = listeAchatStore((state) => state.chargerListeAchat);
 
   useDocumentTitle("Liste d'achat");
 
@@ -91,6 +95,9 @@ function ListeAchat() {
     setBouteillesCellier((precedent) =>
       precedent.filter((b) => b.id !== idBouteille)
     );
+
+    // Synchroniser le store global pour les autres composants
+    chargerListeAchatStore(utilisateur.id, true);
   };
 
 

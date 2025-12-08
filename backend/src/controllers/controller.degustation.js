@@ -51,7 +51,11 @@ export const recupererDegustationBouteille = async (req, res) => {
         data: resultat,
       });
     } else {
-      return res.status(500).json({ message: "Dégustation non trouvée" });
+      // Aucune dégustation trouvée - ce n'est pas une erreur, juste pas de note
+      return res.status(200).json({ 
+        message: "Aucune dégustation trouvée", 
+        data: null 
+      });
     }
 
   } catch (error) {
@@ -152,9 +156,6 @@ export const modifierDegustation = async (req, res) => {
     );
 
     if (resultat) {
-      // return res.status(201).json({
-      //   message: { date_degustation },
-      // });
       // Appel du modèle pour modifier la dégustation
       const modifier = await ModeleDegustation.modifier(
         idBouteilleNombre,
@@ -165,13 +166,13 @@ export const modifierDegustation = async (req, res) => {
       );
 
       // Retour de succès
-      return res.status(201).json({
-        message: "Dégustation modifie",
+      return res.status(200).json({
+        message: "Dégustation modifiée",
         data: modifier,
       });
     } else {
-      // Retour en cas d'erreur
-      return res.status(500).json({ message: "Erreur lors de la modification de la dégustation" });
+      // Dégustation non trouvée - retourner 404 au lieu de 500
+      return res.status(404).json({ message: "Dégustation non trouvée" });
     }
 
   } catch (error) {

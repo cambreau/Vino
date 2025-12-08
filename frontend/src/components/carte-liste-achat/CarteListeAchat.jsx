@@ -1,6 +1,7 @@
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import BoutonQuantite from "@components/components-partages/Boutons/BoutonQuantite";
 import { formatDetailsBouteille } from "@lib/utils.js";
+import ImageOptimisee from "@components/components-partages/ImageOptimisee/ImageOptimisee";
 
 const CarteListeAchat = ({
   bouteille,
@@ -33,11 +34,13 @@ const CarteListeAchat = ({
       {/* Section superieure : Image + Info principale */}
       <div className="flex gap-(--rythme-base) p-(--rythme-base)">
         {/* Image */}
-        <div className="flex-shrink-0">
-          <img
-            src={bouteille.image || "/placeholder-bottle.png"}
+        <div className="shrink-0">
+          <ImageOptimisee
+            src={bouteille.image}
             alt={`Photo de la bouteille ${bouteille.nom}`}
-            className="h-[160px] w-auto object-cover rounded-(--arrondi-moyen)"
+            width={107}
+            height={160}
+            className="h-40 w-auto object-cover rounded-(--arrondi-moyen)"
           />
         </div>
 
