@@ -5,7 +5,7 @@ import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
 import BoiteModale from "@components/components-partages/BoiteModale/BoiteModale";
 import { supprimerUtilisateur } from "@lib/requetes.js";
 import Bouton from "@components/components-partages/Boutons/Bouton";
-import { FaUser } from "react-icons/fa";
+import { IconUtilisateur } from "@components/components-partages/Icon/SvgIcons";
 import authentificationStore from "@store/authentificationStore";
 import { useDocumentTitle } from "@lib/utils.js";
 
@@ -118,7 +118,7 @@ function Profil() {
                 {utilisateur?.courriel}
               </p>
             </div>
-            <FaUser size={32} color="#461243" />
+            <IconUtilisateur size={32} color="#461243" />
           </section>
 
           <div className="flex flex-col mt-(--rythme-base) gap-(--rythme-serre)">

@@ -1,11 +1,15 @@
 import { useState, useId, useMemo } from "react";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import { rechercherBouteilles } from "@lib/utils";
-import { FaSearch, FaChevronDown, FaFilter } from "react-icons/fa";
-import { GiGrapes } from "react-icons/gi";
-import { BiWorld } from "react-icons/bi";
-import { MdOutlineCalendarMonth } from "react-icons/md";
-import { LuWine } from "react-icons/lu";
+import {
+	IconRecherche,
+	IconChevronBas,
+	IconFiltre,
+	IconRaisins,
+	IconMonde,
+	IconCalendrier,
+	IconVin,
+} from "@components/components-partages/Icon/SvgIcons";
 
 /**
  * Composant Recherche - Permet de rechercher des bouteilles par texte
@@ -68,28 +72,28 @@ function Recherche({
 		{
 			id: "nom",
 			label: "Nom de la bouteille",
-			icone: <LuWine className="text-principal-200" />,
+			icone: <IconVin className="text-principal-200" />,
 			placeholder: "Ex: Château Margaux",
 			type: "text",
 		},
 		{
 			id: "type",
 			label: "Type de vin",
-			icone: <GiGrapes className="text-principal-200" />,
+			icone: <IconRaisins className="text-principal-200" />,
 			placeholder: "Ex: Rouge, Blanc, Rosé",
 			type: "text",
 		},
 		{
 			id: "pays",
 			label: "Pays d'origine",
-			icone: <BiWorld className="text-principal-200" />,
+			icone: <IconMonde className="text-principal-200" />,
 			placeholder: "Ex: France, Italie",
 			type: "text",
 		},
 		{
 			id: "annee",
 			label: "Année / Millésime",
-			icone: <MdOutlineCalendarMonth className="text-principal-200" />,
+			icone: <IconCalendrier className="text-principal-200" />,
 			placeholder: "Ex: 2020",
 			type: "number",
 			min: "1900",
@@ -113,10 +117,10 @@ function Recherche({
 					aria-expanded={estOuvert}
 					aria-controls={formulaireId}>
 					<span className="flex items-center gap-2">
-						<FaSearch />
+						<IconRecherche />
 						<span>{titreRecherche}</span>
 					</span>
-					<FaChevronDown
+					<IconChevronBas
 						className={`transition-transform duration-200 ${
 							estOuvert ? "rotate-180" : ""
 						}`}
@@ -129,7 +133,7 @@ function Recherche({
 					disabled={!onFiltrer}
 					className="flex items-center gap-2 px-4 text-principal-200 disabled:opacity-50 disabled:cursor-not-allowed"
 					aria-label="Filtrer">
-					<FaFilter />
+					<IconFiltre />
 				</button>
 			</header>
 			{estOuvert && (

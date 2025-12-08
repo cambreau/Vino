@@ -662,6 +662,37 @@ export const recupererBouteilles = async (page = 1, limit = 10) => {
 };
 
 // **********************************************************  Liste achat
+
+/**
+ * Récupère la liste d'achat simplifiée (juste les IDs et noms)
+ * Optimisée pour vérifier si une bouteille est dans la liste sans charger toutes les infos celliers
+ * @param {number} id_utilisateur - L'ID de l'utilisateur
+ * @returns {Promise<Array>} - La liste des bouteilles (id et nom seulement)
+ */
+export const recupererListeAchatSimple = async (id_utilisateur) => {
+  try {
+    const reponse = await fetch(
+      `${import.meta.env.VITE_BACKEND_LISTE_ACHAT_URL}/${id_utilisateur}`
+    );
+
+    if (!reponse.ok) {
+      throw new Error(`Erreur HTTP: ${reponse.status}`);
+    }
+
+    const data = await reponse.json();
+    const bouteillesListe = data.data || [];
+
+    // Retourner seulement les infos essentielles (id et nom)
+    return bouteillesListe.map((item) => ({
+      id: item.id_bouteille,
+      nom: item.bouteille?.nom || "",
+    }));
+  } catch (error) {
+    console.error("Erreur lors de la récupération de la liste d'achat:", error);
+    return [];
+  }
+};
+
 /**
  * Récupère la liste d'achat complète avec infos bouteilles
  * @param {number} id_utilisateur - L'ID de l'utilisateur

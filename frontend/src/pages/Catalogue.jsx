@@ -1,19 +1,29 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
 import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
 import CarteBouteille from "@components/carte/CarteBouteille";
 import Message from "@components/components-partages/Message/Message";
-import NonTrouver from "@components/components-partages/NonTrouver/NonTrouver";
+import NonTrouver from "@components/components-partages/NonTrouver/NonTrouverLazy";
 import Spinner from "@components/components-partages/Spinner/Spinner";
 import Filtres from "@components/components-partages/Filtre/Filtre";
 
 import authentificationStore from "@store/authentificationStore";
+import listeAchatStore from "@store/listeAchatStore";
 import { useDocumentTitle, useListeAchat } from "@lib/utils.js";
 import { useCatalogue } from "@lib/useCatalogue";
 
 function Catalogue() {
   useDocumentTitle("Catalogue");
   const utilisateur = authentificationStore((state) => state.utilisateur);
+
+  // Charger la liste d'achat UNE SEULE FOIS au niveau du Catalogue
+  const chargerListeAchat = listeAchatStore((state) => state.chargerListeAchat);
+  useEffect(() => {
+    if (utilisateur?.id) {
+      chargerListeAchat(utilisateur.id);
+    }
+  }, [utilisateur?.id, chargerListeAchat]);
 
   //============  Hook pour gérer l'état et les messages de la liste d'achat
   const {etat: etatListeAchat, dispatch, ACTIONS } = useListeAchat();
@@ -117,11 +127,12 @@ function Catalogue() {
               ) : bouteilles.length > 0 ? (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {bouteilles.map((b) => (
+                    {bouteilles.map((b, index) => (
                       <Link key={b.id} to={`/bouteilles/${b.id}`}>
                         <CarteBouteille
                           bouteille={b}
                           type="catalogue"
+                          priority={index < 4} // Priorité pour les 4 premières images (LCP)
                           dispatch={dispatch}
                           ACTIONS={ACTIONS}
                         />
