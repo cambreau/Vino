@@ -1020,3 +1020,45 @@ export const supprimerNote = async (datas) => {
     return { succes: false, erreur: error.message };
   }
 };
+
+/**
+ * Récupère la note de dégustation d'un utilisateur par son identifiant via l'API backend.
+ * @param {string|number} id_utilisateur - L'identifiant unique de l'utilisateur
+ * @param {string|number} id_bouteille - L'identifiant unique de l'utilisateur
+ * @returns {Promise<Object>} Les données d'une note de dégustation (tableau vide en cas d'erreur)
+ */
+export const recupererNoteUtilisateur = async (
+  id_utilisateur,
+  id_bouteille
+) => {
+  try {
+    const reponse = await fetch(
+      `${
+        import.meta.env.VITE_BACKEND_DEGUSTATION_URL
+      }/${id_utilisateur}/${id_bouteille}`
+    );
+
+    if (!reponse.ok) {
+      // 404 est normal si l'utilisateur n'a pas encore de note pour cette bouteille
+      if (reponse.status !== 404) {
+        // Pour debug
+        console.error("Erreur HTTP:", reponse.status);
+      }
+      return null;
+    } else if (reponse.message == "Dégustation non trouvée") {
+      return null;
+    }
+
+    const resultat = await reponse.json();
+    // Gérer différents formats de réponse
+    const note = resultat?.data;
+    return note;
+  } catch (error) {
+    // Pour debug
+    console.error(
+      "Erreur lors de la récupération de la note de l'utilisateur :",
+      error
+    );
+    return [];
+  }
+};

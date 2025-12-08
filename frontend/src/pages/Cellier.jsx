@@ -19,8 +19,10 @@ import {
   useDocumentTitle,
   filtrerBouteilles,
   rechercherBouteilles,
+  useListeAchat,
 } from "@lib/utils.js";
 import authentificationStore from "@store/authentificationStore";
+
 
 function Cellier() {
   const navigate = useNavigate();
@@ -28,6 +30,9 @@ function Cellier() {
   const { idCellier } = useParams();
   const utilisateur = authentificationStore((state) => state.utilisateur);
 
+  //============  Hook pour gérer l'état et les messages de la liste d'achat
+  const { etat, dispatch, ACTIONS } = useListeAchat();
+  
   // Etat pour le cellier : nom
   const [cellier, setCellier] = useState({
     nom: "",
@@ -171,7 +176,7 @@ function Cellier() {
   );
 
   // Handler pour le filtrage
-  const handleFiltrer = useCallback((resultats, criteres) => {
+  const handleFiltrer = useCallback((criteres, resultats) => {
     const actifs = Object.values(criteres ?? {}).some((valeur) =>
       Boolean(valeur)
     );
@@ -182,13 +187,16 @@ function Cellier() {
 
   // Handler pour la recherche
   const handleRecherche = useCallback(
-    (criteres) => {
+    (recherche) => {
+      const criteres =
+        typeof recherche === "string" ? { nom: recherche } : recherche ?? {};
       const actifs = Object.values(criteres ?? {}).some((valeur) =>
         Boolean(valeur)
       );
       if (!actifs) {
         setResultatsFiltres(null);
         setModeRecherche(false);
+        setCriteresFiltres(criteres);
         return;
       }
       setModeRecherche(true);
@@ -257,6 +265,16 @@ function Cellier() {
           </h1>
 
           <article className="mt-(--rythme-base) p-(--rythme-serre) min-h-[200px]">
+            {/* Affiche le message de GestionListeAchat */}
+            {etat.message.texte && (
+              <div className="mb-(--rythme-base)">
+                <Message
+                  type={etat.message.type}
+                  texte={etat.message.texte}
+                />
+              </div>
+            )} 
+            
             {messageAction.texte && (
               <div className="mb-(--rythme-base)">
                 <Message
@@ -275,7 +293,8 @@ function Cellier() {
                 <div className="mb-(--rythme-base)">
                   <Filtres
                     bouteilles={bouteillesCellier}
-                    valeursInitiales={criteresFiltres}
+                    filtresActuels={criteresFiltres}
+                    rechercheActuelle={modeRecherche ? criteresFiltres.nom || "" : ""}
                     onFiltrer={handleFiltrer}
                     onRecherche={handleRecherche}
                     onTri={handleTri}
@@ -299,6 +318,8 @@ function Cellier() {
                           onDiminuer={handleDiminuer}
                           disabled={bouteillesEnTraitement.has(bouteille.id)}
                           aNote={bouteillesNotees.has(bouteille.id)}
+                           dispatch={dispatch}
+                          ACTIONS={ACTIONS}
                         />
                       </Link>
                     ))}

@@ -6,6 +6,7 @@ export default router;
 import {
   recupererDegustationsBouteille,
   recupererDegustationsUtilisateur,
+  recupererDegustationBouteille,
   ajouterDegustation,
   modifierDegustation,
   supprimerDegustation,
@@ -13,6 +14,9 @@ import {
 
 // Récupérer les dégustations d'une bouteille par son id
 router.get("/:id_bouteille", recupererDegustationsBouteille);
+
+// Récupérer une note de dégustations d'une bouteille par son id
+router.get("/:id_utilisateur/:id_bouteille", recupererDegustationBouteille);
 
 // Récupérer les dégustations d'un utilisateur par son id
 router.get("/utilisateur/:id_utilisateur", recupererDegustationsUtilisateur);

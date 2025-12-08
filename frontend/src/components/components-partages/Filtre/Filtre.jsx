@@ -1,15 +1,47 @@
-import { useEffect, useMemo, useState, useId } from "react";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import Bouton from "@components/components-partages/Boutons/Bouton";
-import Recherche from "@components/components-partages/Recherche/Recherche";
 import {
 	formatString,
-	filtrerBouteilles as filtres,
+	filtrerBouteilles as filtrerLocal,
 	normaliserTexte,
 } from "@lib/utils";
-import { FaFilter, FaExchangeAlt, FaWarehouse, FaChevronDown, FaSearch, FaTimes } from "react-icons/fa";
+import {
+	FaFilter,
+	FaExchangeAlt,
+	FaWarehouse,
+	FaChevronDown,
+	FaSearch,
+	FaTimes,
+} from "react-icons/fa";
 import { GiGrapes } from "react-icons/gi";
 import { BiWorld } from "react-icons/bi";
 import { MdOutlineCalendarMonth } from "react-icons/md";
+
+const DEFAULT_OPTIONS = {
+	types: [],
+	pays: [],
+	regions: [],
+	annees: [],
+	regionsParPays: {},
+};
+
+const sontCriteresEgaux = (a = {}, b = {}) => {
+	const cles = new Set([...Object.keys(a), ...Object.keys(b)]);
+	for (const cle of cles) {
+		if ((a?.[cle] ?? "") !== (b?.[cle] ?? "")) return false;
+	}
+	return true;
+};
+
+const sontOptionsEgales = (a = DEFAULT_OPTIONS, b = DEFAULT_OPTIONS) => {
+	return (
+		JSON.stringify(a.types ?? []) === JSON.stringify(b.types ?? []) &&
+		JSON.stringify(a.pays ?? []) === JSON.stringify(b.pays ?? []) &&
+		JSON.stringify(a.regions ?? []) === JSON.stringify(b.regions ?? []) &&
+		JSON.stringify(a.annees ?? []) === JSON.stringify(b.annees ?? []) &&
+		JSON.stringify(a.regionsParPays ?? {}) === JSON.stringify(b.regionsParPays ?? {})
+	);
+};
 
 const extrairePremiereValeur = (item = {}, cles = []) => {
 	for (const cle of cles) {
@@ -37,9 +69,7 @@ const extraireValeurs = (liste = [], cles = [], { numeric = false } = {}) => {
 			.sort((a, b) => b - a)
 			.map((valeur) => valeur.toString());
 	}
-	return tableau.sort((a, b) =>
-		a.localeCompare(b, "fr", { sensitivity: "base" }),
-	);
+	return tableau.sort((a, b) => a.localeCompare(b, "fr", { sensitivity: "base" }));
 };
 
 const construireIndexRegionsParPays = (liste = []) => {
@@ -63,10 +93,27 @@ const construireIndexRegionsParPays = (liste = []) => {
 	return resultat;
 };
 
+const extraireOptionsDepuisBouteilles = (bouteilles = []) => {
+	if (!bouteilles.length) return DEFAULT_OPTIONS;
+	const types = extraireValeurs(bouteilles, ["type", "couleur"]);
+	const pays = extraireValeurs(bouteilles, ["pays", "country", "origine"]);
+	const regions = extraireValeurs(bouteilles, ["region", "appellation"]);
+	const annees = extraireValeurs(
+		bouteilles,
+		["millenisme", "annee", "millesime", "vintage"],
+		{ numeric: true },
+	);
+	const regionsParPays = construireIndexRegionsParPays(bouteilles);
+	return { types, pays, regions, annees, regionsParPays };
+};
 
 function Filtres({
 	bouteilles = [],
+	optionsExternes = null,
+	chargerOptions,
+	filtresActuels = {},
 	valeursInitiales = {},
+	rechercheActuelle = "",
 	onFiltrer,
 	onTri,
 	onRecherche,
@@ -77,58 +124,38 @@ function Filtres({
 	texteBouton = "Chercher",
 	className = "",
 }) {
-	const [estOuvert, setEstOuvert] = useState(false);
-	const [modeRecherche, setModeRecherche] = useState(false);
-	const [criteres, setCriteres] = useState(() => ({
-		type: "",
-		pays: "",
-		region: "",
-		annee: "",
-		...valeursInitiales,
-	}));
-	const formulaireId = useId();
-
-	// Vérifie si des filtres sont actifs
-	const aDesFiltresActifs = useMemo(() => {
-		return Object.values(criteres).some((v) => v !== "" && v !== null && v !== undefined);
-	}, [criteres]);
-
-	useEffect(() => {
-		setCriteres((precedent) => ({ ...precedent, ...valeursInitiales }));
-	}, [valeursInitiales]);
-
-	useEffect(() => {
-		const aDesValeurs = Object.values(valeursInitiales ?? {}).some(
-			(valeur) => valeur !== undefined && valeur !== null && valeur !== "",
-		);
-		if (aDesValeurs) {
-			setEstOuvert(true);
-		}
-	}, [valeursInitiales]);
-
-	const options = useMemo(
-		() => {
-			const types = extraireValeurs(bouteilles, ["type", "couleur"]);
-			const pays = extraireValeurs(bouteilles, ["pays", "country", "origine"]);
-			const regions = extraireValeurs(bouteilles, ["region", "appellation"]);
-			const annees = extraireValeurs(
-				bouteilles,
-				["millenisme", "annee", "millesime", "vintage"],
-				{ numeric: true },
-			);
-			const regionsParPays = construireIndexRegionsParPays(bouteilles);
-			return { types, pays, regions, annees, regionsParPays };
-		},
-		[bouteilles],
+	const valeursInitialesCombinees = useMemo(
+		() => ({
+			type: "",
+			pays: "",
+			region: "",
+			annee: "",
+			...valeursInitiales,
+			...filtresActuels,
+		}),
+		[valeursInitiales, filtresActuels],
 	);
 
-	const regionOptions = criteres.pays
-		? options.regionsParPays[normaliserTexte(criteres.pays)] ?? []
-		: options.regions;
+	const [estOuvert, setEstOuvert] = useState(false);
+	const [modeRecherche, setModeRecherche] = useState(Boolean(rechercheActuelle));
+	const [criteres, setCriteres] = useState(valeursInitialesCombinees);
+	const [texteRecherche, setTexteRecherche] = useState(rechercheActuelle ?? "");
+	const [options, setOptions] = useState(() => {
+		if (optionsExternes) return { ...DEFAULT_OPTIONS, ...optionsExternes };
+		if (bouteilles.length) return extraireOptionsDepuisBouteilles(bouteilles);
+		return DEFAULT_OPTIONS;
+	});
+	const [chargementOptions, setChargementOptions] = useState(false);
+	const formulaireId = useId();
+
+	const aDesFiltresActifs = useMemo(
+		() => Object.values(criteres).some((v) => Boolean(v)) || Boolean(texteRecherche),
+		[criteres, texteRecherche],
+	);
 
 	const resultats = useMemo(() => {
 		if (!bouteilles.length) return [];
-		return filtres(bouteilles, {
+		return filtrerLocal(bouteilles, {
 			type: criteres.type,
 			pays: criteres.pays,
 			region: criteres.region,
@@ -136,11 +163,73 @@ function Filtres({
 		});
 	}, [bouteilles, criteres.type, criteres.pays, criteres.region, criteres.annee]);
 
+	const regionsDisponibles = useMemo(() => {
+		if (criteres.pays && options.regionsParPays) {
+			return options.regionsParPays[normaliserTexte(criteres.pays)] ?? options.regions;
+		}
+		return options.regions;
+	}, [criteres.pays, options.regionsParPays, options.regions]);
+
+	useEffect(() => {
+		setTexteRecherche(rechercheActuelle ?? "");
+		setModeRecherche(Boolean(rechercheActuelle));
+	}, [rechercheActuelle]);
+
+	useEffect(() => {
+		if (optionsExternes) {
+			setOptions((courant) => {
+				const prochain = { ...DEFAULT_OPTIONS, ...optionsExternes };
+				return sontOptionsEgales(courant, prochain) ? courant : prochain;
+			});
+			return;
+		}
+		if (bouteilles.length) {
+			setOptions((courant) => {
+				const prochain = extraireOptionsDepuisBouteilles(bouteilles);
+				return sontOptionsEgales(courant, prochain) ? courant : prochain;
+			});
+		}
+	}, [optionsExternes, bouteilles]);
+
+	const chargerOptionsDistantes = useCallback(async () => {
+		if (optionsExternes || bouteilles.length) return;
+		setChargementOptions(true);
+		try {
+			const donnees = chargerOptions
+				? await chargerOptions()
+				: await fetch(
+					`${import.meta.env.VITE_BACKEND_BOUTEILLES_URL}/options-filtres`,
+				).then((r) => (r.ok ? r.json() : null));
+			if (donnees) {
+				setOptions((courant) => {
+					const prochain = { ...DEFAULT_OPTIONS, ...donnees };
+					return sontOptionsEgales(courant, prochain) ? courant : prochain;
+				});
+			}
+		} catch (erreur) {
+			console.error("Erreur lors du chargement des options:", erreur);
+		} finally {
+			setChargementOptions(false);
+		}
+	}, [optionsExternes, bouteilles.length, chargerOptions]);
+
+	useEffect(() => {
+		chargerOptionsDistantes();
+	}, [chargerOptionsDistantes]);
+
+	useEffect(() => {
+		const aDesValeurs = Object.values(valeursInitialesCombinees).some(
+			(valeur) => valeur !== undefined && valeur !== null && valeur !== "",
+		);
+		if (aDesValeurs || rechercheActuelle) {
+			setEstOuvert(true);
+		}
+	}, [valeursInitialesCombinees, rechercheActuelle]);
+
 	const handleChange = (event) => {
 		const { name, value } = event.target;
 		setCriteres((precedent) => {
 			const nouveauxCriteres = { ...precedent, [name]: value };
-			// Si on change le pays, on réinitialise la région
 			if (name === "pays" && value !== precedent.pays) {
 				nouveauxCriteres.region = "";
 			}
@@ -150,13 +239,17 @@ function Filtres({
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
-		onFiltrer?.(resultats, criteres);
+		if (modeRecherche) {
+			onRecherche?.(texteRecherche, { nom: texteRecherche });
+			return;
+		}
+		const resultatsSoumis = bouteilles.length ? resultats : null;
+		onFiltrer?.(criteres, resultatsSoumis);
 	};
 
 	const handleSupprimerFiltre = (cle) => {
 		setCriteres((precedent) => {
 			const nouveauxCriteres = { ...precedent, [cle]: "" };
-			// Si on supprime le pays, on vide aussi la région
 			if (cle === "pays") {
 				nouveauxCriteres.region = "";
 			}
@@ -166,13 +259,19 @@ function Filtres({
 	};
 
 	const handleReinitialiser = () => {
-		setCriteres({
-			type: "",
-			pays: "",
-			region: "",
-			annee: "",
-		});
+		setCriteres(valeursInitialesCombinees);
+		setTexteRecherche("");
+		setModeRecherche(false);
 		onReinitialiserFiltres?.();
+	};
+
+	const handleBasculerRecherche = () => {
+		setModeRecherche(true);
+	};
+
+	const handleBasculerFiltres = () => {
+		setModeRecherche(false);
+		setTexteRecherche("");
 	};
 
 	const champSelects = [
@@ -190,30 +289,64 @@ function Filtres({
 		},
 		{
 			id: "region",
-			label: "Region",
+			label: "Région",
 			icone: <FaWarehouse className="text-principal-200" />,
-			options: regionOptions,
+			options: regionsDisponibles,
 		},
 	];
 
-	const handleBasculerRecherche = () => {
-		setModeRecherche(true);
-	};
-
-	const handleBasculerFiltres = () => {
-		setModeRecherche(false);
-	};
-
-	// Si on est en mode recherche, afficher le composant Recherche
 	if (modeRecherche) {
 		return (
-			<Recherche
-				bouteilles={bouteilles}
-				valeursInitiales={{}}
-				onRechercher={onRecherche}
-				onFiltrer={handleBasculerFiltres}
-				className={className}
-			/>
+			<section
+				className={`w-full max-w-[380px] bg-fond-secondaire border border-principal-100 rounded-(--arrondi-tres-grand) p-(--rythme-base) shadow-md flex flex-col gap-(--rythme-base) ${className}`}>
+				<header className="flex items-center justify-between text-(length:--taille-petit) font-semibold text-principal-200 uppercase">
+					<span className="flex items-center gap-2">
+						<FaSearch />
+						<span>Recherche</span>
+					</span>
+					<button
+						type="button"
+						onClick={handleBasculerFiltres}
+						className="flex items-center gap-2 px-4 text-principal-200 hover:text-principal-300 transition-colors"
+						aria-label="Retour aux filtres">
+						<FaFilter />
+					</button>
+				</header>
+
+				<form onSubmit={handleSubmit} className="flex flex-col gap-(--rythme-base)">
+					<div className="relative">
+						<input
+							type="text"
+							value={texteRecherche}
+							onChange={(e) => setTexteRecherche(e.target.value)}
+							placeholder="Rechercher un vin..."
+							className="w-full rounded-(--arrondi-grand) border border-principal-100 px-(--rythme-base) py-(--rythme-serre) pr-10 text-(length:--taille-normal) text-texte-secondaire focus:outline-none focus:border-principal-200"
+						/>
+						{texteRecherche && (
+							<button
+								type="button"
+								onClick={() => setTexteRecherche("")}
+								className="absolute right-3 top-1/2 -translate-y-1/2 text-principal-200 hover:text-erreur"
+								aria-label="Effacer la recherche">
+								<FaTimes />
+							</button>
+						)}
+					</div>
+
+					<div className="flex gap-(--rythme-serre)">
+						<Bouton texte="Rechercher" typeHtml="submit" taille="moyen" />
+						{aDesFiltresActifs && (
+							<Bouton
+								texte="Réinitialiser"
+								typeHtml="button"
+								taille="moyen"
+								type="secondaire"
+								action={handleReinitialiser}
+							/>
+						)}
+					</div>
+				</form>
+			</section>
 		);
 	}
 
@@ -252,20 +385,21 @@ function Filtres({
 					id={formulaireId}
 					className="flex flex-col gap-(--rythme-base)"
 					onSubmit={handleSubmit}>
-				{onTri && (
-					<button
-						type="button"
-						onClick={onTri}
-						className="flex items-center gap-2 text-(length:--taille-petit) text-principal-200 hover:text-principal-300 transition-colors">
-						<FaExchangeAlt/>
-						<span>{titreTri}</span>
-					</button>
-				)}
-				{champSelects.map((champ) => (
-					<div key={champ.id} className="flex flex-col gap-(--rythme-tres-serre)">
-						<label
-							htmlFor={champ.id}
-							className="flex items-center gap-2 text-(length:--taille-petit) text-texte-secondaire">
+					{onTri && (
+						<button
+							type="button"
+							onClick={onTri}
+							className="flex items-center gap-2 text-(length:--taille-petit) text-principal-200 hover:text-principal-300 transition-colors">
+							<FaExchangeAlt />
+							<span>{titreTri}</span>
+						</button>
+					)}
+
+					{champSelects.map((champ) => (
+						<div key={champ.id} className="flex flex-col gap-(--rythme-tres-serre)">
+							<label
+								htmlFor={champ.id}
+								className="flex items-center gap-2 text-(length:--taille-petit) text-texte-secondaire">
 								{champ.icone}
 								<span>{champ.label} :</span>
 							</label>
@@ -275,8 +409,11 @@ function Filtres({
 									name={champ.id}
 									value={criteres[champ.id]}
 									onChange={handleChange}
-									className="w-full rounded-(--arrondi-grand) border border-principal-100 px-(--rythme-base) py-(--rythme-tres-serre) pr-10 text-(length:--taille-normal) text-texte-secondaire focus:outline-none focus:border-principal-200">
-									<option value="">Choisissez</option>
+									disabled={chargementOptions}
+									className="w-full rounded-(--arrondi-grand) border border-principal-100 px-(--rythme-base) py-(--rythme-tres-serre) pr-10 text-(length:--taille-normal) text-texte-secondaire focus:outline-none focus:border-principal-200 disabled:opacity-50">
+									<option value="">
+										{chargementOptions ? "Chargement..." : "Choisissez"}
+									</option>
 									{(champ.options ?? []).map((option) => (
 										<option key={`${champ.id}-${formatString(option)}`} value={option}>
 											{option}
@@ -295,60 +432,64 @@ function Filtres({
 							</div>
 						</div>
 					))}
-				<div className="flex flex-col gap-(--rythme-tres-serre)">
-					<label
-						htmlFor="annee"
-						className="flex items-center gap-2 text-(length:--taille-petit) text-texte-secondaire">
+
+					<div className="flex flex-col gap-(--rythme-tres-serre)">
+						<label
+							htmlFor="annee"
+							className="flex items-center gap-2 text-(length:--taille-petit) text-texte-secondaire">
 							<MdOutlineCalendarMonth className="text-principal-200" />
 							<span>Année :</span>
 						</label>
-					<div className="relative">
-						<input
-							type="number"
-							id="annee"
-							name="annee"
-							min="1900"
-							max="2100"
-							list="liste-annees"
-							value={criteres.annee}
-							onChange={handleChange}
-							placeholder="Choisissez"
-							className="w-full rounded-(--arrondi-grand) border border-principal-100 px-(--rythme-base) py-(--rythme-tres-serre) pr-10 text-(length:--taille-normal) text-texte-secondaire focus:outline-none focus:border-principal-200"
-						/>
-						{criteres.annee && (
-							<button
-								type="button"
-								onClick={() => handleSupprimerFiltre("annee")}
-								className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-principal-200 hover:text-erreur transition-colors"
-								aria-label="Supprimer le filtre année">
-								<FaTimes className="w-3 h-3" />
-							</button>
-						)}
-					</div>
-					<datalist id="liste-annees">
-						{(options.annees ?? []).map((option) => (
-							<option key={`annee-${option}`} value={option} />
-						))}
-					</datalist>
-				</div>
-				<div className="flex flex-col gap-(--rythme-tres-serre)">
-					<p className="text-(length:--taille-petit) text-texte-secondaire">
-						{resultats.length} résultat{resultats.length > 1 ? "s" : ""} trouvé{resultats.length > 1 ? "s" : ""}
-					</p>
-					<div className="flex gap-(--rythme-serre)">
-						<Bouton texte={texteBouton} typeHtml="submit" taille="moyen" />
-						{aDesFiltresActifs && (
-							<Bouton 
-								texte="Réinitialiser" 
-								typeHtml="button" 
-								taille="moyen" 
-								type="secondaire"
-								action={handleReinitialiser}
+						<div className="relative">
+							<input
+								type="number"
+								id="annee"
+								name="annee"
+								min="1900"
+								max="2100"
+								list="liste-annees"
+								value={criteres.annee}
+								onChange={handleChange}
+								placeholder="Choisissez"
+								className="w-full rounded-(--arrondi-grand) border border-principal-100 px-(--rythme-base) py-(--rythme-tres-serre) pr-10 text-(length:--taille-normal) text-texte-secondaire focus:outline-none focus:border-principal-200"
 							/>
-						)}
+							{criteres.annee && (
+								<button
+									type="button"
+									onClick={() => handleSupprimerFiltre("annee")}
+									className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-principal-200 hover:text-erreur transition-colors"
+									aria-label="Supprimer le filtre année">
+									<FaTimes className="w-3 h-3" />
+								</button>
+							)}
+						</div>
+						<datalist id="liste-annees">
+							{(options.annees ?? []).map((option) => (
+								<option key={`annee-${option}`} value={option} />
+							))}
+						</datalist>
 					</div>
-				</div>
-			</form>
+
+					<div className="flex flex-col gap-(--rythme-tres-serre)">
+						{bouteilles.length > 0 && (
+							<p className="text-(length:--taille-petit) text-texte-secondaire">
+								{resultats.length} résultat{resultats.length > 1 ? "s" : ""} trouvé{resultats.length > 1 ? "s" : ""}
+							</p>
+						)}
+						<div className="flex gap-(--rythme-serre)">
+							<Bouton texte={texteBouton} typeHtml="submit" taille="moyen" />
+							{aDesFiltresActifs && (
+								<Bouton
+									texte="Réinitialiser"
+									typeHtml="button"
+									taille="moyen"
+									type="secondaire"
+									action={handleReinitialiser}
+								/>
+							)}
+						</div>
+					</div>
+				</form>
 			)}
 		</section>
 	);

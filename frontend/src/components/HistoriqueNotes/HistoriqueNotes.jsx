@@ -6,58 +6,51 @@ import MoyenneEtCompteurNotes from "@components/HistoriqueNotes/MoyenneEtCompteu
 import CarteNoteDegustation from "@components/HistoriqueNotes/CarteNoteDegustation/CarteNoteDegustation";
 import BoiteModaleNotes from "@components/boiteModaleNotes/boiteModaleNotes";
 import iconNotez from "@assets/images/evaluation.svg";
-import { recupererNotes, supprimerNote, traiterNotes } from "@lib/requetes";
+import { recupererNoteUtilisateur, supprimerNote } from "@lib/requetes";
 import authentificationStore from "@store/authentificationStore";
 
 function HistoriqueNotes({ id_bouteille }) {
   const utilisateur = authentificationStore((state) => state.utilisateur);
-  const [notes, setNotes] = useState([]);
-  //Si l'utilisateur a deja mis une note
+  // Si l'utilisateur a deja mis une note
   const [noteUtilisateur, setNoteUtilisateur] = useState(null);
-  //On est en cours de chargement des notes false ou true
+  // On est en cours de chargement des note false ou true
   const [chargement, setChargement] = useState(true);
-  // On affiche seulement 5 notes au chargement de la page.
-  const [nombreNotesAffichees, setNombreNotesAffichees] = useState(5);
   // État pour contrôler l'ouverture de la modale note
   const [estModaleNotezOuverte, setEstModaleNotezOuverte] = useState(false);
-  // Compteur pour forcer la régénération du composant MoyenneEtCompteurNotes
+  // Compteur pour forcer la régénération du composant MoyenneEtCompteurNote
   const [reactualiserComponent, setReactualiserComponent] = useState(0);
 
-  // On recupere les notes et on gere l'afichage durant le chargement.
+  // On recupere les note et on gere l'afichage durant le chargement.
   useEffect(() => {
-    const chargerNotes = async () => {
+    const chargerNote = async () => {
       setChargement(true);
-      const notesRecuperees = await recupererNotes(id_bouteille);
-      const idUtilisateurActuel = utilisateur?.id;
-      const { noteUtilisateur, autresNotes } = traiterNotes(
-        notesRecuperees,
-        idUtilisateurActuel
+      const noteRecupere = await recupererNoteUtilisateur(
+        utilisateur.id,
+        id_bouteille
       );
-      setNoteUtilisateur(noteUtilisateur);
-      setNotes(autresNotes);
+
+      setNoteUtilisateur(noteRecupere);
       setChargement(false);
     };
-    chargerNotes();
+    chargerNote();
   }, [id_bouteille, utilisateur?.id]);
 
-  // Fonction pour recharger les notes
-  const rechargerNotes = async () => {
+  // Fonction pour recharger la note
+  const rechargerNote = async () => {
     setChargement(true);
-    const notesRecuperees = await recupererNotes(id_bouteille);
-    const idUtilisateurActuel = utilisateur?.id;
-    const { noteUtilisateur, autresNotes } = traiterNotes(
-      notesRecuperees,
-      idUtilisateurActuel
+    const noteRecupere = await recupererNoteUtilisateur(
+      utilisateur.id,
+      id_bouteille
     );
-    setNoteUtilisateur(noteUtilisateur);
-    setNotes(autresNotes);
+
+    setNoteUtilisateur(noteRecupere);
     setChargement(false);
   };
 
-  // Fonction pour recharger les notes après modification
-  // L'API est gérée directement dans BoiteModaleNotes
+  // Fonction pour recharger les note après modification
+  // L'API est gérée directement dans BoiteModaleNote
   const gererModifierNote = async () => {
-    await rechargerNotes();
+    await rechargerNote();
     // Petit délai pour s'assurer que les données sont mises à jour avant de régénérer
     setTimeout(() => {
       setReactualiserComponent((prev) => prev + 1);
@@ -71,8 +64,8 @@ function HistoriqueNotes({ id_bouteille }) {
       id_bouteille: note.id_bouteille,
     });
     if (resultat.succes) {
-      // Recharger les notes après suppression
-      await rechargerNotes();
+      // Recharger les note après suppression
+      await rechargerNote();
       // Petit délai pour s'assurer que les données sont mises à jour avant de régénérer
       setTimeout(() => {
         setReactualiserComponent((prev) => prev + 1);
@@ -82,37 +75,21 @@ function HistoriqueNotes({ id_bouteille }) {
     }
   };
 
-  // Fonction pour afficher plus de notes
-  const afficherPlus = () => {
-    setNombreNotesAffichees((prev) => prev + 5);
-  };
-
   // Fonction pour ouvrir la modale de notation
   const ouvrirBoiteModaleNotez = () => {
     setEstModaleNotezOuverte(true);
   };
 
-  // Fonction pour fermer la modale et recharger les notes (ajout d'une note)
+  // Fonction pour fermer la modale et recharger les note (ajout d'une note)
   const fermerBoiteModaleNotez = async () => {
     setEstModaleNotezOuverte(false);
-    // Recharger les notes après fermeture pour vérifier si l'utilisateur a maintenant une note
-    await rechargerNotes();
+    // Recharger les note après fermeture pour vérifier si l'utilisateur a maintenant une note
+    await rechargerNote();
     // Petit délai pour s'assurer que les données sont mises à jour avant de régénérer
     setTimeout(() => {
       setReactualiserComponent((prev) => prev + 1);
     }, 100);
   };
-
-  // Limite l'affichage aux N premières notes selon nombreNotesAffichees
-  // Si nombreNotesAffichees = 5, on obtient les 5 premieres notes.
-  // Si nombreNotesAffichees = 10, on obtient les 10 premieres notes.
-  const notesAffichees = notes.slice(0, nombreNotesAffichees);
-  //
-  // Vérifie si toutes les notes sont affichées.
-  // Retourne true si le nombre de notes affichées est supérieur ou égal
-  // notes.length = 12, nombreNotesAffichees = 5 = false (il reste des notes)
-  // notes.length = 12, nombreNotesAffichees = 15 = true (toutes affichées)
-  const toutesNotesAffichees = nombreNotesAffichees >= notes.length;
 
   return (
     <section
@@ -153,40 +130,18 @@ function HistoriqueNotes({ id_bouteille }) {
           </div>
         )}
       </header>
-      {chargement ? (
-        <Spinner />
-      ) : noteUtilisateur || notes.length > 0 ? (
-        <>
-          {/* Note de l'utilisateur actuel en premier avec fond pâle */}
-          {noteUtilisateur && (
-            <div className="mb-(--rythme-base) bg-principal-100 rounded-(--arrondi-grand) p-(--rythme-tres-serre)">
-              <CarteNoteDegustation
-                note={noteUtilisateur}
-                estNoteUtilisateur={true}
-                onModifier={gererModifierNote}
-                onSupprimer={gererSupprimerNote}
-              />
-            </div>
-          )}
-          {/* Autres notes */}
-          {notesAffichees.map((note, index) => (
-            <CarteNoteDegustation
-              key={index}
-              note={note}
-              estNoteUtilisateur={false}
-            />
-          ))}
-          {!toutesNotesAffichees && (
-            // Max 5 de plus a chaque clics
-            <Bouton
-              texte="Voir plus"
-              type="secondaire"
-              action={afficherPlus}
-              typeHtml="button"
-            />
-          )}
-        </>
-      ) : (
+      {chargement && <Spinner />}
+      {noteUtilisateur && (
+        <div className="mb-(--rythme-base) p-(--rythme-tres-serre)">
+          <CarteNoteDegustation
+            note={noteUtilisateur}
+            estNoteUtilisateur={true}
+            onModifier={gererModifierNote}
+            onSupprimer={gererSupprimerNote}
+          />
+        </div>
+      )}
+      {!noteUtilisateur &&(
         <Message type="information" texte="Aucune note disponible" />
       )}
       {/* Modale pour ajouter une note */}

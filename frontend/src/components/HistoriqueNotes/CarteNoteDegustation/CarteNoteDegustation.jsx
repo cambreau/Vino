@@ -17,7 +17,7 @@ const CarteNoteDegustation = ({
   const commentaire = note.commentaire || "";
   const dateNote =
     note.date_degustation || note.date_creation || note.date || "";
-  const nomUtilisateur = note.nom_utilisateur || note.nom || "Utilisateur";
+  // const nomUtilisateur = note.nom_utilisateur || note.nom || "Utilisateur";
 
   // Formater la date
   const formaterDate = (dateString) => {
@@ -89,7 +89,7 @@ const CarteNoteDegustation = ({
           <div>
             <header className="flex justify-between items-center mb-(--rythme-tres-serre)">
               <h3 className="text-(length:--taille-normal) font-semibold text-principal-300">
-                {nomUtilisateur}
+                Vous
               </h3>
               {/* Étoiles pour la notation */}
               <div className="flex justify-center items-center gap-(--rythme-serre)">

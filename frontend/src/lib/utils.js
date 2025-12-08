@@ -3,7 +3,8 @@
  * @param {string} nomString
  * @returns {string}
  */
-import { useEffect } from "react";
+import { useEffect, useReducer } from "react";
+
 
 export const formatString = (nomString) => {
 	// Faire une copie du string dans une nouvelle constante
@@ -283,3 +284,38 @@ export const rechercherBouteilles = (bouteilles = [], criteres = {}) => {
 	});
 };
 
+/**=========================================
+/**=========================================
+ * Hook :  GestionListeAchat et Messages
+ * @returns {Object} { etat, dispatch, ACTIONS }
+ */
+
+const creerEtatInitial = () => ({
+  message: { texte: "", type: "" },
+});
+
+export const ACTIONS = {
+  RESET: "reset",
+  INIT_SUCCESS: "init_success",
+  INIT_ERROR: "init_error",
+  LOAD_MORE_START: "load_more_start",
+  LOAD_MORE_SUCCESS: "load_more_success",
+  LOAD_MORE_ERROR: "load_more_error",
+  SET_MESSAGE: "set_message",
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case ACTIONS.SET_MESSAGE:
+      return { ...state, message: action.payload };
+    case ACTIONS.RESET:
+      return creerEtatInitial();
+    default:
+      return state;
+  }
+};
+
+export const useListeAchat = () => {
+  const [etat, dispatch] = useReducer(reducer, undefined, creerEtatInitial);
+  return { etat, dispatch, ACTIONS };
+};
