@@ -61,34 +61,13 @@ const CarteBouteille = ({
      * ------------------------------ */
     if (type === "catalogue") {
       return (
-        <div className="grid grid-cols-[1fr_auto] gap-4 w-full items-center">
+        <div className="grid grid-cols-[1fr_auto] w-full items-center">
           <Bouton
             texte={disabled ? "Déjà dans le cellier" : "Ajouter au cellier"}
             type="secondaire"
             action={ouvrirBoiteModaleAjout}
             disabled={disabled}
           />
-
-          <GestionListeAchat
-            bouteille={bouteille}
-            dispatch={dispatch}
-            ACTIONS={ACTIONS}
-          >
-            {({ gererAjouterListe, dansListe }) => (
-              <Bouton
-                variante="icone"
-                icone={<IconCarnet size={20} />}
-                action={gererAjouterListe}
-                disabled={disabled}
-                className={
-                  "transition-colors " +
-                  (dansListe
-                    ? "bg-principal-200 text-principal-100"
-                    : "bg-principal-100 text-principal-300")
-                }
-              />
-            )}
-          </GestionListeAchat>
         </div>
       );
     }
@@ -201,7 +180,7 @@ const CarteBouteille = ({
 
   return (
     <div className="relative flex flex-col justify-between bg-fond-secondaire p-(--rythme-serre) rounded-(--arrondi-grand) shadow-md min-h-80">
-      {type === "cellier" && (
+
         <div className="absolute top-(--rythme-tres-serre) left-(--rythme-tres-serre) z-10">
           <GestionListeAchat
             bouteille={bouteille}
@@ -224,8 +203,7 @@ const CarteBouteille = ({
             )}
           </GestionListeAchat>
         </div>
-      )}
-
+ 
       {/* Badge moyenne + nombre de notes en haut à droite */}
       <div className="absolute top-(--rythme-tres-serre) right-(--rythme-tres-serre) z-10">
         <MoyenneEtCompteurNotes
