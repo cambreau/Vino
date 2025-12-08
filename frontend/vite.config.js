@@ -45,10 +45,6 @@ export default defineConfig({
           if (id.includes("node_modules/zustand")) {
             return "vendor-zustand";
           }
-          // Séparer Lottie (chargé en lazy)
-          if (id.includes("node_modules/lottie-react") || id.includes("node_modules/lottie-web")) {
-            return "vendor-lottie";
-          }
         },
       },
     },
@@ -57,6 +53,6 @@ export default defineConfig({
   },
   // Optimiser les dépendances pour le dev
   optimizeDeps: {
-    include: ["react", "react-dom", "react-router-dom", "zustand", "lottie-react"],
+    include: ["react", "react-dom", "react-router-dom", "zustand"],
   },
 });
