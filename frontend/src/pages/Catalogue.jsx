@@ -5,13 +5,13 @@ import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
 import CarteBouteille from "@components/carte/CarteBouteille";
 import Message from "@components/components-partages/Message/Message";
 import NonTrouver from "@components/components-partages/NonTrouver/NonTrouverLazy";
-import Spinner from "@components/components-partages/Spinner/Spinner";
 import Filtres from "@components/components-partages/Filtre/Filtre";
 
 import authentificationStore from "@store/authentificationStore";
 import listeAchatStore from "@store/listeAchatStore";
 import { useDocumentTitle, useListeAchat } from "@lib/utils.js";
 import { useCatalogue } from "@lib/useCatalogue";
+import Spinner from "../components/components-partages/Spinner/Spinner";
 
 function Catalogue() {
   useDocumentTitle("Catalogue");
@@ -26,7 +26,7 @@ function Catalogue() {
   }, [utilisateur?.id, chargerListeAchat]);
 
   //============  Hook pour gérer l'état et les messages de la liste d'achat
-  const {etat: etatListeAchat, dispatch, ACTIONS } = useListeAchat();
+  const { etat: etatListeAchat, dispatch, ACTIONS } = useListeAchat();
 
   const {
     mainRef,
@@ -43,7 +43,14 @@ function Catalogue() {
     handleReinitialiserFiltres,
   } = useCatalogue(utilisateur?.id);
 
-  const { chargementInitial, message, scrollLoading, hasMore, bouteilles, total } = etat;
+  const {
+    chargementInitial,
+    message,
+    scrollLoading,
+    hasMore,
+    bouteilles,
+    total,
+  } = etat;
   const messageListeVide = filtresActifs
     ? "Aucune bouteille ne correspond à vos critères"
     : "Aucune bouteille disponible";
@@ -80,8 +87,7 @@ function Catalogue() {
         </h1>
 
         <section className="pt-(--rythme-espace) px-(--rythme-serre)">
-
-        {/* Message d'ajout/suppression de la liste d'achat */}
+          {/* Message d'ajout/suppression de la liste d'achat */}
           {etatListeAchat.message.texte && (
             <div className="mb-(--rythme-base)">
               <Message
@@ -89,9 +95,11 @@ function Catalogue() {
                 texte={etatListeAchat.message.texte}
               />
             </div>
-        )}
+          )}
 
-          {message.texte && <Message texte={message.texte} type={message.type} />}
+          {message.texte && (
+            <Message texte={message.texte} type={message.type} />
+          )}
 
           {/* Filtres - centrés sur mobile et tablette, en colonne jusqu'à xl */}
           <div className="flex flex-col items-center gap-(--rythme-base) mb-(--rythme-espace)">
@@ -112,50 +120,60 @@ function Catalogue() {
             />
             {total > 0 && (
               <p className="text-(length:--taille-petit) text-texte-secondaire text-center">
-                {total} bouteille{total > 1 ? "s" : ""} trouvée{total > 1 ? "s" : ""}
+                {total} bouteille{total > 1 ? "s" : ""} trouvée
+                {total > 1 ? "s" : ""}
               </p>
             )}
           </div>
 
           {/* Grille des bouteilles */}
           <div>
-
-              {chargementInitial ? (
-                <div className="flex justify-center items-center py-(--rythme-espace)">
-                  <Spinner size={220} ariaLabel="Chargement du catalogue de bouteilles" />
+            {chargementInitial ? (
+              <div className="flex justify-center items-center py-(--rythme-espace)">
+                <Spinner
+                  size={220}
+                  ariaLabel="Chargement du catalogue de bouteilles"
+                />
+              </div>
+            ) : bouteilles.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {bouteilles.map((b, index) => (
+                    <Link key={b.id} to={`/bouteilles/${b.id}`}>
+                      <CarteBouteille
+                        bouteille={b}
+                        type="catalogue"
+                        priority={index < 4} // Priorité pour les 4 premières images (LCP)
+                        dispatch={dispatch}
+                        ACTIONS={ACTIONS}
+                      />
+                    </Link>
+                  ))}
                 </div>
-              ) : bouteilles.length > 0 ? (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {bouteilles.map((b, index) => (
-                      <Link key={b.id} to={`/bouteilles/${b.id}`}>
-                        <CarteBouteille
-                          bouteille={b}
-                          type="catalogue"
-                          priority={index < 4} // Priorité pour les 4 premières images (LCP)
-                          dispatch={dispatch}
-                          ACTIONS={ACTIONS}
-                        />
-                      </Link>
-                    ))}
+
+                {hasMore && (
+                  <div
+                    ref={sentinelRef}
+                    className="h-4 w-full"
+                    aria-hidden="true"
+                  />
+                )}
+
+                {scrollLoading && (
+                  <div className="flex justify-center py-(--rythme-base)">
+                    <Spinner
+                      size={140}
+                      ariaLabel="Chargement de nouvelles bouteilles"
+                    />
                   </div>
-
-                  {hasMore && (
-                    <div ref={sentinelRef} className="h-4 w-full" aria-hidden="true" />
-                  )}
-
-                  {scrollLoading && (
-                    <div className="flex justify-center py-(--rythme-base)">
-                      <Spinner size={140} ariaLabel="Chargement de nouvelles bouteilles" />
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="flex justify-center py-(--rythme-espace)">
-                  <NonTrouver size={180} message={messageListeVide} />
-                </div>
-              )}
-            </div>
+                )}
+              </>
+            ) : (
+              <div className="flex justify-center py-(--rythme-espace)">
+                <NonTrouver size={180} message={messageListeVide} />
+              </div>
+            )}
+          </div>
         </section>
       </main>
 
