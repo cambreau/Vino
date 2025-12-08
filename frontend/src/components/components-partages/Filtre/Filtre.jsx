@@ -6,16 +6,16 @@ import {
 	normaliserTexte,
 } from "@lib/utils";
 import {
-	FaFilter,
-	FaExchangeAlt,
-	FaWarehouse,
-	FaChevronDown,
-	FaSearch,
-	FaTimes,
-} from "react-icons/fa";
-import { GiGrapes } from "react-icons/gi";
-import { BiWorld } from "react-icons/bi";
-import { MdOutlineCalendarMonth } from "react-icons/md";
+	IconFiltre,
+	IconEchange,
+	IconEntrepot,
+	IconChevronBas,
+	IconRecherche,
+	IconFermerX,
+	IconRaisins,
+	IconMonde,
+	IconCalendrier,
+} from "@components/components-partages/Icon/SvgIcons";
 
 const DEFAULT_OPTIONS = {
 	types: [],
@@ -23,14 +23,6 @@ const DEFAULT_OPTIONS = {
 	regions: [],
 	annees: [],
 	regionsParPays: {},
-};
-
-const sontCriteresEgaux = (a = {}, b = {}) => {
-	const cles = new Set([...Object.keys(a), ...Object.keys(b)]);
-	for (const cle of cles) {
-		if ((a?.[cle] ?? "") !== (b?.[cle] ?? "")) return false;
-	}
-	return true;
 };
 
 const sontOptionsEgales = (a = DEFAULT_OPTIONS, b = DEFAULT_OPTIONS) => {
@@ -278,19 +270,19 @@ function Filtres({
 		{
 			id: "type",
 			label: "Type",
-			icone: <GiGrapes className="text-principal-200" />,
+			icone: <IconRaisins className="text-principal-200" />,
 			options: options.types,
 		},
 		{
 			id: "pays",
 			label: "Pays",
-			icone: <BiWorld className="text-principal-200" />,
+			icone: <IconMonde className="text-principal-200" />,
 			options: options.pays,
 		},
 		{
 			id: "region",
 			label: "Région",
-			icone: <FaWarehouse className="text-principal-200" />,
+			icone: <IconEntrepot className="text-principal-200" />,
 			options: regionsDisponibles,
 		},
 	];
@@ -301,7 +293,7 @@ function Filtres({
 				className={`w-full max-w-[380px] bg-fond-secondaire border border-principal-100 rounded-(--arrondi-tres-grand) p-(--rythme-base) shadow-md flex flex-col gap-(--rythme-base) ${className}`}>
 				<header className="flex items-center justify-between text-(length:--taille-petit) font-semibold text-principal-200 uppercase">
 					<span className="flex items-center gap-2">
-						<FaSearch />
+						<IconRecherche />
 						<span>Recherche</span>
 					</span>
 					<button
@@ -309,7 +301,7 @@ function Filtres({
 						onClick={handleBasculerFiltres}
 						className="flex items-center gap-2 px-4 text-principal-200 hover:text-principal-300 transition-colors"
 						aria-label="Retour aux filtres">
-						<FaFilter />
+						<IconFiltre />
 					</button>
 				</header>
 
@@ -328,7 +320,7 @@ function Filtres({
 								onClick={() => setTexteRecherche("")}
 								className="absolute right-3 top-1/2 -translate-y-1/2 text-principal-200 hover:text-erreur"
 								aria-label="Effacer la recherche">
-								<FaTimes />
+								<IconFermerX />
 							</button>
 						)}
 					</div>
@@ -362,10 +354,10 @@ function Filtres({
 					aria-expanded={estOuvert}
 					aria-controls={formulaireId}>
 					<span className="flex items-center gap-2">
-						<FaFilter />
+						<IconFiltre />
 						<span>{titreFiltrer}</span>
 					</span>
-					<FaChevronDown
+					<IconChevronBas
 						className={`transition-transform duration-200 ${
 							estOuvert ? "rotate-180" : ""
 						}`}
@@ -377,7 +369,7 @@ function Filtres({
 					onClick={handleBasculerRecherche}
 					className="flex items-center gap-2 px-4 text-principal-200 hover:text-principal-300 transition-colors"
 					aria-label="Rechercher">
-					<FaSearch />
+					<IconRecherche />
 				</button>
 			</header>
 			{estOuvert && (
@@ -390,7 +382,7 @@ function Filtres({
 							type="button"
 							onClick={onTri}
 							className="flex items-center gap-2 text-(length:--taille-petit) text-principal-200 hover:text-principal-300 transition-colors">
-							<FaExchangeAlt />
+							<IconEchange />
 							<span>{titreTri}</span>
 						</button>
 					)}
@@ -426,7 +418,7 @@ function Filtres({
 										onClick={() => handleSupprimerFiltre(champ.id)}
 										className="absolute right-8 top-1/2 -translate-y-1/2 p-1 text-principal-200 hover:text-erreur transition-colors"
 										aria-label={`Supprimer le filtre ${champ.label}`}>
-										<FaTimes className="w-3 h-3" />
+										<IconFermerX className="w-3 h-3" />
 									</button>
 								)}
 							</div>
@@ -437,7 +429,7 @@ function Filtres({
 						<label
 							htmlFor="annee"
 							className="flex items-center gap-2 text-(length:--taille-petit) text-texte-secondaire">
-							<MdOutlineCalendarMonth className="text-principal-200" />
+							<IconCalendrier className="text-principal-200" />
 							<span>Année :</span>
 						</label>
 						<div className="relative">
@@ -459,7 +451,7 @@ function Filtres({
 									onClick={() => handleSupprimerFiltre("annee")}
 									className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-principal-200 hover:text-erreur transition-colors"
 									aria-label="Supprimer le filtre année">
-									<FaTimes className="w-3 h-3" />
+									<IconFermerX className="w-3 h-3" />
 								</button>
 							)}
 						</div>

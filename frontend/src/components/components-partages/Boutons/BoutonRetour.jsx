@@ -1,4 +1,4 @@
-import { FiArrowLeft } from "react-icons/fi";
+import { IconFlecheGauche } from "@components/components-partages/Icon/SvgIcons";
 import { useNavigate } from "react-router-dom";
 
 function BoutonRetour() {
@@ -21,7 +21,7 @@ function BoutonRetour() {
       "
       onClick={revenirEnArriere}
     >
-      <FiArrowLeft size={24} color="var(--color-texte-premier)" />
+      <IconFlecheGauche size={24} color="var(--color-texte-premier)" />
     </button>
   );
 }

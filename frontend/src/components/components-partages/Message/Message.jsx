@@ -1,4 +1,9 @@
-import { MdError, MdCheckCircle, MdInfo, MdClose } from "react-icons/md";
+import {
+  IconErreur,
+  IconSucces,
+  IconInfo,
+  IconFermerX,
+} from "@components/components-partages/Icon/SvgIcons";
 
 function Message({
   texte,
@@ -34,11 +39,11 @@ function Message({
 
     switch (type) {
       case "erreur":
-        return <MdError size={iconTaille} className={iconClasse} />;
+        return <IconErreur size={iconTaille} className={iconClasse} />;
       case "succes":
-        return <MdCheckCircle size={iconTaille} className={iconClasse} />;
+        return <IconSucces size={iconTaille} className={iconClasse} />;
       default:
-        return <MdInfo size={iconTaille} className={iconClasse} />;
+        return <IconInfo size={iconTaille} className={iconClasse} />;
     }
   };
 
@@ -57,7 +62,7 @@ function Message({
             className="hover:opacity-75 transition-opacity cursor-pointer"
             aria-label="Fermer le message"
           >
-            <MdClose size={20} />
+            <IconFermerX size={20} />
           </button>
         )}
       </div>
