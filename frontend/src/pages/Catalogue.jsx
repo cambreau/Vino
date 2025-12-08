@@ -4,6 +4,7 @@ import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
 import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
 import CarteBouteille from "@components/carte/CarteBouteille";
 import Message from "@components/components-partages/Message/Message";
+import Toast from "@components/components-partages/Toast/Toast";
 import NonTrouver from "@components/components-partages/NonTrouver/NonTrouver";
 import Filtres from "@components/components-partages/Filtre/Filtre";
 
@@ -86,17 +87,17 @@ function Catalogue() {
           Catalogue des vins
         </h1>
 
-        <section className="pt-(--rythme-espace) px-(--rythme-serre)">
-          {/* Message d'ajout/suppression de la liste d'achat */}
-          {etatListeAchat.message.texte && (
-            <div className="mb-(--rythme-base)">
-              <Message
-                type={etatListeAchat.message.type}
-                texte={etatListeAchat.message.texte}
-              />
-            </div>
-          )}
+        {/* Toast de confirmation ajout/suppression de la liste d'achat */}
+        {etatListeAchat.message.texte && (
+          <Toast
+            type={etatListeAchat.message.type}
+            texte={etatListeAchat.message.texte}
+            duree={3000}
+            onFerme={() => dispatch({ type: ACTIONS.RESET })}
+          />
+        )}
 
+        <section className="pt-(--rythme-espace) px-(--rythme-serre)">
           {message.texte && (
             <Message texte={message.texte} type={message.type} />
           )}
