@@ -7,12 +7,17 @@ import {
   supprimerCellier,
   recupererTousCelliers,
   recupererCellier,
+  recupererNomCellier,
+
 } from "../controllers/controller.cellier.js";
 
 // Récupérer tous les celliers d'un utilisateur
 router.get("/", recupererTousCelliers); // tous les celliers (avec query param id_utilisateur)
 // Récupérer un cellier par son id
 router.get("/:id_cellier", recupererCellier);
+
+// Verifier un cellier par nom
+router.post("/:id_utilisateur/cellierNom", recupererNomCellier);
 
 // Ajouter un cellier
 router.post("/:id_utilisateur", ajouterCellier);
