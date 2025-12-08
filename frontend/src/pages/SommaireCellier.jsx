@@ -8,6 +8,7 @@ import {
   creerCellier,
   modifierCellier,
   supprimerCellier,
+  recupererNomCellier,
 } from "@lib/requetes.js";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import FormulaireInput from "@components/components-partages/Formulaire/FormulaireInput/FormulaireInput";
@@ -38,6 +39,8 @@ function SommaireCellier() {
   const [estModaleSuppresionOuverte, setEstModaleSuppressionOuverte] =
     useState(false);
   const [cellierASupprimer, setCellierASupprimer] = useState(null);
+  // Verier si le nom du cellier existe
+  const [nomExistant, setnomExistant] = useState(null);
 
   //**** Fonctions charger les celliers */
   // Fonction pour charger les celliers
@@ -64,14 +67,24 @@ function SommaireCellier() {
   const fermerModaleAjout = () => {
     setEstModaleAjoutOuverte(false);
     setNomCellier("");
+    setnomExistant("");
   };
 
   // Fonction pour creer le cellier avec le nom
   const creerCellierAvecNom = async () => {
-    const resultat = await creerCellier(idUtilisateur, nomCellier);
-    if (resultat.succes) {
-      await chargerCelliers();
-      fermerModaleAjout();
+    const verifierCellierExiste = await recupererNomCellier(
+      idUtilisateur,
+      nomCellier
+    );
+
+    if (verifierCellierExiste === "Ce nom est disponible") {
+      const resultat = await creerCellier(idUtilisateur, nomCellier);
+      if (resultat.succes) {
+        await chargerCelliers();
+        fermerModaleAjout();
+      }
+    } else {
+      setnomExistant(verifierCellierExiste);
     }
   };
 
@@ -195,7 +208,11 @@ function SommaireCellier() {
             <BoiteModale
               texte="Créer un nouveau cellier"
               contenu={
-                <>
+                <div className="flex flex-col">
+                  {/* Message si aucun cellier */}
+                  {nomExistant === "Un cellier avec ce nom existe déjà" && (
+                    <Message type="information" texte={nomExistant} />
+                  )}
                   <FormulaireInput
                     type="text"
                     nom="nom du cellier"
@@ -206,7 +223,7 @@ function SommaireCellier() {
                     value={nomCellier}
                     onChange={(e) => setNomCellier(e.target.value)}
                   />
-                </>
+                </div>
               }
               bouton={
                 <>
