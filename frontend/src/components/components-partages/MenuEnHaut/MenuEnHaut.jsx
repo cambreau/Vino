@@ -67,14 +67,14 @@ function MenuEnHaut({}) {
         {/* Ombre */}
         {estMenuOuvert && (
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-[1px] transition-opacity duration-200"
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-[1px] transition-opacity duration-200"
             onClick={() => setestMenuOuvert(false)}
           />
         )}
 
         {/* Menu déroulant */}
         {estMenuOuvert && (
-          <div className="absolute z-10 -left-(--rythme-base) mt-(--rythme-tres-serre) p-(--rythme-base) h-screen min-w-[300px] bg-fond-secondaire shadow-xl rounded-r-(--arrondi-grand) flex flex-col gap-(--rythme-base) transition-transform duration-200">
+          <div className="absolute z-50 -left-(--rythme-base) mt-(--rythme-tres-serre) p-(--rythme-base) h-screen min-w-[300px] bg-fond-secondaire shadow-xl rounded-r-(--arrondi-grand) flex flex-col gap-(--rythme-base) transition-transform duration-200">
             <div className="flex justify-between mb-(--rythme-espace)">
               <header>
                 <h2 className="text-texte-premier text-(length:--taille-grand) font-display font-bold">
