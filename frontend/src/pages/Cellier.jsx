@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 import MenuEnHaut from "@components/components-partages/MenuEnHaut/MenuEnHaut";
 import MenuEnBas from "@components/components-partages/MenuEnBas/MenuEnBas";
+import BoutonRetour from "@components/components-partages/Boutons/BoutonRetour";
 import Bouton from "@components/components-partages/Boutons/Bouton";
 import Message from "@components/components-partages/Message/Message";
 import CarteBouteille from "@components/carte/CarteBouteille";
@@ -24,7 +25,6 @@ import {
 import authentificationStore from "@store/authentificationStore";
 import listeAchatStore from "@store/listeAchatStore";
 
-
 function Cellier() {
   const navigate = useNavigate();
   // Récupérer id du cellier dans l'URL
@@ -41,7 +41,7 @@ function Cellier() {
 
   //============  Hook pour gérer l'état et les messages de la liste d'achat
   const { etat, dispatch, ACTIONS } = useListeAchat();
-  
+
   // Etat pour le cellier : nom
   const [cellier, setCellier] = useState({
     nom: "",
@@ -269,6 +269,7 @@ function Cellier() {
 
       <main className="bg-fond overflow-y-auto">
         <section className="pt-(--rythme-espace) pb-(--rythme-base) px-(--rythme-serre)">
+          <BoutonRetour />
           <h1 className="text-(length:--taille-grand) text-center font-display font-semibold text-principal-300">
             Cellier - {cellier.nom}
           </h1>
@@ -277,13 +278,10 @@ function Cellier() {
             {/* Affiche le message de GestionListeAchat */}
             {etat.message.texte && (
               <div className="mb-(--rythme-base)">
-                <Message
-                  type={etat.message.type}
-                  texte={etat.message.texte}
-                />
+                <Message type={etat.message.type} texte={etat.message.texte} />
               </div>
-            )} 
-            
+            )}
+
             {messageAction.texte && (
               <div className="mb-(--rythme-base)">
                 <Message
@@ -303,7 +301,9 @@ function Cellier() {
                   <Filtres
                     bouteilles={bouteillesCellier}
                     filtresActuels={criteresFiltres}
-                    rechercheActuelle={modeRecherche ? criteresFiltres.nom || "" : ""}
+                    rechercheActuelle={
+                      modeRecherche ? criteresFiltres.nom || "" : ""
+                    }
                     onFiltrer={handleFiltrer}
                     onRecherche={handleRecherche}
                     onTri={handleTri}
@@ -327,7 +327,7 @@ function Cellier() {
                           onDiminuer={handleDiminuer}
                           disabled={bouteillesEnTraitement.has(bouteille.id)}
                           aNote={bouteillesNotees.has(bouteille.id)}
-                           dispatch={dispatch}
+                          dispatch={dispatch}
                           ACTIONS={ACTIONS}
                         />
                       </Link>
