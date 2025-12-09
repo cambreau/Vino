@@ -172,9 +172,9 @@ const gererAjouterCellier = async (idBouteille, idCellier, variation = 1) => {
         </header>
 
         <main className="bg-fond overflow-y-auto">
-          <div className="flex flex-col items-center justify-center min-h-[400px] gap-(--rythme-base) p-(--rythme-base)">
+          <div className="flex flex-col items-center min-h-[400px] gap-(--rythme-base) p-(--rythme-base)">
             <Message
-              type="information"
+              type="erreur"
               texte="Veuillez vous connecter pour accéder à votre liste d'achat."
             />
             <Bouton
